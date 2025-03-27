@@ -7,8 +7,9 @@ import { Section, SectionHeader, Loader, EmptyState, ErrorState } from "@/compon
 import { getProductByHandle, formatPrice } from "@/lib/api";
 import { Product, ProductVariant } from "@/types";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Heart, Share2, ShoppingBag, ChevronRight } from "lucide-react";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useCart } from "@/contexts/CartContext";
 
 export default function ProductDetail() {
   const { handle } = useParams<{ handle: string }>();
@@ -18,7 +19,8 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const { toast } = useToast();
+  const { addToWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -49,31 +51,29 @@ export default function ProductDetail() {
     fetchProduct();
   }, [handle]);
 
-  const addToCart = () => {
+  const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
     
-    toast({
-      title: "Added to cart",
-      description: `${product.title} (${selectedVariant.title}) - Quantity: ${quantity}`,
-    });
+    addToCart(product, selectedVariant, quantity);
   };
 
-  const addToWishlist = () => {
+  const handleAddToWishlist = () => {
     if (!product) return;
     
-    toast({
-      title: "Added to wishlist",
-      description: product.title,
-    });
+    addToWishlist(product);
   };
 
   const shareProduct = () => {
     if (!product) return;
     
-    toast({
-      title: "Share product",
-      description: "Share functionality coming soon!",
-    });
+    // This is a placeholder for share functionality
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => {
+        alert("Link copied to clipboard");
+      })
+      .catch(err => {
+        console.error('Could not copy text: ', err);
+      });
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,6 +117,7 @@ export default function ProductDetail() {
   }
 
   const { title, body_html, vendor, images, variants, options } = product;
+  const productInWishlist = isInWishlist(product.id);
   
   const getBreadcrumbs = () => {
     if (!product.product_category) return [];
@@ -288,7 +289,7 @@ export default function ProductDetail() {
             
             <div className="flex gap-4">
               <button
-                onClick={addToCart}
+                onClick={handleAddToCart}
                 className="flex-1 bg-primary text-white py-3 rounded-md font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
               >
                 <ShoppingBag className="h-5 w-5" />
@@ -296,10 +297,13 @@ export default function ProductDetail() {
               </button>
               
               <button
-                onClick={addToWishlist}
-                className="w-12 h-12 border border-gray-200 rounded-md flex items-center justify-center text-dark hover:text-primary transition-colors"
+                onClick={handleAddToWishlist}
+                className={cn(
+                  "w-12 h-12 border border-gray-200 rounded-md flex items-center justify-center transition-colors",
+                  productInWishlist ? "text-primary" : "text-dark hover:text-primary"
+                )}
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5" fill={productInWishlist ? "currentColor" : "none"} />
               </button>
               
               <button

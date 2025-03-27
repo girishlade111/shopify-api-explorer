@@ -44,7 +44,9 @@ export function ProductCard({ product, className, featured = false }: ProductCar
     return null;
   };
   
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const defaultVariant = getDefaultVariant();
     if (defaultVariant) {
       addToCart(product, defaultVariant, 1);
@@ -113,13 +115,18 @@ export function ProductCard({ product, className, featured = false }: ProductCar
             >
               <Heart size={18} fill={productInWishlist ? "currentColor" : "none"} />
             </button>
-            <Link 
-              to={`/products/${product.handle}`}
+            
+            <button 
               className="w-9 h-9 rounded-full bg-white shadow-soft flex items-center justify-center text-dark hover:text-primary transition-colors"
               aria-label="Quick view"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `/products/${product.handle}`;
+              }}
             >
               <Eye size={18} />
-            </Link>
+            </button>
           </div>
           
           {/* Product vendor badge */}

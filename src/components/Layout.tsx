@@ -86,25 +86,33 @@ export function Layout({ children }: LayoutProps) {
             <div className="flex items-center gap-4">
               <button 
                 onClick={handleWishlistClick}
-                className="flex items-center gap-1 p-2 hover:text-primary transition-colors rounded-full"
+                className="relative p-2 hover:text-primary transition-colors rounded-full"
                 aria-label="Wishlist"
               >
                 <Heart className="h-5 w-5" />
-                <span className="text-sm font-medium">{wishlistCount}</span>
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
               </button>
               
               <button 
                 onClick={handleCartClick}
-                className="flex items-center gap-1 p-2 hover:text-primary transition-colors rounded-full"
+                className="relative p-2 hover:text-primary transition-colors rounded-full"
                 aria-label="Shopping Bag"
               >
                 <ShoppingBag className="h-5 w-5" />
-                <span className="text-sm font-medium">{cartCount}</span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
               </button>
               
               <button 
                 onClick={handleAccountClick}
-                className="flex items-center p-2 hover:text-primary transition-colors rounded-full"
+                className="p-2 hover:text-primary transition-colors rounded-full"
                 aria-label="Account"
               >
                 <User className="h-5 w-5" />
