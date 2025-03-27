@@ -52,7 +52,14 @@ export default function CategoryPage() {
     setError(null);
     
     try {
-      const formattedCategory = category.replace(/-/g, " ");
+      // Extract the last part of the category path for the API call
+      const categoryParts = category.split("/");
+      const lastCategory = categoryParts[categoryParts.length - 1];
+      
+      // Replace hyphens with spaces for the API call
+      const formattedCategory = lastCategory.replace(/-/g, " ");
+      console.log("Fetching products for category:", formattedCategory);
+      
       const response = await getProductsByCategory(
         formattedCategory,
         page,
@@ -61,7 +68,12 @@ export default function CategoryPage() {
         selectedSort.order
       );
       
-      setProducts(response.items);
+      if (page === 1) {
+        setProducts(response.items);
+      } else {
+        setProducts(prev => [...prev, ...response.items]);
+      }
+      
       setTotalProducts(response.total);
       setTotalPages(response.pages);
       setCurrentPage(response.page);
@@ -232,9 +244,11 @@ export default function CategoryPage() {
           {/* Main Content */}
           <div className="md:col-span-9">
             {/* Products count */}
-            <div className="text-sm text-muted mb-6">
-              Showing {products.length} of {totalProducts} products
-            </div>
+            {!loading && !error && products.length > 0 && (
+              <div className="text-sm text-muted mb-6">
+                Showing {products.length} of {totalProducts} products
+              </div>
+            )}
             
             <ProductGrid
               products={products}

@@ -79,6 +79,8 @@ export const getProductsByCategory = async (
   if (sortBy) params.append("sort_by", sortBy);
   if (sortOrder) params.append("sort_order", sortOrder);
   
+  console.log(`Fetching category products: ${categoryName}, URL: ${API_BASE_URL}/store/categories/${encodeURIComponent(categoryName)}/products`);
+  
   const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryName)}/products?${params}`);
   return handleApiResponse<PaginatedResponse<Product>>(response);
 };
