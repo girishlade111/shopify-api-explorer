@@ -84,26 +84,31 @@ export function Layout({ children }: LayoutProps) {
             </div>
             
             <div className="flex items-center gap-4">
-              <IconButton 
-                aria-label="Wishlist" 
+              <button 
                 onClick={handleWishlistClick}
-                badgeCount={wishlistCount}
+                className="flex items-center gap-1 p-2 hover:text-primary transition-colors rounded-full"
+                aria-label="Wishlist"
               >
                 <Heart className="h-5 w-5" />
-              </IconButton>
-              <IconButton 
-                aria-label="Shopping Bag"
+                <span className="text-sm font-medium">{wishlistCount}</span>
+              </button>
+              
+              <button 
                 onClick={handleCartClick}
-                badgeCount={cartCount}
+                className="flex items-center gap-1 p-2 hover:text-primary transition-colors rounded-full"
+                aria-label="Shopping Bag"
               >
                 <ShoppingBag className="h-5 w-5" />
-              </IconButton>
-              <IconButton 
-                aria-label="Account"
+                <span className="text-sm font-medium">{cartCount}</span>
+              </button>
+              
+              <button 
                 onClick={handleAccountClick}
+                className="flex items-center p-2 hover:text-primary transition-colors rounded-full"
+                aria-label="Account"
               >
                 <User className="h-5 w-5" />
-              </IconButton>
+              </button>
             </div>
           </div>
           
@@ -135,25 +140,25 @@ export function Layout({ children }: LayoutProps) {
               
               <div className="flex space-x-4 pt-4 border-t border-gray-100">
                 <button
-                  className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
+                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleWishlistClick}
                 >
                   <Heart className="h-5 w-5" />
-                  <span className="ml-2">Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</span>
+                  <span>Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</span>
                 </button>
                 <button
-                  className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
+                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleCartClick}
                 >
                   <ShoppingBag className="h-5 w-5" />
-                  <span className="ml-2">Cart {cartCount > 0 && `(${cartCount})`}</span>
+                  <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
                 </button>
                 <button
-                  className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
+                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleAccountClick}
                 >
                   <User className="h-5 w-5" />
-                  <span className="ml-2">Account</span>
+                  <span>Account</span>
                 </button>
               </div>
             </div>
