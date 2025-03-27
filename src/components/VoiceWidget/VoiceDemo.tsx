@@ -61,6 +61,7 @@ export default function VoiceDemo() {
       isInitialConnectionRef.current = false;
       // Try to reconnect with a slight delay to ensure component is fully mounted
       setTimeout(() => {
+        console.log("Attempting initial connection");
         handleReconnection();
       }, 1000);
     }
@@ -107,7 +108,7 @@ export default function VoiceDemo() {
   useEffect(() => {
     if (!audioElementRef.current) {
       const audio = new Audio();
-      audio.autoplay = true;
+      audio.autoplay = isAudioEnabled;
       audioElementRef.current = audio;
     }
 
@@ -156,6 +157,7 @@ export default function VoiceDemo() {
   }, [sessionStatus, clientSecret]);
 
   const cleanupResources = () => {
+    console.log("Cleaning up WebRTC resources");
     // Clean up RTCPeerConnection
     cleanupConnection(pcRef.current);
     pcRef.current = null;
