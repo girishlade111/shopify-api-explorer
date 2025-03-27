@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useCart } from "./CartContext";
 import { useWishlist } from "./WishlistContext";
@@ -36,6 +36,7 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
   const location = useLocation();
   const { cart } = useCart();
   const { wishlist } = useWishlist();
+  const isUpdatingProfile = useRef(false);
   
   // Initialize user profile from localStorage
   const initializeUserProfile = (): UserProfileValues | null => {
@@ -98,6 +99,12 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
 
   // Update user activity and log to console
   const updateUserActivity = (updates: Partial<UserActivity>) => {
+    // Skip logging if we're currently in the middle of a userProfile update
+    // This prevents loops when profile updates trigger more profile updates
+    if (isUpdatingProfile.current && 'userProfile' in updates) {
+      return;
+    }
+    
     setUserActivity(prev => {
       const newActivity = {
         ...prev,
@@ -105,8 +112,12 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
         lastUpdated: new Date().toISOString()
       };
       
-      // Log the updated activity to console
-      console.log("User Activity Updated:", JSON.stringify(newActivity, null, 2));
+      // Only log if something other than lastUpdated has changed
+      const prevCopy = { ...prev, lastUpdated: newActivity.lastUpdated };
+      if (JSON.stringify(prevCopy) !== JSON.stringify(newActivity)) {
+        // Log the updated activity to console
+        console.log("User Activity Updated:", JSON.stringify(newActivity, null, 2));
+      }
       
       return newActivity;
     });
@@ -114,7 +125,12 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
 
   // Function to update user profile
   const updateUserProfile = (profile: UserProfileValues | null) => {
+    isUpdatingProfile.current = true;
     updateUserActivity({ userProfile: profile });
+    // Reset the flag after a short delay to allow state updates to complete
+    setTimeout(() => {
+      isUpdatingProfile.current = false;
+    }, 100);
   };
 
   return (
