@@ -80,12 +80,12 @@ export function NewArrivals() {
           <div className="relative">
             <div 
               ref={scrollContainerRef}
-              className="flex overflow-x-auto gap-6 pb-6 snap-x scrollbar-hide"
+              className="flex overflow-x-auto gap-4 pb-6 snap-x scrollbar-hide"
             >
               {products.map(product => (
                 <div 
                   key={product.id} 
-                  className="min-w-[280px] md:min-w-[300px] flex-shrink-0 snap-start"
+                  className="min-w-[220px] w-[220px] sm:min-w-[240px] sm:w-[240px] md:min-w-[260px] md:w-[260px] flex-shrink-0 snap-start"
                 >
                   <ProductCard product={product} />
                 </div>
@@ -95,18 +95,18 @@ export function NewArrivals() {
             <div className="hidden md:block">
               <button 
                 onClick={() => scroll("left")}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white rounded-full shadow-medium flex items-center justify-center text-dark hover:text-primary transition-colors"
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white rounded-full shadow-medium flex items-center justify-center text-dark hover:text-primary transition-colors"
                 aria-label="Scroll left"
               >
-                <ChevronLeft className="h-6 w-6" />
+                <ChevronLeft className="h-5 w-5" />
               </button>
               
               <button 
                 onClick={() => scroll("right")}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 w-12 h-12 bg-white rounded-full shadow-medium flex items-center justify-center text-dark hover:text-primary transition-colors"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 w-10 h-10 bg-white rounded-full shadow-medium flex items-center justify-center text-dark hover:text-primary transition-colors"
                 aria-label="Scroll right"
               >
-                <ChevronRight className="h-6 w-6" />
+                <ChevronRight className="h-5 w-5" />
               </button>
             </div>
           </div>
