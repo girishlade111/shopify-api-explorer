@@ -61,7 +61,7 @@ export function useHandleServerEvent({
   const fittingRoom = useFittingRoom();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist } = useWishlist();
+  const { addToWishlist, removeFromWishlist, clearWishlist } = useWishlist();
   const currentSessionId = useRef<string | null>(null);
 
   const fns = {
@@ -173,9 +173,12 @@ export function useHandleServerEvent({
     },
     clear_wishlist: () => {
       try {
-        // Dispatch a custom event that can be listened to by the wishlist management system
-        // window.dispatchEvent(new CustomEvent('clearWishlist'));
-        return { success: true };
+        // Call the clearWishlist function from WishlistContext
+        clearWishlist();
+        return { 
+          success: true,
+          message: "Wishlist has been cleared successfully" 
+        };
       } catch (error) {
         console.error("Error clearing wishlist:", error);
         return { 
