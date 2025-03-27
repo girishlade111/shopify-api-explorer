@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -31,7 +30,6 @@ export default function ProductDetail() {
         const data = await getProductByHandle(handle);
         setProduct(data);
         
-        // Set initial selected image and variant
         if (data.images && data.images.length > 0) {
           setSelectedImage(data.images[0].src);
         }
@@ -108,10 +106,8 @@ export default function ProductDetail() {
     );
   }
 
-  // Extract product info
   const { title, body_html, vendor, images, variants, options } = product;
   
-  // Get breadcrumb from product category
   const getBreadcrumbs = () => {
     if (!product.product_category) return [];
     
@@ -134,7 +130,6 @@ export default function ProductDetail() {
 
   return (
     <Layout>
-      {/* Breadcrumbs */}
       <div className="container-wide py-4">
         <nav className="flex items-center text-sm text-muted">
           <Link to="/" className="hover:text-primary">Home</Link>
@@ -163,7 +158,6 @@ export default function ProductDetail() {
       
       <Section>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Images */}
           <div className="space-y-6">
             <div className="aspect-square bg-accent/30 rounded-lg overflow-hidden">
               {selectedImage && (
@@ -199,7 +193,6 @@ export default function ProductDetail() {
             )}
           </div>
           
-          {/* Product Info */}
           <div className="space-y-6">
             {vendor && (
               <div className="text-sm text-muted">
@@ -221,7 +214,6 @@ export default function ProductDetail() {
               </div>
             )}
             
-            {/* Variant Selection */}
             {options && options.length > 0 && (
               <div className="space-y-4">
                 {options.map((option) => (
@@ -229,7 +221,6 @@ export default function ProductDetail() {
                     <h3 className="text-sm font-medium mb-2">{option.name}</h3>
                     <div className="flex flex-wrap gap-2">
                       {option.values && option.values.map((value) => {
-                        // Find variant with this option value
                         const variantWithOption = variants?.find(
                           (v) =>
                             v[`option${option.position}` as keyof ProductVariant] === value
@@ -243,13 +234,11 @@ export default function ProductDetail() {
                           <button
                             key={value}
                             onClick={() => variantWithOption && setSelectedVariant(variantWithOption)}
-                            disabled={!variantWithOption?.available}
                             className={cn(
                               "px-4 py-2 rounded border text-sm font-medium transition-colors",
                               isSelected
                                 ? "bg-dark text-white border-dark"
-                                : "bg-white text-dark border-gray-200 hover:border-dark",
-                              !variantWithOption?.available && "opacity-50 cursor-not-allowed"
+                                : "bg-white text-dark border-gray-200 hover:border-dark"
                             )}
                           >
                             {value}
@@ -262,7 +251,6 @@ export default function ProductDetail() {
               </div>
             )}
             
-            {/* Quantity Selector */}
             <div>
               <h3 className="text-sm font-medium mb-2">Quantity</h3>
               <div className="flex items-center">
@@ -288,12 +276,10 @@ export default function ProductDetail() {
               </div>
             </div>
             
-            {/* Add to Cart */}
             <div className="flex gap-4">
               <button
                 onClick={addToCart}
-                disabled={!selectedVariant?.available}
-                className="flex-1 bg-primary text-white py-3 rounded-md font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-primary text-white py-3 rounded-md font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
               >
                 <ShoppingBag className="h-5 w-5" />
                 Add to Cart
@@ -313,7 +299,6 @@ export default function ProductDetail() {
               </button>
             </div>
             
-            {/* Availability */}
             {selectedVariant && (
               <div className="text-sm">
                 {selectedVariant.available ? (
@@ -324,19 +309,17 @@ export default function ProductDetail() {
               </div>
             )}
             
-            {/* Description */}
             <div className="pt-4 border-t border-gray-200">
               <h3 className="text-lg font-semibold mb-2">Description</h3>
               <div 
                 className="text-muted prose prose-sm max-w-none" 
-                dangerouslySetInnerHTML={{ __html: body_html }}
+                dangerouslySetInnerHTML={{ __html: body_html || '' }}
               />
             </div>
           </div>
         </div>
       </Section>
       
-      {/* Related Products */}
       <Section>
         <SectionHeader
           title="You might also like"
