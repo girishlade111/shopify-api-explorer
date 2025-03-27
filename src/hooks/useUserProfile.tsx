@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -8,15 +7,13 @@ import { useBeforeUnload } from "react-router-dom";
 import { useUserActivity } from "@/contexts/UserActivityContext";
 
 export const UserProfileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  gender: z.enum(["male", "female", "non-binary", "prefer-not-to-say"], {
-    required_error: "Please select a gender",
-  }),
-  location: z.string().min(1, "Location is required"),
+  name: z.string().optional(),
+  gender: z.enum(["male", "female", "non-binary", "prefer-not-to-say"]).optional(),
+  location: z.string().optional(),
   birthday: z.date().optional(),
   mailingList: z.boolean().default(false),
-  clothingSize: z.string().min(1, "Clothing size is required"),
-  shoeSize: z.string().min(1, "Shoe size is required"),
+  clothingSize: z.string().optional(),
+  shoeSize: z.string().optional(),
   favoriteColors: z.string().optional(),
   avoidColors: z.string().optional(),
   styleDescriptors: z.string().optional(),
@@ -25,8 +22,8 @@ export const UserProfileSchema = z.object({
   preferredBrands: z.string().optional(),
   preferredCategories: z.string().optional(),
   specialNotes: z.string().optional(),
-  budgetMin: z.string().min(1, "Minimum budget is required"),
-  budgetMax: z.string().min(1, "Maximum budget is required"),
+  budgetMin: z.string().optional(),
+  budgetMax: z.string().optional(),
 });
 
 export type UserProfileValues = z.infer<typeof UserProfileSchema>;
