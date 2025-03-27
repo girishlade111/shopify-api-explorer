@@ -14,7 +14,7 @@ import NewArrivalsPage from "./pages/NewArrivalsPage";
 import WishlistPage from "./pages/WishlistPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
-
+import VoiceWidget from "./components/VoiceWidget";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -40,6 +40,7 @@ const App = () => (
               <Route path="/categories/:category/*" element={<CategoryPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <VoiceWidget />
           </BrowserRouter>
         </TooltipProvider>
       </CartProvider>
