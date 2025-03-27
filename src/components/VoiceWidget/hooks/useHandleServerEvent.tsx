@@ -102,12 +102,25 @@ export function useHandleServerEvent({
           throw new Error("No link found for the specified product variant");
         }
 
-        // Navigate to the product link
-        window.location.href = productInfo.link;
+        // Extract the product handle from the link
+        const urlParts = productInfo.link.split('/products/');
+        let productHandle = '';
+        
+        if (urlParts.length > 1) {
+          // Remove any query parameters
+          productHandle = urlParts[1].split('?')[0];
+        }
+        
+        if (!productHandle) {
+          throw new Error("Could not extract product handle from link");
+        }
+
+        // Navigate to the product using React Router
+        navigate(`/products/${productHandle}`);
 
         return {
           success: true,
-          link: productInfo.link,
+          handle: productHandle,
           sessionId
         };
       } catch (error) {
