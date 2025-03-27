@@ -5,6 +5,7 @@ import { useEvent } from "../contexts/EventContext";
 import { useFittingRoom } from "@/contexts/FittingRoomContext";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
@@ -60,6 +61,7 @@ export function useHandleServerEvent({
   const fittingRoom = useFittingRoom();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist } = useWishlist();
   const currentSessionId = useRef<string | null>(null);
 
   const fns = {
@@ -526,22 +528,78 @@ export function useHandleServerEvent({
     },
     add_to_wishlist: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
       try {
-        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/add_to_wishlist`, {
+        if (!cart_items || !Array.isArray(cart_items) || cart_items.length === 0) {
+          return {
+            success: false,
+            error: "No items provided",
+            sessionId
+          };
+        }
+
+        // Get product variants information
+        const products_list = {
+          products: cart_items.map(item => ({
+            product_id: item.product.product_id,
+            color: item.product.color || null,
+            size: item.product.size || null
+          }))
+        };
+
+        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ cart_items }),
+          body: JSON.stringify({ 
+            products_list,
+            max_variants: cart_items.length
+          }),
         });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data = await response.json() as GetVariantsResponse;
+        
+        // Add each item to the wishlist
+        const addedItems = [];
+        for (const productId in data.artifact) {
+          const product = data.artifact[productId];
+          
+          if (product) {
+            // Create minimal product object required by addToWishlist
+            const minimalProduct = {
+              id: product.product_id,
+              title: product.title,
+              images: [{ src: product.image_url }],
+              handle: product.link.split('/products/')[1]?.split('?')[0] || '',
+              variants: [{
+                id: product.variant_id,
+                product_id: product.product_id,
+                title: product.title,
+                price: product.price.toString(),
+              }]
+            };
+
+            addToWishlist(minimalProduct as any);
+            
+            addedItems.push({
+              title: product.title,
+              price: product.price,
+              image_url: product.image_url,
+              link: product.link,
+              product_id: product.product_id,
+              variant_id: product.variant_id,
+              operation: "add"
+            });
+          }
+        }
+
         return {
           success: true,
-          ...data,
+          context: `Added ${addedItems.length} item(s) to wishlist`,
+          artifact: addedItems,
           sessionId
         };
       } catch (error) {
@@ -555,22 +613,65 @@ export function useHandleServerEvent({
     },
     remove_from_wishlist: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
       try {
-        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/remove_from_wishlist`, {
+        if (!cart_items || !Array.isArray(cart_items) || cart_items.length === 0) {
+          return {
+            success: false,
+            error: "No items provided",
+            sessionId
+          };
+        }
+
+        // Get product variants information
+        const products_list = {
+          products: cart_items.map(item => ({
+            product_id: item.product.product_id,
+            color: item.product.color || null,
+            size: item.product.size || null
+          }))
+        };
+
+        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ cart_items }),
+          body: JSON.stringify({ 
+            products_list,
+            max_variants: cart_items.length
+          }),
         });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data = await response.json() as GetVariantsResponse;
+        
+        // Remove each item from the wishlist
+        const removedItems = [];
+        for (const productId in data.artifact) {
+          const product = data.artifact[productId];
+          
+          if (product) {
+            // Remove from wishlist using product ID
+            removeFromWishlist(product.product_id);
+            
+            removedItems.push({
+              title: product.title,
+              price: product.price,
+              image_url: product.image_url,
+              link: product.link,
+              product_id: product.product_id,
+              variant_id: product.variant_id,
+              operation: "remove"
+            });
+          }
+        }
+
         return {
           success: true,
-          ...data,
+          context: `Removed ${removedItems.length} item(s) from wishlist`,
+          artifact: removedItems,
           sessionId
         };
       } catch (error) {
