@@ -1,9 +1,10 @@
 
 import { useState, useEffect, ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Heart, User, Menu, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,7 +13,10 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -27,6 +31,28 @@ export function Layout({ children }: LayoutProps) {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
+
+  const handleWishlistClick = () => {
+    toast({
+      title: "Wishlist",
+      description: "Coming soon! Wishlist functionality is under development.",
+    });
+  };
+
+  const handleCartClick = () => {
+    toast({
+      title: "Shopping Bag",
+      description: `You have ${cartCount} items in your bag.`,
+    });
+  };
+
+  const handleAccountClick = () => {
+    navigate("/account");
+    toast({
+      title: "Account",
+      description: "Account page is currently under development.",
+    });
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -58,13 +84,22 @@ export function Layout({ children }: LayoutProps) {
             </div>
             
             <div className="flex items-center gap-4">
-              <IconButton aria-label="Favorites">
+              <IconButton 
+                aria-label="Favorites" 
+                onClick={handleWishlistClick}
+              >
                 <Heart className="h-5 w-5" />
               </IconButton>
-              <IconButton aria-label="Shopping Bag">
+              <IconButton 
+                aria-label="Shopping Bag"
+                onClick={handleCartClick}
+              >
                 <ShoppingBag className="h-5 w-5" />
               </IconButton>
-              <IconButton aria-label="Account">
+              <IconButton 
+                aria-label="Account"
+                onClick={handleAccountClick}
+              >
                 <User className="h-5 w-5" />
               </IconButton>
             </div>
@@ -97,18 +132,27 @@ export function Layout({ children }: LayoutProps) {
               </nav>
               
               <div className="flex space-x-4 pt-4 border-t border-gray-100">
-                <IconButton aria-label="Favorites">
+                <button
+                  className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
+                  onClick={handleWishlistClick}
+                >
                   <Heart className="h-5 w-5" />
                   <span className="ml-2">Wishlist</span>
-                </IconButton>
-                <IconButton aria-label="Shopping Bag">
+                </button>
+                <button
+                  className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
+                  onClick={handleCartClick}
+                >
                   <ShoppingBag className="h-5 w-5" />
                   <span className="ml-2">Cart</span>
-                </IconButton>
-                <IconButton aria-label="Account">
+                </button>
+                <button
+                  className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
+                  onClick={handleAccountClick}
+                >
                   <User className="h-5 w-5" />
                   <span className="ml-2">Account</span>
-                </IconButton>
+                </button>
               </div>
             </div>
           </div>
@@ -234,17 +278,20 @@ const FooterLink = ({ to, children }: { to: string; children: ReactNode }) => (
 const IconButton = ({
   children,
   className,
+  onClick,
   ...props
 }: {
   children: ReactNode;
   className?: string;
+  onClick?: () => void;
   [key: string]: any;
 }) => (
   <button
     className={cn(
-      "flex items-center justify-center hover:text-primary rounded-full transition-colors",
+      "flex items-center justify-center hover:text-primary rounded-full transition-colors p-2",
       className
     )}
+    onClick={onClick}
     {...props}
   >
     {children}

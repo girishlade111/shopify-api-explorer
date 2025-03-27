@@ -67,6 +67,15 @@ export default function ProductDetail() {
     });
   };
 
+  const shareProduct = () => {
+    if (!product) return;
+    
+    toast({
+      title: "Share product",
+      description: "Share functionality coming soon!",
+    });
+  };
+
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (isNaN(value) || value < 1) {
@@ -294,6 +303,7 @@ export default function ProductDetail() {
               </button>
               
               <button
+                onClick={shareProduct}
                 className="w-12 h-12 border border-gray-200 rounded-md flex items-center justify-center text-dark hover:text-primary transition-colors"
               >
                 <Share2 className="h-5 w-5" />

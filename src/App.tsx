@@ -25,6 +25,7 @@ const App = () => (
           <Route path="/categories/:category" element={<CategoryPage />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/new-arrivals" element={<NewArrivalsPage />} />
+          <Route path="/account" element={<NotFound />} /> {/* Temporarily using NotFound for account page */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
