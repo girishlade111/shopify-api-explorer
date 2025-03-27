@@ -1,5 +1,4 @@
-
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,9 +20,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CalendarIcon, Save } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useNavigate, useBeforeUnload } from "react-router-dom";
 
 const UserProfileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -51,53 +53,102 @@ type UserProfileValues = z.infer<typeof UserProfileSchema>;
 
 const STORAGE_KEY = "user-profile";
 
+const defaultValues: UserProfileValues = {
+  name: "",
+  gender: "prefer-not-to-say",
+  location: "",
+  birthday: undefined,
+  mailingList: false,
+  clothingSize: "",
+  shoeSize: "",
+  favoriteColors: "",
+  avoidColors: "",
+  styleDescriptors: "",
+  fashionInterests: "",
+  lifestyle: "",
+  preferredBrands: "",
+  preferredCategories: "",
+  specialNotes: "",
+  budgetMin: "",
+  budgetMax: "",
+};
+
 export default function UserProfilePage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  
+  const [savedProfile, setSavedProfile] = useState<UserProfileValues | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [showSaveInfoDialog, setShowSaveInfoDialog] = useState(false);
   
   const form = useForm<UserProfileValues>({
     resolver: zodResolver(UserProfileSchema),
-    defaultValues: {
-      name: "",
-      gender: "prefer-not-to-say",
-      location: "",
-      birthday: undefined,
-      mailingList: false,
-      clothingSize: "",
-      shoeSize: "",
-      favoriteColors: "",
-      avoidColors: "",
-      styleDescriptors: "",
-      fashionInterests: "",
-      lifestyle: "",
-      preferredBrands: "",
-      preferredCategories: "",
-      specialNotes: "",
-      budgetMin: "",
-      budgetMax: "",
-    },
+    defaultValues,
   });
 
   useEffect(() => {
-    // Load saved profile from localStorage on component mount
-    const savedProfile = localStorage.getItem(STORAGE_KEY);
-    if (savedProfile) {
+    const storedProfile = localStorage.getItem(STORAGE_KEY);
+    if (storedProfile) {
       try {
-        const parsedProfile = JSON.parse(savedProfile);
+        const parsedProfile = JSON.parse(storedProfile);
         
-        // Handle date conversion for birthday
         if (parsedProfile.birthday) {
           parsedProfile.birthday = new Date(parsedProfile.birthday);
         }
         
         form.reset(parsedProfile);
+        setSavedProfile(parsedProfile);
       } catch (error) {
         console.error("Failed to parse saved profile", error);
       }
     }
   }, [form]);
 
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (!savedProfile) {
+        const hasValues = Object.values(value).some(val => {
+          if (typeof val === 'string') return val.trim().length > 0;
+          return val !== undefined && val !== null;
+        });
+        setHasUnsavedChanges(hasValues);
+      } else {
+        const formValues = form.getValues();
+        
+        let formBirthday = formValues.birthday ? formValues.birthday.toISOString() : undefined;
+        let savedBirthday = savedProfile.birthday ? new Date(savedProfile.birthday).toISOString() : undefined;
+        
+        const formWithoutBirthday = { ...formValues, birthday: undefined };
+        const savedWithoutBirthday = { ...savedProfile, birthday: undefined };
+        
+        const hasOtherChanges = JSON.stringify(formWithoutBirthday) !== JSON.stringify(savedWithoutBirthday);
+        
+        const hasBirthdayChanged = formBirthday !== savedBirthday;
+        
+        setHasUnsavedChanges(hasOtherChanges || hasBirthdayChanged);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form, savedProfile]);
+  
+  useBeforeUnload(
+    useCallback(
+      (event) => {
+        if (hasUnsavedChanges) {
+          event.preventDefault();
+          return "You have unsaved changes. Are you sure you want to leave?";
+        }
+      },
+      [hasUnsavedChanges]
+    )
+  );
+
   function onSubmit(data: UserProfileValues) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setSavedProfile(data);
+    setHasUnsavedChanges(false);
     toast({
       title: "Profile Saved",
       description: "Your profile has been saved successfully.",
@@ -106,29 +157,21 @@ export default function UserProfilePage() {
 
   function handleReset() {
     localStorage.removeItem(STORAGE_KEY);
-    form.reset({
-      name: "",
-      gender: "prefer-not-to-say",
-      location: "",
-      birthday: undefined,
-      mailingList: false,
-      clothingSize: "",
-      shoeSize: "",
-      favoriteColors: "",
-      avoidColors: "",
-      styleDescriptors: "",
-      fashionInterests: "",
-      lifestyle: "",
-      preferredBrands: "",
-      preferredCategories: "",
-      specialNotes: "",
-      budgetMin: "",
-      budgetMax: "",
-    });
+    form.reset(defaultValues);
+    setSavedProfile(null);
+    setHasUnsavedChanges(false);
     toast({
       title: "Profile Reset",
       description: "Your profile has been cleared.",
     });
+  }
+
+  function handleSaveClick() {
+    if (!hasUnsavedChanges) {
+      setShowSaveInfoDialog(true);
+    } else {
+      form.handleSubmit(onSubmit)();
+    }
   }
 
   return (
@@ -136,8 +179,14 @@ export default function UserProfilePage() {
       <div className="container mx-auto py-10">
         <h1 className="text-3xl font-bold mb-8">My Profile</h1>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Personal Details Section */}
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (hasUnsavedChanges) {
+              form.handleSubmit(onSubmit)(e);
+            } else {
+              setShowSaveInfoDialog(true);
+            }
+          }} className="space-y-8">
             <div className="bg-white p-6 rounded-lg shadow-sm border">
               <h2 className="text-xl font-semibold mb-4">Personal Details</h2>
               <div className="space-y-4">
@@ -279,7 +328,6 @@ export default function UserProfilePage() {
               </div>
             </div>
 
-            {/* Shopping Preferences Section */}
             <div className="bg-white p-6 rounded-lg shadow-sm border">
               <h2 className="text-xl font-semibold mb-4">Shopping Preferences</h2>
               <div className="space-y-6">
@@ -416,7 +464,6 @@ export default function UserProfilePage() {
               </div>
             </div>
 
-            {/* Interests Section */}
             <div className="bg-white p-6 rounded-lg shadow-sm border">
               <h2 className="text-xl font-semibold mb-4">Interests</h2>
               <div className="space-y-4">
@@ -462,7 +509,6 @@ export default function UserProfilePage() {
               </div>
             </div>
 
-            {/* Favorite Brands Section */}
             <div className="bg-white p-6 rounded-lg shadow-sm border">
               <h2 className="text-xl font-semibold mb-4">Favorite Brands</h2>
               <div className="space-y-4">
@@ -505,7 +551,6 @@ export default function UserProfilePage() {
               </div>
             </div>
 
-            {/* Special Notes Section */}
             <div className="bg-white p-6 rounded-lg shadow-sm border">
               <h2 className="text-xl font-semibold mb-4">Special Notes</h2>
               <FormField
@@ -537,11 +582,68 @@ export default function UserProfilePage() {
               >
                 Reset
               </Button>
-              <Button type="submit">Save Profile</Button>
+              <Button 
+                type="button"
+                onClick={handleSaveClick}
+                disabled={!hasUnsavedChanges}
+                className="gap-2"
+              >
+                <Save size={16} />
+                Save Profile
+              </Button>
             </div>
           </form>
         </Form>
       </div>
+
+      <Dialog open={showSaveInfoDialog} onOpenChange={setShowSaveInfoDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>No Changes to Save</DialogTitle>
+            <DialogDescription>
+              There are no changes to save. Make changes to your profile first.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowSaveInfoDialog(false)}>
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showUnsavedChangesDialog} onOpenChange={setShowUnsavedChangesDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Do you want to save them before leaving?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowUnsavedChangesDialog(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                form.handleSubmit(onSubmit)();
+                setShowUnsavedChangesDialog(false);
+              }}
+            >
+              Save
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => {
+                setShowUnsavedChangesDialog(false);
+                setHasUnsavedChanges(false);
+              }}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Discard
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }
