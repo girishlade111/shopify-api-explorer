@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryNav } from "@/components/CategoryNav";
 import { Section } from "@/components/ui-components";
-import { getProductsByCategory } from "@/lib/api";
-import { Product } from "@/types";
+import { getCategories, getProductsByCategory } from "@/lib/api";
+import { Category, Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, SlidersHorizontal, ChevronRight } from "lucide-react";
 
@@ -36,10 +35,42 @@ export default function CategoryPage() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [categoryPath, setCategoryPath] = useState<string[]>([]);
+  const [categoryFullName, setCategoryFullName] = useState<string>("");
+
+  useEffect(() => {
+    const fetchCategoryInfo = async () => {
+      if (!category) return;
+      
+      try {
+        const categories = await getCategories(100);
+        
+        const urlPathSegments = category.split("/");
+        const lastSegment = urlPathSegments[urlPathSegments.length - 1]
+          .replace(/-/g, " ")
+          .toLowerCase();
+        
+        const matchedCategory = categories.find(cat => {
+          const catLastPart = cat.full_path.split(" > ").pop()?.toLowerCase() || "";
+          return catLastPart === lastSegment;
+        });
+        
+        if (matchedCategory) {
+          setCategoryFullName(matchedCategory.full_path);
+        } else {
+          console.error("Could not find matching category:", lastSegment);
+        }
+        
+        setCategoryPath(urlPathSegments);
+      } catch (error) {
+        console.error("Error fetching category information:", error);
+      }
+    };
+    
+    fetchCategoryInfo();
+  }, [category]);
   
   useEffect(() => {
     if (category) {
-      // Create breadcrumb from URL
       const parts = category.split("/");
       setCategoryPath(parts);
     }
@@ -52,41 +83,50 @@ export default function CategoryPage() {
     setError(null);
     
     try {
-      // Get the category in the format the API expects (spaces instead of hyphens)
-      // For the API, we need to convert from URL format to the format expected by the API
-      // Example: clothing-tops -> clothing tops
-      let categoryForApi: string;
-      
-      // Check if this is a nested category path
-      if (category.includes("/")) {
-        // If it's a full path, we just need the last part for the API
-        const parts = category.split("/");
-        const lastPart = parts[parts.length - 1].replace(/-/g, " ");
-        categoryForApi = lastPart;
+      if (categoryFullName) {
+        console.log("Fetching products for category full name:", categoryFullName);
+        
+        const response = await getProductsByCategory(
+          categoryFullName,
+          page,
+          12,
+          selectedSort.value,
+          selectedSort.order
+        );
+        
+        if (page === 1) {
+          setProducts(response.items);
+        } else {
+          setProducts(prev => [...prev, ...response.items]);
+        }
+        
+        setTotalProducts(response.total);
+        setTotalPages(response.pages);
+        setCurrentPage(response.page);
       } else {
-        // Simple category
-        categoryForApi = category.replace(/-/g, " ");
+        const lastSegment = category.split("/").pop() || category;
+        const categoryName = lastSegment.replace(/-/g, " ");
+        
+        console.log("Fallback: Fetching products for category name:", categoryName);
+        
+        const response = await getProductsByCategory(
+          categoryName,
+          page,
+          12,
+          selectedSort.value,
+          selectedSort.order
+        );
+        
+        if (page === 1) {
+          setProducts(response.items);
+        } else {
+          setProducts(prev => [...prev, ...response.items]);
+        }
+        
+        setTotalProducts(response.total);
+        setTotalPages(response.pages);
+        setCurrentPage(response.page);
       }
-      
-      console.log("Fetching products for category:", categoryForApi);
-      
-      const response = await getProductsByCategory(
-        categoryForApi,
-        page,
-        12,
-        selectedSort.value,
-        selectedSort.order
-      );
-      
-      if (page === 1) {
-        setProducts(response.items);
-      } else {
-        setProducts(prev => [...prev, ...response.items]);
-      }
-      
-      setTotalProducts(response.total);
-      setTotalPages(response.pages);
-      setCurrentPage(response.page);
     } catch (error) {
       console.error("Failed to fetch products:", error);
       setError("Failed to load products. Please try again later.");
@@ -97,8 +137,10 @@ export default function CategoryPage() {
   
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchProducts(1);
-  }, [category, selectedSort]);
+    if (category) {
+      fetchProducts(1);
+    }
+  }, [category, selectedSort, categoryFullName]);
   
   const loadMore = () => {
     if (currentPage < totalPages) {
@@ -114,7 +156,6 @@ export default function CategoryPage() {
 
   return (
     <Layout>
-      {/* Breadcrumb */}
       <div className="container-wide py-4">
         <nav className="flex items-center text-sm text-muted">
           <Link to="/" className="hover:text-primary">Home</Link>
@@ -179,7 +220,6 @@ export default function CategoryPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          {/* Sidebar - shown by default on desktop, toggleable on mobile */}
           <div 
             className={cn(
               "md:col-span-3",
@@ -206,7 +246,6 @@ export default function CategoryPage() {
                 <CategoryNav activeCategory={category} />
               </div>
               
-              {/* Price Filter */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">Price Range</h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -251,9 +290,7 @@ export default function CategoryPage() {
             </div>
           </div>
           
-          {/* Main Content */}
           <div className="md:col-span-9">
-            {/* Products count */}
             {!loading && !error && products.length > 0 && (
               <div className="text-sm text-muted mb-6">
                 Showing {products.length} of {totalProducts} products
@@ -268,7 +305,6 @@ export default function CategoryPage() {
               cols={3}
             />
             
-            {/* Load More Button */}
             {!loading && !error && products.length > 0 && currentPage < totalPages && (
               <div className="mt-12 text-center">
                 <button

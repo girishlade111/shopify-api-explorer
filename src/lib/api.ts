@@ -1,4 +1,3 @@
-
 import { Category, PaginatedResponse, Product, SearchSuggestionsResponse } from "@/types";
 
 const API_BASE_URL = "https://shopifyproducts.ngrok.io";
@@ -79,15 +78,13 @@ export const getProductsByCategory = async (
   if (sortBy) params.append("sort_by", sortBy);
   if (sortOrder) params.append("sort_order", sortOrder);
   
-  // For the API request, we only need the last part of the category name
-  // But we need to make sure we're not manipulating the input parameter directly
-  const categoryNameForApi = categoryName.includes(" > ") 
+  const categoryNameOnly = categoryName.includes(" > ") 
     ? categoryName.split(" > ").pop() || categoryName
     : categoryName;
   
-  console.log(`Fetching category products: ${categoryNameForApi}, URL: ${API_BASE_URL}/store/categories/${encodeURIComponent(categoryNameForApi)}/products`);
+  console.log(`Fetching products for category name: ${categoryNameOnly}`);
   
-  const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryNameForApi)}/products?${params}`);
+  const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryNameOnly)}/products?${params}`);
   return handleApiResponse<PaginatedResponse<Product>>(response);
 };
 
