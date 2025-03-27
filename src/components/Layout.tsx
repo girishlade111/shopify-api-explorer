@@ -5,6 +5,8 @@ import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Heart, User, Menu, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useCart } from "@/contexts/CartContext";
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,10 +15,11 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { wishlist } = useWishlist();
+  const { getCartCount } = useCart();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -33,17 +36,11 @@ export function Layout({ children }: LayoutProps) {
   }, [location]);
 
   const handleWishlistClick = () => {
-    toast({
-      title: "Wishlist",
-      description: "Coming soon! Wishlist functionality is under development.",
-    });
+    navigate("/wishlist");
   };
 
   const handleCartClick = () => {
-    toast({
-      title: "Shopping Bag",
-      description: `You have ${cartCount} items in your bag.`,
-    });
+    navigate("/cart");
   };
 
   const handleAccountClick = () => {
@@ -53,6 +50,9 @@ export function Layout({ children }: LayoutProps) {
       description: "Account page is currently under development.",
     });
   };
+
+  const cartCount = getCartCount();
+  const wishlistCount = wishlist.length;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -85,14 +85,16 @@ export function Layout({ children }: LayoutProps) {
             
             <div className="flex items-center gap-4">
               <IconButton 
-                aria-label="Favorites" 
+                aria-label="Wishlist" 
                 onClick={handleWishlistClick}
+                badgeCount={wishlistCount}
               >
                 <Heart className="h-5 w-5" />
               </IconButton>
               <IconButton 
                 aria-label="Shopping Bag"
                 onClick={handleCartClick}
+                badgeCount={cartCount}
               >
                 <ShoppingBag className="h-5 w-5" />
               </IconButton>
@@ -137,14 +139,14 @@ export function Layout({ children }: LayoutProps) {
                   onClick={handleWishlistClick}
                 >
                   <Heart className="h-5 w-5" />
-                  <span className="ml-2">Wishlist</span>
+                  <span className="ml-2">Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</span>
                 </button>
                 <button
                   className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleCartClick}
                 >
                   <ShoppingBag className="h-5 w-5" />
-                  <span className="ml-2">Cart</span>
+                  <span className="ml-2">Cart {cartCount > 0 && `(${cartCount})`}</span>
                 </button>
                 <button
                   className="flex items-center px-4 py-2 rounded-md hover:bg-accent"
@@ -275,25 +277,34 @@ const FooterLink = ({ to, children }: { to: string; children: ReactNode }) => (
   </Link>
 );
 
+interface IconButtonProps {
+  children: ReactNode;
+  className?: string;
+  onClick?: () => void;
+  badgeCount?: number;
+  [key: string]: any;
+}
+
 const IconButton = ({
   children,
   className,
   onClick,
+  badgeCount,
   ...props
-}: {
-  children: ReactNode;
-  className?: string;
-  onClick?: () => void;
-  [key: string]: any;
-}) => (
+}: IconButtonProps) => (
   <button
     className={cn(
-      "flex items-center justify-center hover:text-primary rounded-full transition-colors p-2",
+      "flex items-center justify-center hover:text-primary rounded-full transition-colors p-2 relative",
       className
     )}
     onClick={onClick}
     {...props}
   >
     {children}
+    {badgeCount && badgeCount > 0 && (
+      <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+        {badgeCount > 99 ? '99+' : badgeCount}
+      </span>
+    )}
   </button>
 );

@@ -3,8 +3,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Product } from "@/types";
 import { cn } from "@/lib/utils";
-import { Eye, Heart } from "lucide-react";
+import { Eye, Heart, ShoppingBag } from "lucide-react";
 import { formatPrice, getProductThumbnail } from "@/lib/api";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +17,8 @@ interface ProductCardProps {
 export function ProductCard({ product, className, featured = false }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const { addToWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
   
   const mainImage = getProductThumbnail(product);
   const secondaryImage = product.images && product.images.length > 1 ? product.images[1].src : mainImage;
@@ -31,6 +35,29 @@ export function ProductCard({ product, className, featured = false }: ProductCar
   
   // Check if product has multiple variants
   const hasVariants = product.variants && product.variants.length > 1;
+
+  // Get default variant for quick add to cart
+  const getDefaultVariant = () => {
+    if (product.variants && product.variants.length > 0) {
+      return product.variants[0];
+    }
+    return null;
+  };
+  
+  const handleAddToCart = () => {
+    const defaultVariant = getDefaultVariant();
+    if (defaultVariant) {
+      addToCart(product, defaultVariant, 1);
+    }
+  };
+  
+  const handleAddToWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToWishlist(product);
+  };
+  
+  const productInWishlist = isInWishlist(product.id);
   
   return (
     <div 
@@ -77,10 +104,14 @@ export function ProductCard({ product, className, featured = false }: ProductCar
             isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
           )}>
             <button 
-              className="w-9 h-9 rounded-full bg-white shadow-soft flex items-center justify-center text-dark hover:text-primary transition-colors"
-              aria-label="Add to wishlist"
+              className={cn(
+                "w-9 h-9 rounded-full bg-white shadow-soft flex items-center justify-center transition-colors",
+                productInWishlist ? "text-primary" : "text-dark hover:text-primary"
+              )}
+              aria-label={productInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={handleAddToWishlist}
             >
-              <Heart size={18} />
+              <Heart size={18} fill={productInWishlist ? "currentColor" : "none"} />
             </button>
             <Link 
               to={`/products/${product.handle}`}
@@ -123,8 +154,10 @@ export function ProductCard({ product, className, featured = false }: ProductCar
         "md:block hidden" // Only show on desktop
       )}>
         <button 
-          className="w-full bg-primary text-white py-2 rounded font-medium hover:bg-primary/90 transition-colors"
+          className="w-full bg-primary text-white py-2 rounded font-medium hover:bg-primary/90 transition-colors flex items-center justify-center"
+          onClick={handleAddToCart}
         >
+          <ShoppingBag className="h-4 w-4 mr-2" />
           Add to Cart
         </button>
       </div>
@@ -132,8 +165,10 @@ export function ProductCard({ product, className, featured = false }: ProductCar
       {/* Mobile-only add to cart button */}
       <div className="md:hidden block p-4 pt-0">
         <button 
-          className="w-full bg-primary text-white py-2 rounded font-medium hover:bg-primary/90 transition-colors"
+          className="w-full bg-primary text-white py-2 rounded font-medium hover:bg-primary/90 transition-colors flex items-center justify-center"
+          onClick={handleAddToCart}
         >
+          <ShoppingBag className="h-4 w-4 mr-2" />
           Add to Cart
         </button>
       </div>
