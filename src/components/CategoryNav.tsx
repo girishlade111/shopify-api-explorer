@@ -115,10 +115,10 @@ function CategoryItem({ name, count, path, isActive, onClick }: CategoryItemProp
       <span>{name}</span>
       <span 
         className={cn(
-          "text-xs rounded-full px-2 py-0.5",
+          "text-xs rounded-full w-8 h-6 flex items-center justify-center",
           isActive 
             ? "bg-white/20 text-white" 
-            : "bg-accent text-muted"
+            : "bg-accent/80 text-secondary"
         )}
       >
         {count}
