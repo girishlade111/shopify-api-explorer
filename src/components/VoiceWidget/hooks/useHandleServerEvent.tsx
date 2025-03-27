@@ -4,6 +4,7 @@ import { useTranscript } from "../contexts/TranscriptContext";
 import { useEvent } from "../contexts/EventContext";
 import { useFittingRoom } from "@/contexts/FittingRoomContext";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
@@ -58,6 +59,7 @@ export function useHandleServerEvent({
   const { logServerEvent } = useEvent();
   const fittingRoom = useFittingRoom();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const currentSessionId = useRef<string | null>(null);
 
   const fns = {
@@ -394,22 +396,81 @@ export function useHandleServerEvent({
     },
     add_to_cart: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
       try {
-        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/add_to_cart`, {
+        if (!cart_items || !Array.isArray(cart_items) || cart_items.length === 0) {
+          return {
+            success: false,
+            error: "No cart items provided",
+            sessionId
+          };
+        }
+
+        // Get product variants information
+        const products_list = {
+          products: cart_items.map(item => ({
+            product_id: item.product.product_id,
+            color: item.product.color || null,
+            size: item.product.size || null
+          }))
+        };
+
+        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ cart_items }),
+          body: JSON.stringify({ 
+            products_list,
+            max_variants: cart_items.length
+          }),
         });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data = await response.json() as GetVariantsResponse;
+        
+        // Add each item to the cart
+        const addedItems = [];
+        for (const productId in data.artifact) {
+          const product = data.artifact[productId];
+          const cartItem = cart_items.find(item => item.product.product_id === product.product_id);
+          
+          if (product && cartItem) {
+            // Create minimal product and variant objects required by addToCart
+            const minimalProduct = {
+              id: product.product_id,
+              title: product.title,
+              images: [{ src: product.image_url }],
+              handle: product.link.split('/products/')[1]?.split('?')[0] || '',
+            };
+
+            const minimalVariant = {
+              id: product.variant_id,
+              product_id: product.product_id,
+              title: product.title,
+              price: product.price.toString(),
+            };
+
+            addToCart(minimalProduct as any, minimalVariant as any, cartItem.quantity || 1);
+            
+            addedItems.push({
+              title: product.title,
+              price: product.price,
+              image_url: product.image_url,
+              link: product.link,
+              product_id: product.product_id,
+              variant_id: product.variant_id,
+              quantity: cartItem.quantity || 1,
+              operation: "add"
+            });
+          }
+        }
+
         return {
           success: true,
-          ...data,
+          context: `Added ${addedItems.length} item(s) to cart`,
+          artifact: addedItems,
           sessionId
         };
       } catch (error) {
