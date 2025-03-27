@@ -87,17 +87,17 @@ export function CategoryNav({
     }
   };
 
-  // Function to check if a category is active
+  // Improved function to check if a category is active based on URL path
   const isCategoryActive = (categoryPath: string): boolean => {
-    if (!activeCategory) return false;
+    // Get the current URL path from location
+    const currentPath = location.pathname;
     
-    // Convert both paths to a standardized format for comparison
-    const normalizedActivePath = activeCategory.toLowerCase().replace(/\/$/, '');
-    const normalizedCategoryPath = categoryPath.toLowerCase().replace(/\/$/, '');
+    // Create the expected category URL for comparison
+    const categoryUrl = `/categories/${categoryPath}`;
     
-    // Check if the active category is equal to or contains the category path
-    return normalizedActivePath === normalizedCategoryPath || 
-           normalizedActivePath.startsWith(normalizedCategoryPath + '/');
+    // Check if the current path matches or starts with the category URL
+    return currentPath === categoryUrl || 
+           currentPath.startsWith(`${categoryUrl}/`);
   };
 
   return (
