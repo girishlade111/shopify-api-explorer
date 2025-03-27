@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { useBeforeUnload } from "react-router-dom";
+import { useUserActivity } from "@/contexts/UserActivityContext";
 
 export const UserProfileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -54,6 +55,7 @@ export const defaultValues: UserProfileValues = {
 
 export function useUserProfile() {
   const { toast } = useToast();
+  const { updateUserProfile } = useUserActivity();
   
   const [savedProfile, setSavedProfile] = useState<UserProfileValues | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -77,11 +79,16 @@ export function useUserProfile() {
         
         form.reset(parsedProfile);
         setSavedProfile(parsedProfile);
+        
+        // Update the user activity context with the loaded profile
+        updateUserProfile(parsedProfile);
+        
+        console.log("User Profile Loaded:", JSON.stringify(parsedProfile, null, 2));
       } catch (error) {
         console.error("Failed to parse saved profile", error);
       }
     }
-  }, [form]);
+  }, [form, updateUserProfile]);
 
   useEffect(() => {
     const subscription = form.watch((value) => {
@@ -127,6 +134,12 @@ export function useUserProfile() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     setSavedProfile(data);
     setHasUnsavedChanges(false);
+    
+    // Update user activity with the new profile data
+    updateUserProfile(data);
+    
+    console.log("User Profile Updated:", JSON.stringify(data, null, 2));
+    
     toast({
       title: "Profile Saved",
       description: "Your profile has been saved successfully.",
@@ -141,6 +154,12 @@ export function useUserProfile() {
     form.reset(defaultValues);
     setSavedProfile(null);
     setHasUnsavedChanges(false);
+    
+    // Update user activity to clear profile data
+    updateUserProfile(null);
+    
+    console.log("User Profile Reset");
+    
     toast({
       title: "Profile Reset",
       description: "Your profile has been cleared.",

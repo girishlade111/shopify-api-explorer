@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useCart } from "./CartContext";
 import { useWishlist } from "./WishlistContext";
+import { UserProfileValues } from "@/hooks/useUserProfile";
 
 interface UserActivity {
   currentPage: string;
@@ -18,24 +19,49 @@ interface UserActivity {
     productId: number;
     title: string;
   }[];
+  userProfile: UserProfileValues | null;
   lastUpdated: string;
 }
 
 interface UserActivityContextType {
   userActivity: UserActivity;
+  updateUserProfile: (profile: UserProfileValues | null) => void;
 }
 
 const UserActivityContext = createContext<UserActivityContextType | undefined>(undefined);
+
+const STORAGE_KEY = "user-profile";
 
 export function UserActivityProvider({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const { cart } = useCart();
   const { wishlist } = useWishlist();
   
+  // Initialize user profile from localStorage
+  const initializeUserProfile = (): UserProfileValues | null => {
+    try {
+      const storedProfile = localStorage.getItem(STORAGE_KEY);
+      if (storedProfile) {
+        const parsedProfile = JSON.parse(storedProfile);
+        
+        // Convert birthday string back to Date object if it exists
+        if (parsedProfile.birthday) {
+          parsedProfile.birthday = new Date(parsedProfile.birthday);
+        }
+        
+        return parsedProfile;
+      }
+    } catch (error) {
+      console.error("Failed to parse saved profile", error);
+    }
+    return null;
+  };
+  
   const [userActivity, setUserActivity] = useState<UserActivity>({
     currentPage: location.pathname,
     cartItems: [],
     wishlistItems: [],
+    userProfile: initializeUserProfile(),
     lastUpdated: new Date().toISOString()
   });
 
@@ -86,8 +112,13 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
     });
   };
 
+  // Function to update user profile
+  const updateUserProfile = (profile: UserProfileValues | null) => {
+    updateUserActivity({ userProfile: profile });
+  };
+
   return (
-    <UserActivityContext.Provider value={{ userActivity }}>
+    <UserActivityContext.Provider value={{ userActivity, updateUserProfile }}>
       {children}
     </UserActivityContext.Provider>
   );

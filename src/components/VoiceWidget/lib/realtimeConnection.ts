@@ -41,6 +41,19 @@ export async function createRealtimeConnection(
   // First check if microphone is supported
   await checkMicrophoneSupport();
   
+  // Log user profile at session start
+  try {
+    const userProfileStorage = localStorage.getItem("user-profile");
+    if (userProfileStorage) {
+      const userProfile = JSON.parse(userProfileStorage);
+      console.log("WebRTC Session Start - User Profile:", JSON.stringify(userProfile, null, 2));
+    } else {
+      console.log("WebRTC Session Start - No User Profile Found");
+    }
+  } catch (error) {
+    console.error("Error loading user profile during WebRTC session start:", error);
+  }
+  
   const pc = new RTCPeerConnection({
     iceServers: [
       {
