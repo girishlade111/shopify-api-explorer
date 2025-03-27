@@ -1,6 +1,7 @@
 
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { ArrowRight } from "lucide-react";
 import { useTranscript } from "../contexts/TranscriptContext";
 
@@ -67,7 +68,7 @@ function Transcript({
                       {timestamp}
                     </div>
                     <div className={`whitespace-pre-wrap ${messageStyle}`}>
-                      <ReactMarkdown>{displayTitle}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayTitle}</ReactMarkdown>
                     </div>
                   </div>
                 </div>
