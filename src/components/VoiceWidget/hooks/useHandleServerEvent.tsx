@@ -23,6 +23,15 @@ interface GetVariantsResponse {
   };
 }
 
+interface CartItem {
+  product: {
+    product_id: number;
+    size?: string | number | null;
+    color?: string | null;
+  };
+  quantity: number;
+}
+
 const fns = {
   get_page_HTML: () => {
     return { success: true, html: document.documentElement.outerHTML };
@@ -214,9 +223,11 @@ const fns = {
       }));
       console.log("variants_info", variants_info);
 
+      const productIds = variants_info.map(product => product.product_id).join(", ");
+
       return {
         success: true,
-        context: "Product cards displayed to the user",
+        context: `Product cards displayed to the user`,
         sessionId
       };
     } catch (error) {
@@ -317,6 +328,151 @@ const fns = {
       return {
         success: false,
         error: error instanceof Error ? error.message : "Failed to get total number of products",
+        sessionId
+      };
+    }
+  },
+  get_weather: async ({ location, sessionId }: { location: string, sessionId: string }) => {
+    try {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_weather`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ location }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        ...data,
+        sessionId
+      };
+    } catch (error) {
+      console.error("Error getting weather:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to get weather information",
+        sessionId
+      };
+    }
+  },
+  add_to_cart: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
+    try {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/add_to_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cart_items }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        ...data,
+        sessionId
+      };
+    } catch (error) {
+      console.error("Error adding items to cart:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to add items to cart",
+        sessionId
+      };
+    }
+  },
+  remove_from_cart: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
+    try {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/remove_from_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cart_items }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        ...data,
+        sessionId
+      };
+    } catch (error) {
+      console.error("Error removing items from cart:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to remove items from cart",
+        sessionId
+      };
+    }
+  },
+  add_to_wishlist: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
+    try {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/add_to_wishlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cart_items }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        ...data,
+        sessionId
+      };
+    } catch (error) {
+      console.error("Error adding items to wishlist:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to add items to wishlist",
+        sessionId
+      };
+    }
+  },
+  remove_from_wishlist: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
+    try {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/remove_from_wishlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cart_items }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        ...data,
+        sessionId
+      };
+    } catch (error) {
+      console.error("Error removing items from wishlist:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to remove items from wishlist",
         sessionId
       };
     }
