@@ -35,7 +35,10 @@ export function ProfileDialogs({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => setShowSaveInfoDialog(false)}>
+            <Button onClick={(e) => {
+              e.preventDefault();
+              setShowSaveInfoDialog(false);
+            }}>
               Got it
             </Button>
           </DialogFooter>
@@ -51,11 +54,15 @@ export function ProfileDialogs({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowUnsavedChangesDialog(false)}>
+            <AlertDialogCancel onClick={(e) => {
+              e.preventDefault();
+              setShowUnsavedChangesDialog(false);
+            }}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 form.handleSubmit(onSubmit)();
                 setShowUnsavedChangesDialog(false);
               }}
@@ -63,7 +70,8 @@ export function ProfileDialogs({
               Save
             </AlertDialogAction>
             <AlertDialogAction
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 setShowUnsavedChangesDialog(false);
                 if (setHasUnsavedChanges) {
                   setHasUnsavedChanges(false);

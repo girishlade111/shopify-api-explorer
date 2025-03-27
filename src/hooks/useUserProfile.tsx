@@ -133,7 +133,10 @@ export function useUserProfile() {
     });
   }
 
-  function handleReset() {
+  function handleReset(e?: React.MouseEvent<HTMLButtonElement>) {
+    if (e) {
+      e.preventDefault();
+    }
     localStorage.removeItem(STORAGE_KEY);
     form.reset(defaultValues);
     setSavedProfile(null);
@@ -144,7 +147,10 @@ export function useUserProfile() {
     });
   }
 
-  function handleSaveClick() {
+  function handleSaveClick(e?: React.MouseEvent<HTMLButtonElement>) {
+    if (e) {
+      e.preventDefault();
+    }
     if (!hasUnsavedChanges) {
       setShowSaveInfoDialog(true);
     } else {

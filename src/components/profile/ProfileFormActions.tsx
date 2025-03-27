@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Save } from "lucide-react";
 
 interface ProfileFormActionsProps {
-  handleReset: () => void;
-  handleSaveClick: () => void;
+  handleReset: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  handleSaveClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   hasUnsavedChanges: boolean;
 }
 
@@ -18,13 +18,19 @@ export function ProfileFormActions({
       <Button
         type="button"
         variant="outline"
-        onClick={handleReset}
+        onClick={(e) => {
+          e.preventDefault();
+          handleReset(e);
+        }}
       >
         Reset
       </Button>
       <Button 
         type="button"
-        onClick={handleSaveClick}
+        onClick={(e) => {
+          e.preventDefault();
+          handleSaveClick(e);
+        }}
         disabled={!hasUnsavedChanges}
         className="gap-2"
       >
