@@ -4,7 +4,8 @@ import { useTranscript } from "../contexts/TranscriptContext";
 import { useEvent } from "../contexts/EventContext";
 
 // Global variable for the ngrok address
-const NGROK_URL = "https://conv-engine-testing.ngrok.io";
+const NGROK_URL = import.meta.env.VITE_NGROK_URL;
+const STORE_URL = import.meta.env.VITE_STORE_URL;
 
 interface ProductVariant {
   title: string;
@@ -34,7 +35,7 @@ const fns = {
   }) => {
     try {
       // First get the variant information
-      const response = await fetch(`${NGROK_URL}/api/appella-dev.myshopify.com/${sessionId}/get_variants`, {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +133,7 @@ const fns = {
   search_products: async ({ queries, sessionId, price_range }: { queries: string[], sessionId: string, price_range?: [number, number] }) => {
     try {
       console.log("sessionId", sessionId);
-      const response = await fetch(`${NGROK_URL}/api/appella-dev.myshopify.com/${sessionId}/search_products`, {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/search_products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -165,29 +166,33 @@ const fns = {
       };
     }
   },
-  display_products: async ({ products, sessionId, max_variants = 6 }: { 
-    products: Array<{
-      product_id: number;
-      size?: string | number | null;
-      color?: string | null;
-    }>;
+  display_products: async ({ products_list, sessionId, max_variants = 6 }: { 
+    products_list: {
+      products: Array<{
+        product_id: number;
+        size?: string | number | null;
+        color?: string | null;
+      }>;
+    };
     sessionId: string;
     max_variants?: number;
   }) => {
     try {
-      const response = await fetch(`${NGROK_URL}/api/appella-dev.myshopify.com/${sessionId}/get_variants`, {
+      if (!products_list?.products || !Array.isArray(products_list.products) || products_list.products.length === 0) {
+        return {
+          success: false,
+          error: "No products provided",
+          sessionId
+        };
+      }
+
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
-          products_list: {
-            products: products.map(product => ({
-              product_id: product.product_id,
-              color: product.color,
-              size: product.size
-            }))
-          },
+          products_list,
           max_variants 
         }),
       });
@@ -207,11 +212,11 @@ const fns = {
         product_id: product.product_id,
         variant_id: product.variant_id
       }));
+      console.log("variants_info", variants_info);
 
       return {
         success: true,
-        variants_info,
-        context: data.context,
+        context: "Product cards displayed to the user",
         sessionId
       };
     } catch (error) {
@@ -225,7 +230,7 @@ const fns = {
   },
   get_similar_products: async ({ product_id, sessionId, num_similar = 5, price_range }: { product_id: number, sessionId: string, num_similar?: number, price_range?: [number, number] }) => {
     try {
-      const response = await fetch(`${NGROK_URL}/api/appella-dev.myshopify.com/${sessionId}/get_similar_products`, {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_similar_products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -261,7 +266,7 @@ const fns = {
   },
   search_policy: async ({ query, sessionId }: { query: string, sessionId: string }) => {
     try {
-      const response = await fetch(`${NGROK_URL}/api/appella-dev.myshopify.com/${sessionId}/search_policy`, {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/search_policy`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -290,7 +295,7 @@ const fns = {
   },
   get_total_number_of_products: async ({ sessionId }: { sessionId: string }) => {
     try {
-      const response = await fetch(`${NGROK_URL}/api/appella-dev.myshopify.com/${sessionId}/get_total_number_of_products`, {
+      const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_total_number_of_products`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
