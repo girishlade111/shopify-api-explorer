@@ -333,37 +333,6 @@ export default function CategoryPage() {
                 />
               </div>
               
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Price Range</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="min-price" className="text-sm text-muted block mb-1">
-                      Min Price
-                    </label>
-                    <input
-                      type="number"
-                      id="min-price"
-                      placeholder="$0"
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="max-price" className="text-sm text-muted block mb-1">
-                      Max Price
-                    </label>
-                    <input
-                      type="number"
-                      id="max-price"
-                      placeholder="$1000"
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <button className="w-full bg-accent text-dark mt-4 py-2 rounded-md font-medium hover:bg-accent/80 transition-colors">
-                  Apply Filter
-                </button>
-              </div>
-              
               {showFilterSidebar && (
                 <div className="md:hidden mt-6">
                   <button
