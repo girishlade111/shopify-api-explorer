@@ -139,7 +139,7 @@ export default function ProductDetail() {
         <nav className="flex items-center text-sm text-muted">
           <Link to="/" className="hover:text-primary">Home</Link>
           
-          {breadcrumbs.map((crumb, index) => (
+          {breadcrumbs && breadcrumbs.map((crumb, index) => (
             <div key={crumb.path} className="flex items-center">
               <ChevronRight className="h-3 w-3 mx-2" />
               {index === breadcrumbs.length - 1 ? (
@@ -152,7 +152,7 @@ export default function ProductDetail() {
             </div>
           ))}
           
-          {breadcrumbs.length > 0 && (
+          {breadcrumbs && breadcrumbs.length > 0 && (
             <>
               <ChevronRight className="h-3 w-3 mx-2" />
               <span className="text-dark line-clamp-1">{title}</span>
@@ -228,9 +228,9 @@ export default function ProductDetail() {
                   <div key={option.id}>
                     <h3 className="text-sm font-medium mb-2">{option.name}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {option.values.map((value) => {
+                      {option.values && option.values.map((value) => {
                         // Find variant with this option value
-                        const variantWithOption = variants.find(
+                        const variantWithOption = variants?.find(
                           (v) =>
                             v[`option${option.position}` as keyof ProductVariant] === value
                         );
