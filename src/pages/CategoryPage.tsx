@@ -5,10 +5,10 @@ import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryNav } from "@/components/CategoryNav";
 import { Section } from "@/components/ui-components";
-import { getCategories, getProductsByCategory } from "@/lib/api";
+import { getCategories, getProductsByCategory, getProducts } from "@/lib/api";
 import { Category, Product } from "@/types";
 import { cn } from "@/lib/utils";
-import { ChevronDown, SlidersHorizontal, ChevronRight } from "lucide-react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -51,6 +51,7 @@ export default function CategoryPage() {
 
   // This is the full path from URL (like "apparel-accessories/clothing/pants")
   const fullPathFromUrl = categoryPath || "";
+  const isRootCategory = !fullPathFromUrl;
 
   // Format path segments for display
   const formatPathSegment = (segment: string): string => {
@@ -127,13 +128,30 @@ export default function CategoryPage() {
   // Fetch products whenever categoryFullName, page, or sort changes
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!fullPathFromUrl) return;
-      
       setLoading(true);
       setError(null);
       
       try {
-        if (categoryFullName) {
+        // If we're at the root categories page, fetch all products
+        if (isRootCategory) {
+          console.log("Fetching all products (no specific category)");
+          const response = await getProducts(
+            currentPage,
+            12,
+            selectedSort.value,
+            selectedSort.order
+          );
+          
+          if (currentPage === 1) {
+            setProducts(response.items);
+          } else {
+            setProducts(prev => [...prev, ...response.items]);
+          }
+          
+          setTotalProducts(response.total);
+          setTotalPages(response.pages);
+          setCurrentPage(response.page);
+        } else if (categoryFullName) {
           console.log("Fetching products for category full name:", categoryFullName);
           
           const response = await getProductsByCategory(
@@ -188,7 +206,7 @@ export default function CategoryPage() {
     };
     
     fetchProducts();
-  }, [categoryFullName, fullPathFromUrl, currentPage, selectedSort]);
+  }, [categoryFullName, fullPathFromUrl, currentPage, selectedSort, isRootCategory]);
 
   // Reset to page 1 when changing categories or sort options
   useEffect(() => {
@@ -208,9 +226,8 @@ export default function CategoryPage() {
   };
 
   const breadcrumbSegments = getBreadcrumbSegments();
-  const categoryTitle = breadcrumbSegments.length > 0 
-    ? breadcrumbSegments[breadcrumbSegments.length - 1].label 
-    : "Products";
+  const pageTitle = isRootCategory ? "All Products" : 
+    (breadcrumbSegments.length > 0 ? breadcrumbSegments[breadcrumbSegments.length - 1].label : "Products");
 
   return (
     <Layout>
@@ -222,13 +239,17 @@ export default function CategoryPage() {
                 <Link to="/">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
             
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/categories">Categories</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
+            {!isRootCategory && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link to="/categories">All Products</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </>
+            )}
             
             {breadcrumbSegments.map((segment, index) => (
               <BreadcrumbItem key={segment.path}>
@@ -249,7 +270,7 @@ export default function CategoryPage() {
       <Section>
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl md:text-4xl font-semibold">
-            {categoryTitle}
+            {pageTitle}
           </h1>
           
           <div className="flex items-center gap-4">
