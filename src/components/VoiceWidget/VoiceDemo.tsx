@@ -1,16 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
-import { 
-  createRealtimeConnection, 
-  cleanupConnection, 
-  attemptReconnection,
-  saveConnectionState
-} from './lib/realtimeConnection';
+import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
@@ -32,13 +26,11 @@ export default function VoiceDemo() {
   const [tools, setTools] = useState<any[]>([]);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [connectionRetries, setConnectionRetries] = useState(0);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const connectionRetryTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load persisted settings on component mount
   useEffect(() => {
@@ -49,50 +41,20 @@ export default function VoiceDemo() {
         setIsTranscriptionEnabled(settings.isTranscriptionEnabled ?? false);
         setIsAudioEnabled(settings.isAudioEnabled ?? false);
         setIsWidgetOpen(settings.isWidgetOpen ?? false);
+        
+        // Auto-connect if it was previously connected
+        if (settings.wasConnected && isInitialConnectionRef.current) {
+          isInitialConnectionRef.current = false;
+          // Use setTimeout to ensure component is fully mounted
+          setTimeout(() => {
+            handleToggleConnection();
+          }, 1000);
+        }
       } catch (e) {
         console.error('Error parsing stored voice widget settings:', e);
       }
     }
   }, []);
-
-  // Try to reconnect when component is mounted
-  useEffect(() => {
-    if (isInitialConnectionRef.current) {
-      isInitialConnectionRef.current = false;
-      // Try to reconnect with a slight delay to ensure component is fully mounted
-      setTimeout(() => {
-        console.log("Attempting initial connection");
-        handleReconnection();
-      }, 1000);
-    }
-  }, []);
-
-  // Attempt to reconnect when navigating back to a page
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && 
-          sessionStatus === 'DISCONNECTED') {
-        console.log("Page became visible, attempting reconnection");
-        handleReconnection();
-      }
-    };
-
-    const handlePageShow = (e: PageTransitionEvent) => {
-      // If the page is being loaded from the back-forward cache
-      if (e.persisted && sessionStatus === 'DISCONNECTED') {
-        console.log("Page restored from bfcache, attempting reconnection");
-        handleReconnection();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('pageshow', handlePageShow);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('pageshow', handlePageShow);
-    };
-  }, [sessionStatus]);
 
   // Save settings whenever they change
   useEffect(() => {
@@ -104,11 +66,10 @@ export default function VoiceDemo() {
     }));
   }, [isTranscriptionEnabled, isAudioEnabled, isWidgetOpen, sessionStatus]);
 
-  // Initialize and configure the audio element
   useEffect(() => {
     if (!audioElementRef.current) {
       const audio = new Audio();
-      audio.autoplay = isAudioEnabled;
+      audio.autoplay = true;
       audioElementRef.current = audio;
     }
 
@@ -130,34 +91,10 @@ export default function VoiceDemo() {
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
       }
-      if (connectionRetryTimerRef.current) {
-        clearTimeout(connectionRetryTimerRef.current);
-      }
-      
-      // When unmounting, save the current state if we're connected
-      if (sessionStatus === 'CONNECTED' && pcRef.current && clientSecret) {
-        saveConnectionState(pcRef.current, clientSecret);
-      }
     };
-  }, [sessionStatus, clientSecret]);
-
-  // Before unloading the page, save connection state if connected
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (sessionStatus === 'CONNECTED' && pcRef.current && clientSecret) {
-        saveConnectionState(pcRef.current, clientSecret);
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [sessionStatus, clientSecret]);
+  }, []);
 
   const cleanupResources = () => {
-    console.log("Cleaning up WebRTC resources");
     // Clean up RTCPeerConnection
     cleanupConnection(pcRef.current);
     pcRef.current = null;
@@ -179,86 +116,8 @@ export default function VoiceDemo() {
       setInstructions("");
       setTools([]);
       setConnectionRetries(0);
-      setClientSecret(null);
     } else {
       await connectToService();
-    }
-  };
-
-  const handleReconnection = async () => {
-    if (sessionStatus === 'CONNECTED' || sessionStatus === 'CONNECTING') {
-      console.log("Already connected or connecting, skipping reconnection");
-      return;
-    }
-    
-    setError(null);
-    setSessionStatus('CONNECTING');
-    
-    try {
-      // First try to reconnect using saved state
-      const reconnection = await attemptReconnection(
-        audioElementRef, 
-        isAudioEnabled
-      );
-      
-      if (reconnection) {
-        pcRef.current = reconnection.pc;
-        dcRef.current = reconnection.dc;
-        setSessionStatus('CONNECTED');
-        
-        // Fetch session data to get instructions and tools
-        try {
-          const sessionData = await fetchSessionData();
-          if (sessionData?.result?.client_secret?.value) {
-            setClientSecret(sessionData.result.client_secret.value);
-          }
-        } catch (error) {
-          console.error("Failed to fetch session data after reconnection:", error);
-        }
-        
-        console.log("Successfully reconnected using saved state");
-      } else {
-        // If reconnection fails, try connecting normally
-        console.log("Reconnection with saved state failed, connecting normally");
-        await connectToService();
-      }
-    } catch (error) {
-      console.error("Reconnection error:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : 'Failed to reconnect. Please try again.'
-      );
-      setSessionStatus('DISCONNECTED');
-    }
-  };
-
-  const fetchSessionData = async () => {
-    try {
-      const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const sessionInstructions = data.result?.instructions;
-      const sessionTools = data.result?.tools || [];
-      
-      setInstructions(sessionInstructions || "");
-      setTools(sessionTools);
-      
-      return data;
-    } catch (error) {
-      console.error("Error fetching session data:", error);
-      throw error;
     }
   };
 
@@ -291,11 +150,11 @@ export default function VoiceDemo() {
           }
 
           const data = await response.json();
-          const newClientSecret = data.result?.client_secret?.value;
+          const clientSecret = data.result?.client_secret?.value;
           const sessionInstructions = data.result?.instructions;
           const sessionTools = data.result?.tools || [];
 
-          if (!newClientSecret) {
+          if (!clientSecret) {
             throw new Error('No client secret found in response');
           }
 
@@ -303,17 +162,17 @@ export default function VoiceDemo() {
           cleanupResources();
 
           const { pc, dc } = await createRealtimeConnection(
-            newClientSecret,
+            clientSecret,
             audioElementRef,
             isAudioEnabled
           );
 
           pcRef.current = pc;
           dcRef.current = dc;
-          setClientSecret(newClientSecret);
           setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
+          setIsWidgetOpen(true);
           setConnectionRetries(0); // Reset retries on successful connection
 
           if (audioElementRef.current && isAudioEnabled) {
@@ -362,7 +221,7 @@ export default function VoiceDemo() {
       // If we haven't exceeded the retry limit, try again after a delay
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
         console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
-        connectionRetryTimerRef.current = setTimeout(() => {
+        setTimeout(() => {
           connectToService();
         }, 2000); // Wait 2 seconds before retrying
       }
@@ -420,8 +279,7 @@ export default function VoiceDemo() {
       {/* Chat Widget Toggle Button */}
       <button
         onClick={() => setIsWidgetOpen(!isWidgetOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-200"
-        aria-label="Toggle voice assistant"
+        className="fixed bottom-6 right-6 z-50 bg-[#5856d6] text-white p-4 rounded-full shadow-lg hover:bg-[#4745ac] transition-all duration-200"
       >
         {isWidgetOpen ? (
           <X className="w-6 h-6" />
