@@ -2,6 +2,8 @@ import { useRef } from "react";
 import { ServerEvent, SessionStatus } from "../types";
 import { useTranscript } from "../contexts/TranscriptContext";
 import { useEvent } from "../contexts/EventContext";
+import { useFittingRoom } from "@/contexts/FittingRoomContext";
+import { useNavigate } from "react-router-dom";
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
@@ -38,7 +40,6 @@ const fns = {
     sessionId: string;
   }) => {
     try {
-      // First get the variant information
       const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
         method: "POST",
         headers: {
@@ -67,7 +68,6 @@ const fns = {
         throw new Error("No link found for the specified product variant");
       }
 
-      // Navigate to the product link
       window.location.href = productInfo.link;
 
       return {
@@ -110,8 +110,6 @@ const fns = {
   },
   clear_cart: () => {
     try {
-      // Dispatch a custom event that can be listened to by the cart management system
-      // window.dispatchEvent(new CustomEvent('clearCart'));
       return { success: true };
     } catch (error) {
       console.error("Error clearing cart:", error);
@@ -123,8 +121,6 @@ const fns = {
   },
   clear_wishlist: () => {
     try {
-      // Dispatch a custom event that can be listened to by the wishlist management system
-      // window.dispatchEvent(new CustomEvent('clearWishlist'));
       return { success: true };
     } catch (error) {
       console.error("Error clearing wishlist:", error);
@@ -207,7 +203,6 @@ const fns = {
 
       const data = await response.json() as GetVariantsResponse;
       
-      // Transform the artifact data into an array of product info
       const variants_info = Object.values(data.artifact || {}).map(product => ({
         title: product.title,
         price: product.price,
@@ -217,6 +212,12 @@ const fns = {
         variant_id: product.variant_id
       }));
       console.log("variants_info", variants_info);
+
+      const fittingRoomContext = window.fittingRoomContext;
+      if (fittingRoomContext && variants_info.length > 0) {
+        fittingRoomContext.addProducts(variants_info);
+        window.location.href = '/fitting-room';
+      }
 
       return {
         success: true,
@@ -344,9 +345,14 @@ export function useHandleServerEvent({
     updateTranscriptMessage,
     updateTranscriptItemStatus,
   } = useTranscript();
-
   const { logServerEvent } = useEvent();
+  const fittingRoom = useFittingRoom();
+  const navigate = useNavigate();
   const currentSessionId = useRef<string | null>(null);
+
+  if (typeof window !== 'undefined') {
+    window.fittingRoomContext = fittingRoom;
+  }
 
   const handleFunctionCall = async (functionCallParams: {
     name: string;
@@ -356,7 +362,6 @@ export function useHandleServerEvent({
     let args;
     try {
       args = JSON.parse(functionCallParams.arguments);
-      // Add session ID to arguments if available
       if (currentSessionId.current) {
         args = { ...args, sessionId: currentSessionId.current };
       }
@@ -375,7 +380,13 @@ export function useHandleServerEvent({
     if (fn !== undefined) {
       try {
         result = await fn(args);
-        // Add function call result to transcript
+        
+        if (functionCallParams.name === 'display_products' && result.success) {
+          addTranscriptBreadcrumb(`Displaying products in fitting room`, {
+            count: Object.keys(args.products_list?.products || {}).length
+          });
+        }
+        
         addTranscriptBreadcrumb(`function result: ${functionCallParams.name}`, {
           ...result
         });
@@ -386,7 +397,6 @@ export function useHandleServerEvent({
           error: error instanceof Error ? error.message : "Unknown error",
           sessionId: currentSessionId.current
         };
-        // Add error result to transcript
         addTranscriptBreadcrumb(`function error: ${functionCallParams.name}`, {
           ...result
         });
@@ -397,7 +407,6 @@ export function useHandleServerEvent({
         error: `Function ${functionCallParams.name} not found`,
         sessionId: currentSessionId.current
       };
-      // Add not found error to transcript
       addTranscriptBreadcrumb(`function not found: ${functionCallParams.name}`, {
         ...result
       });
@@ -416,9 +425,6 @@ export function useHandleServerEvent({
 
   const handleServerEvent = (serverEvent: ServerEvent) => {
     logServerEvent(serverEvent);
-    // if (serverEvent.type !== "response.audio_transcript.delta" && serverEvent.type !== "response.function_call_arguments.done") {
-    //   console.log("serverEvent", serverEvent);
-    // }
     switch (serverEvent.type) {
       case "session.created": {
         if (serverEvent.session?.id) {
@@ -509,4 +515,10 @@ export function useHandleServerEvent({
   handleServerEventRef.current = handleServerEvent;
 
   return handleServerEventRef;
+}
+
+declare global {
+  interface Window {
+    fittingRoomContext?: any;
+  }
 }
