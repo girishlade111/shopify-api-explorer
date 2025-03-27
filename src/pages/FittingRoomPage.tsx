@@ -5,7 +5,7 @@ import { formatPrice } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FittingRoom as FittingRoomIcon } from "@/components/icons/FittingRoom";
+import FittingRoomIcon from "@/components/icons/FittingRoom";
 import { ArrowLeft, ExternalLink, ShoppingBag } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 

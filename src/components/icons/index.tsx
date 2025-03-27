@@ -1,2 +1,4 @@
 
-export { default as FittingRoom } from './FittingRoom';
+import FittingRoom from './FittingRoom';
+
+export { FittingRoom };

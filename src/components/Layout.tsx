@@ -1,9 +1,10 @@
+
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Heart, User, Menu, X } from "lucide-react";
-import { FittingRoom } from "./icons";
+import FittingRoom from "./icons/FittingRoom";
 import { useToast } from "@/hooks/use-toast";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
