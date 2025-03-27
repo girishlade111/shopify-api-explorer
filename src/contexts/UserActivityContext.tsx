@@ -99,7 +99,7 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
 
   // Update user activity and log to console
   const updateUserActivity = (updates: Partial<UserActivity>) => {
-    // Skip logging if we're currently in the middle of a userProfile update that was triggered internally
+    // Skip if we're currently in the middle of a userProfile update that was triggered internally
     if (isUpdatingProfile.current && 'userProfile' in updates) {
       return;
     }
@@ -111,14 +111,8 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
         lastUpdated: new Date().toISOString()
       };
       
-      // Only log if something meaningful has changed (comparing without lastUpdated field)
-      const prevCopy = { ...prev, lastUpdated: newActivity.lastUpdated };
-      const hasChanges = JSON.stringify(prevCopy) !== JSON.stringify(newActivity);
-      
-      if (hasChanges) {
-        // Log the updated activity to console
-        console.log("User Activity Updated:", JSON.stringify(newActivity, null, 2));
-      }
+      // Always log user activity updates
+      console.log("User Activity Updated:", JSON.stringify(newActivity, null, 2));
       
       return newActivity;
     });
