@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { FittingRoomProvider } from "@/contexts/FittingRoomContext";
+import { UserActivityProvider } from "@/contexts/UserActivityContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
@@ -26,30 +27,32 @@ const App = () => (
     <WishlistProvider>
       <CartProvider>
         <FittingRoomProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/products/:handle" element={<ProductDetail />} />
-                <Route path="/all-products" element={<CategoryPage />} />
-                <Route path="/all-products/:category/*" element={<CategoryPage />} />
-                <Route path="/search" element={<SearchResults />} />
-                <Route path="/new-arrivals" element={<NewArrivalsPage />} />
-                <Route path="/wishlist" element={<WishlistPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/fitting-room" element={<FittingRoomPage />} />
-                <Route path="/profile" element={<UserProfilePage />} />
-                <Route path="/account" element={<UserProfilePage />} /> {/* Updated to use UserProfilePage instead of NotFound */}
-                <Route path="/categories" element={<CategoryPage />} />
-                <Route path="/categories/:category/*" element={<CategoryPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <VoiceWidget />
-            </BrowserRouter>
-          </TooltipProvider>
+          <BrowserRouter>
+            <UserActivityProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/products/:handle" element={<ProductDetail />} />
+                  <Route path="/all-products" element={<CategoryPage />} />
+                  <Route path="/all-products/:category/*" element={<CategoryPage />} />
+                  <Route path="/search" element={<SearchResults />} />
+                  <Route path="/new-arrivals" element={<NewArrivalsPage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/fitting-room" element={<FittingRoomPage />} />
+                  <Route path="/profile" element={<UserProfilePage />} />
+                  <Route path="/account" element={<UserProfilePage />} /> {/* Updated to use UserProfilePage instead of NotFound */}
+                  <Route path="/categories" element={<CategoryPage />} />
+                  <Route path="/categories/:category/*" element={<CategoryPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <VoiceWidget />
+              </TooltipProvider>
+            </UserActivityProvider>
+          </BrowserRouter>
         </FittingRoomProvider>
       </CartProvider>
     </WishlistProvider>
