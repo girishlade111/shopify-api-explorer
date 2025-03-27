@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Category } from "@/types";
 import { getCategories } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -22,6 +21,7 @@ export function CategoryNav({
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -65,6 +65,17 @@ export function CategoryNav({
       .join("/");
   };
 
+  const handleCategoryClick = (category: Category) => {
+    // If onCategoryClick prop exists, call it
+    if (onCategoryClick) {
+      onCategoryClick(category);
+    } else {
+      // Otherwise, navigate directly to the category page
+      const path = getCategoryPath(category.full_path);
+      navigate(`/categories/${path}`);
+    }
+  };
+
   return (
     <div className={cn("space-y-1", className)}>
       {categories.map((category) => {
@@ -79,7 +90,7 @@ export function CategoryNav({
             count={category.count}
             path={`/categories/${path}`}
             isActive={isActive}
-            onClick={() => onCategoryClick?.(category)}
+            onClick={() => handleCategoryClick(category)}
           />
         );
       })}
@@ -96,17 +107,12 @@ interface CategoryItemProps {
 }
 
 function CategoryItem({ name, count, path, isActive, onClick }: CategoryItemProps) {
+  // Use button instead of Link if onClick is provided
   return (
-    <Link
-      to={path}
-      onClick={(e) => {
-        if (onClick) {
-          e.preventDefault();
-          onClick();
-        }
-      }}
+    <button
+      onClick={onClick}
       className={cn(
-        "flex items-center justify-between px-4 py-2 rounded-md transition-colors",
+        "flex items-center justify-between px-4 py-2 rounded-md transition-colors w-full text-left",
         isActive
           ? "bg-primary text-white font-medium"
           : "hover:bg-accent text-secondary"
@@ -123,6 +129,6 @@ function CategoryItem({ name, count, path, isActive, onClick }: CategoryItemProp
       >
         {count}
       </span>
-    </Link>
+    </button>
   );
 }
