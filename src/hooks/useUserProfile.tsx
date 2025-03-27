@@ -68,6 +68,7 @@ export function useUserProfile() {
     defaultValues,
   });
 
+  // Load the user profile from local storage on component mount
   useEffect(() => {
     const storedProfile = localStorage.getItem(STORAGE_KEY);
     if (storedProfile) {
@@ -83,6 +84,7 @@ export function useUserProfile() {
         setSavedProfile(parsedProfile);
         
         // Update the user activity context with the loaded profile
+        // This is synchronized with the profile loading
         updateUserProfile(parsedProfile);
         
         console.log("User Profile Loaded:", JSON.stringify(parsedProfile, null, 2));
@@ -98,6 +100,7 @@ export function useUserProfile() {
     }
   }, [form, updateUserProfile]);
 
+  // Watch for changes in the form to detect unsaved changes
   useEffect(() => {
     const subscription = form.watch((value) => {
       // Skip the check if we're loading a profile from storage
@@ -129,6 +132,7 @@ export function useUserProfile() {
     return () => subscription.unsubscribe();
   }, [form, savedProfile]);
   
+  // Handle window/tab close with unsaved changes
   useBeforeUnload(
     useCallback(
       (event) => {
@@ -141,15 +145,18 @@ export function useUserProfile() {
     )
   );
 
+  // Submit handler - saves the profile
   function onSubmit(data: UserProfileValues) {
     // Set isLoadingProfile to true to prevent watch from triggering changes
     isLoadingProfile.current = true;
     
+    // Store in localStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     setSavedProfile(data);
     setHasUnsavedChanges(false);
     
     // Update user activity with the new profile data
+    // This ensures that the user activity tracking is synchronized with profile updates
     updateUserProfile(data);
     
     console.log("User Profile Updated:", JSON.stringify(data, null, 2));
@@ -165,6 +172,7 @@ export function useUserProfile() {
     }, 100);
   }
 
+  // Reset handler - clears the profile
   function handleReset(e?: React.MouseEvent<HTMLButtonElement>) {
     if (e) {
       e.preventDefault();
@@ -173,12 +181,14 @@ export function useUserProfile() {
     // Set isLoadingProfile to true to prevent watch from triggering changes
     isLoadingProfile.current = true;
     
+    // Clear localStorage and form
     localStorage.removeItem(STORAGE_KEY);
     form.reset(defaultValues);
     setSavedProfile(null);
     setHasUnsavedChanges(false);
     
     // Update user activity to clear profile data
+    // This ensures the user activity is synchronized when profile is reset
     updateUserProfile(null);
     
     console.log("User Profile Reset");
@@ -194,6 +204,7 @@ export function useUserProfile() {
     }, 100);
   }
 
+  // Handler for save button click
   function handleSaveClick(e?: React.MouseEvent<HTMLButtonElement>) {
     if (e) {
       e.preventDefault();
