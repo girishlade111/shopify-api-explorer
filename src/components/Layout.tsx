@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Heart, User, Menu, X } from "lucide-react";
+import { FittingRoom } from "./icons";
 import { useToast } from "@/hooks/use-toast";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
@@ -47,6 +48,13 @@ export function Layout({ children }: LayoutProps) {
     toast({
       title: "Account",
       description: "Account page is currently under development.",
+    });
+  };
+
+  const handleFittingRoomClick = () => {
+    toast({
+      title: "Fitting Room",
+      description: "Virtual fitting room is coming soon!",
     });
   };
 
@@ -108,6 +116,14 @@ export function Layout({ children }: LayoutProps) {
               </button>
               
               <button 
+                onClick={handleFittingRoomClick}
+                className="p-2 hover:text-primary transition-colors rounded-full"
+                aria-label="Fitting Room"
+              >
+                <FittingRoom className="h-5 w-5" />
+              </button>
+              
+              <button 
                 onClick={handleAccountClick}
                 className="p-2 hover:text-primary transition-colors rounded-full"
                 aria-label="Account"
@@ -154,6 +170,13 @@ export function Layout({ children }: LayoutProps) {
                 >
                   <ShoppingBag className="h-5 w-5" />
                   <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
+                </button>
+                <button
+                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
+                  onClick={handleFittingRoomClick}
+                >
+                  <FittingRoom className="h-5 w-5" />
+                  <span>Fitting Room</span>
                 </button>
                 <button
                   className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
