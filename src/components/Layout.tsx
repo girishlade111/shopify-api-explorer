@@ -1,4 +1,3 @@
-
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
@@ -45,10 +44,6 @@ export function Layout({ children }: LayoutProps) {
 
   const handleAccountClick = () => {
     navigate("/account");
-    toast({
-      title: "Account",
-      description: "Account page is currently under development.",
-    });
   };
 
   const handleFittingRoomClick = () => {

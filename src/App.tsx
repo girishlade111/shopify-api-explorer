@@ -42,7 +42,7 @@ const App = () => (
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/fitting-room" element={<FittingRoomPage />} />
                 <Route path="/profile" element={<UserProfilePage />} />
-                <Route path="/account" element={<NotFound />} /> {/* Temporarily using NotFound for account page */}
+                <Route path="/account" element={<UserProfilePage />} /> {/* Updated to use UserProfilePage instead of NotFound */}
                 <Route path="/categories" element={<CategoryPage />} />
                 <Route path="/categories/:category/*" element={<CategoryPage />} />
                 <Route path="*" element={<NotFound />} />
