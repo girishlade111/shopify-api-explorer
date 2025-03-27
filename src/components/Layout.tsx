@@ -70,7 +70,7 @@ export function Layout({ children }: LayoutProps) {
               <span className="text-xl font-semibold tracking-tight">STORE</span>
             </Link>
             
-            <nav className="hidden md:flex items-center space-x-6">
+            <nav className="hidden md:flex items-center space-x-8">
               <NavLink to="/categories/clothing-tops">Tops</NavLink>
               <NavLink to="/categories/dresses">Dresses</NavLink>
               <NavLink to="/categories/sweaters">Sweaters</NavLink>
@@ -252,13 +252,15 @@ const NavLink = ({ to, children }: { to: string; children: ReactNode }) => {
     <Link
       to={to}
       className={cn(
-        "text-sm font-medium transition-colors hover:text-primary relative",
-        isActive ? "text-primary" : "text-dark"
+        "text-sm font-medium transition-colors hover:text-primary px-3 py-2 rounded-md relative",
+        isActive 
+          ? "text-primary bg-primary/5" 
+          : "text-dark hover:bg-accent/60"
       )}
     >
       {children}
       {isActive && (
-        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full transform -translate-y-1" />
+        <span className="absolute bottom-0 left-0 right-0 mx-auto w-1/2 h-0.5 bg-primary rounded-full" />
       )}
     </Link>
   );
@@ -272,8 +274,8 @@ const MobileNavLink = ({ to, children }: { to: string; children: ReactNode }) =>
     <Link
       to={to}
       className={cn(
-        "text-lg font-medium p-2 rounded-md transition-colors",
-        isActive ? "text-primary bg-accent" : "text-dark hover:bg-accent"
+        "text-lg font-medium p-3 rounded-md transition-colors",
+        isActive ? "text-primary bg-primary/5" : "text-dark hover:bg-accent"
       )}
     >
       {children}
