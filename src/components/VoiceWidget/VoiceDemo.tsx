@@ -6,6 +6,14 @@ import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection } from './lib/realtimeConnection';
 
+// Default values for environment variables
+const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
+const DEFAULT_STORE_URL = "appella-test.myshopify.com";
+
+// Use environment variables or fallback to defaults
+const NGROK_URL = import.meta.env.VITE_NGROK_URL || DEFAULT_NGROK_URL;
+const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
+
 export default function VoiceDemo() {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
@@ -95,7 +103,7 @@ export default function VoiceDemo() {
       setError(null);
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_NGROK_URL}/openai-realtime/session/${import.meta.env.VITE_STORE_URL}`, {
+        const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
           method: 'GET',
           mode: 'cors',
           headers: {
