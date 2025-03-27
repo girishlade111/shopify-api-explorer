@@ -134,7 +134,7 @@ export default function ProductDetail() {
         <nav className="flex items-center text-sm text-muted">
           <Link to="/" className="hover:text-primary">Home</Link>
           
-          {breadcrumbs && breadcrumbs.map((crumb, index) => (
+          {breadcrumbs && breadcrumbs.length > 0 && breadcrumbs.map((crumb, index) => (
             <div key={crumb.path} className="flex items-center">
               <ChevronRight className="h-3 w-3 mx-2" />
               {index === breadcrumbs.length - 1 ? (
@@ -299,21 +299,12 @@ export default function ProductDetail() {
               </button>
             </div>
             
-            {selectedVariant && (
-              <div className="text-sm">
-                {selectedVariant.available ? (
-                  <span className="text-green-600">In Stock</span>
-                ) : (
-                  <span className="text-red-500">Out of Stock</span>
-                )}
-              </div>
-            )}
             
             <div className="pt-4 border-t border-gray-200">
               <h3 className="text-lg font-semibold mb-2">Description</h3>
               <div 
                 className="text-muted prose prose-sm max-w-none" 
-                dangerouslySetInnerHTML={{ __html: body_html || '' }}
+                dangerouslySetInnerHTML={{ __html: body_html || 'No description available.' }}
               />
             </div>
           </div>
