@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -299,11 +300,10 @@ export default function ProductDetail() {
               </button>
             </div>
             
-            
             <div className="pt-4 border-t border-gray-200">
               <h3 className="text-lg font-semibold mb-2">Description</h3>
               <div 
-                className="text-muted prose prose-sm max-w-none" 
+                className="text-dark prose prose-sm max-w-none" 
                 dangerouslySetInnerHTML={{ __html: body_html || 'No description available.' }}
               />
             </div>
