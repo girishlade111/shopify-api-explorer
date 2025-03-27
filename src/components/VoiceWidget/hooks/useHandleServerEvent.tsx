@@ -213,9 +213,8 @@ const fns = {
       }));
       console.log("variants_info", variants_info);
 
-      const fittingRoomContext = window.fittingRoomContext;
-      if (fittingRoomContext && variants_info.length > 0) {
-        fittingRoomContext.addProducts(variants_info);
+      if (variants_info.length > 0) {
+        localStorage.setItem('fittingRoomProducts', JSON.stringify(variants_info));
         window.location.href = '/fitting-room';
       }
 

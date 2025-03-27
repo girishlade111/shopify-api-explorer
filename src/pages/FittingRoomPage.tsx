@@ -1,4 +1,6 @@
 
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useFittingRoom } from "@/contexts/FittingRoomContext";
 import { formatPrice } from "@/lib/api";
@@ -10,8 +12,22 @@ import { ArrowLeft, ExternalLink, ShoppingBag } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 
 export default function FittingRoomPage() {
-  const { products } = useFittingRoom();
+  const { products, addProducts } = useFittingRoom();
   const { addToCart } = useCart();
+
+  // Load products from localStorage on component mount
+  useEffect(() => {
+    const storedProducts = localStorage.getItem('fittingRoomProducts');
+    if (storedProducts && (!products || products.length === 0)) {
+      try {
+        const parsedProducts = JSON.parse(storedProducts);
+        console.log("Loading products from localStorage:", parsedProducts);
+        addProducts(parsedProducts);
+      } catch (error) {
+        console.error("Error parsing stored products:", error);
+      }
+    }
+  }, [addProducts, products]);
 
   const handleAddToCart = (productId: number, variantId: number) => {
     // We don't have the full product data here, so we create a minimal version
@@ -45,10 +61,10 @@ export default function FittingRoomPage() {
             <h1 className="text-3xl font-bold tracking-tight">Virtual Fitting Room</h1>
           </div>
           <Button variant="outline" size="sm" asChild>
-            <a href="/">
+            <Link to="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Shopping
-            </a>
+            </Link>
           </Button>
         </div>
 
@@ -59,7 +75,9 @@ export default function FittingRoomPage() {
             <p className="text-muted-foreground max-w-md mb-6">
               Try asking the assistant to find clothing items for you to try on virtually.
             </p>
-            <Button>Start Shopping</Button>
+            <Button asChild>
+              <Link to="/">Start Shopping</Link>
+            </Button>
           </div>
         ) : (
           <Tabs defaultValue="grid" className="w-full">
