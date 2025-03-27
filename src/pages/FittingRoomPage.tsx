@@ -9,13 +9,20 @@ import FittingRoomIcon from "@/components/icons/FittingRoom";
 import { ArrowLeft, ExternalLink, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function FittingRoomPage() {
   const { products, tabs, clearProducts } = useFittingRoom();
   const { addToCart } = useCart();
   const [viewType, setViewType] = useState<"grid" | "compare">("grid");
-  const [activeTabId, setActiveTabId] = useState<string>(tabs.length > 0 ? tabs[0].id : "");
+  const [activeTabId, setActiveTabId] = useState<string>("");
+
+  // Set the active tab to the newest tab (first in the list) whenever tabs change
+  useEffect(() => {
+    if (tabs.length > 0) {
+      setActiveTabId(tabs[0].id);
+    }
+  }, [tabs.length]);
 
   const handleAddToCart = (productId: number, variantId: number) => {
     // We don't have the full product data here, so we create a minimal version
@@ -172,31 +179,33 @@ export default function FittingRoomPage() {
             </div>
             
             {/* Product Set Tabs */}
-            <Tabs 
-              value={activeTabId} 
-              onValueChange={setActiveTabId}
-              className="w-full"
-            >
-              <TabsList className="mb-6 flex flex-wrap">
+            {tabs.length > 0 && (
+              <Tabs 
+                value={activeTabId} 
+                onValueChange={setActiveTabId}
+                className="w-full"
+              >
+                <TabsList className="mb-6 flex flex-wrap">
+                  {tabs.map((tab) => (
+                    <TabsTrigger key={tab.id} value={tab.id} className="flex-grow">
+                      {tab.name} ({tab.products.length})
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                
                 {tabs.map((tab) => (
-                  <TabsTrigger key={tab.id} value={tab.id} className="flex-grow">
-                    {tab.name} ({tab.products.length})
-                  </TabsTrigger>
+                  <TabsContent key={tab.id} value={tab.id} className="mt-0">
+                    <div className="mb-4">
+                      <p className="text-muted-foreground">
+                        {tab.products.length} item{tab.products.length !== 1 ? "s" : ""} added {new Date(tab.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                    
+                    {viewType === "grid" ? renderProductGrid(tab.products) : renderCompareTable(tab.products)}
+                  </TabsContent>
                 ))}
-              </TabsList>
-              
-              {tabs.map((tab) => (
-                <TabsContent key={tab.id} value={tab.id} className="mt-0">
-                  <div className="mb-4">
-                    <p className="text-muted-foreground">
-                      {tab.products.length} item{tab.products.length !== 1 ? "s" : ""} added {new Date(tab.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                  
-                  {viewType === "grid" ? renderProductGrid(tab.products) : renderCompareTable(tab.products)}
-                </TabsContent>
-              ))}
-            </Tabs>
+              </Tabs>
+            )}
           </div>
         )}
       </div>

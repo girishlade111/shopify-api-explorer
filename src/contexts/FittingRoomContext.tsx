@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 export interface FittingRoomProduct {
@@ -72,7 +73,8 @@ export const FittingRoomProvider: React.FC<{ children: React.ReactNode }> = ({ c
       timestamp: Date.now()
     };
     
-    const updatedTabs = [...tabs, newTab];
+    // Place the new tab at the beginning of the array (newest first)
+    const updatedTabs = [newTab, ...tabs];
     setTabs(updatedTabs);
     
     // Save to localStorage
