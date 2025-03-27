@@ -49,18 +49,20 @@ export default function VoiceDemo() {
         setIsTranscriptionEnabled(settings.isTranscriptionEnabled ?? false);
         setIsAudioEnabled(settings.isAudioEnabled ?? false);
         setIsWidgetOpen(settings.isWidgetOpen ?? false);
-        
-        // Auto-connect if it was previously connected
-        if (settings.wasConnected && isInitialConnectionRef.current) {
-          isInitialConnectionRef.current = false;
-          // Use setTimeout to ensure component is fully mounted
-          setTimeout(() => {
-            handleReconnection();
-          }, 1000);
-        }
       } catch (e) {
         console.error('Error parsing stored voice widget settings:', e);
       }
+    }
+  }, []);
+
+  // Try to reconnect when component is mounted
+  useEffect(() => {
+    if (isInitialConnectionRef.current) {
+      isInitialConnectionRef.current = false;
+      // Try to reconnect with a slight delay to ensure component is fully mounted
+      setTimeout(() => {
+        handleReconnection();
+      }, 1000);
     }
   }, []);
 
@@ -68,8 +70,7 @@ export default function VoiceDemo() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && 
-          sessionStatus === 'DISCONNECTED' && 
-          clientSecret) {
+          sessionStatus === 'DISCONNECTED') {
         console.log("Page became visible, attempting reconnection");
         handleReconnection();
       }
@@ -77,7 +78,7 @@ export default function VoiceDemo() {
 
     const handlePageShow = (e: PageTransitionEvent) => {
       // If the page is being loaded from the back-forward cache
-      if (e.persisted && sessionStatus === 'DISCONNECTED' && clientSecret) {
+      if (e.persisted && sessionStatus === 'DISCONNECTED') {
         console.log("Page restored from bfcache, attempting reconnection");
         handleReconnection();
       }
@@ -90,7 +91,7 @@ export default function VoiceDemo() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pageshow', handlePageShow);
     };
-  }, [sessionStatus, clientSecret]);
+  }, [sessionStatus]);
 
   // Save settings whenever they change
   useEffect(() => {
@@ -102,6 +103,7 @@ export default function VoiceDemo() {
     }));
   }, [isTranscriptionEnabled, isAudioEnabled, isWidgetOpen, sessionStatus]);
 
+  // Initialize and configure the audio element
   useEffect(() => {
     if (!audioElementRef.current) {
       const audio = new Audio();
@@ -201,11 +203,16 @@ export default function VoiceDemo() {
         pcRef.current = reconnection.pc;
         dcRef.current = reconnection.dc;
         setSessionStatus('CONNECTED');
-        setIsWidgetOpen(true);
-        setConnectionRetries(0);
         
         // Fetch session data to get instructions and tools
-        await fetchSessionData();
+        try {
+          const sessionData = await fetchSessionData();
+          if (sessionData?.result?.client_secret?.value) {
+            setClientSecret(sessionData.result.client_secret.value);
+          }
+        } catch (error) {
+          console.error("Failed to fetch session data after reconnection:", error);
+        }
         
         console.log("Successfully reconnected using saved state");
       } else {
@@ -305,7 +312,6 @@ export default function VoiceDemo() {
           setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
-          setIsWidgetOpen(true);
           setConnectionRetries(0); // Reset retries on successful connection
 
           if (audioElementRef.current && isAudioEnabled) {
@@ -412,7 +418,8 @@ export default function VoiceDemo() {
       {/* Chat Widget Toggle Button */}
       <button
         onClick={() => setIsWidgetOpen(!isWidgetOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-[#5856d6] text-white p-4 rounded-full shadow-lg hover:bg-[#4745ac] transition-all duration-200"
+        className="fixed bottom-6 right-6 z-50 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-200"
+        aria-label="Toggle voice assistant"
       >
         {isWidgetOpen ? (
           <X className="w-6 h-6" />
