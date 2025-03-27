@@ -52,16 +52,26 @@ export default function CategoryPage() {
     setError(null);
     
     try {
-      // Extract the last part of the category path for the API call
-      const categoryParts = category.split("/");
-      const lastCategory = categoryParts[categoryParts.length - 1];
+      // Get the category in the format the API expects (spaces instead of hyphens)
+      // For the API, we need to convert from URL format to the format expected by the API
+      // Example: clothing-tops -> clothing tops
+      let categoryForApi: string;
       
-      // Replace hyphens with spaces for the API call
-      const formattedCategory = lastCategory.replace(/-/g, " ");
-      console.log("Fetching products for category:", formattedCategory);
+      // Check if this is a nested category path
+      if (category.includes("/")) {
+        // If it's a full path, we just need the last part for the API
+        const parts = category.split("/");
+        const lastPart = parts[parts.length - 1].replace(/-/g, " ");
+        categoryForApi = lastPart;
+      } else {
+        // Simple category
+        categoryForApi = category.replace(/-/g, " ");
+      }
+      
+      console.log("Fetching products for category:", categoryForApi);
       
       const response = await getProductsByCategory(
-        formattedCategory,
+        categoryForApi,
         page,
         12,
         selectedSort.value,

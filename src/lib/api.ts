@@ -79,9 +79,15 @@ export const getProductsByCategory = async (
   if (sortBy) params.append("sort_by", sortBy);
   if (sortOrder) params.append("sort_order", sortOrder);
   
-  console.log(`Fetching category products: ${categoryName}, URL: ${API_BASE_URL}/store/categories/${encodeURIComponent(categoryName)}/products`);
+  // For the API request, we only need the last part of the category name
+  // But we need to make sure we're not manipulating the input parameter directly
+  const categoryNameForApi = categoryName.includes(" > ") 
+    ? categoryName.split(" > ").pop() || categoryName
+    : categoryName;
   
-  const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryName)}/products?${params}`);
+  console.log(`Fetching category products: ${categoryNameForApi}, URL: ${API_BASE_URL}/store/categories/${encodeURIComponent(categoryNameForApi)}/products`);
+  
+  const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryNameForApi)}/products?${params}`);
   return handleApiResponse<PaginatedResponse<Product>>(response);
 };
 

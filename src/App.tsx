@@ -29,7 +29,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/products/:handle" element={<ProductDetail />} />
-              <Route path="/categories/:category" element={<CategoryPage />} />
+              {/* Update category route to handle nested paths */}
+              <Route path="/categories/:category/*" element={<CategoryPage />} />
               <Route path="/search" element={<SearchResults />} />
               <Route path="/new-arrivals" element={<NewArrivalsPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />

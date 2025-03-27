@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Category } from "@/types";
@@ -76,12 +77,25 @@ export function CategoryNav({
     }
   };
 
+  // Function to check if a category is active
+  const isCategoryActive = (categoryPath: string): boolean => {
+    if (!activeCategory) return false;
+    
+    // Convert both paths to a standardized format for comparison
+    const normalizedActivePath = activeCategory.toLowerCase().replace(/\/$/, '');
+    const normalizedCategoryPath = categoryPath.toLowerCase().replace(/\/$/, '');
+    
+    // Check if the active category is equal to or contains the category path
+    return normalizedActivePath === normalizedCategoryPath || 
+           normalizedActivePath.startsWith(normalizedCategoryPath + '/');
+  };
+
   return (
     <div className={cn("space-y-1", className)}>
       {categories.map((category) => {
         const simpleName = getSimpleCategoryName(category.full_path);
         const path = getCategoryPath(category.full_path);
-        const isActive = activeCategory === path;
+        const isActive = isCategoryActive(path);
         
         return (
           <CategoryItem
