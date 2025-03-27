@@ -1,4 +1,3 @@
-
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
@@ -71,10 +70,8 @@ export function Layout({ children }: LayoutProps) {
             </Link>
             
             <nav className="hidden md:flex items-center space-x-8">
-              <NavLink to="/categories/clothing-tops">Tops</NavLink>
-              <NavLink to="/categories/dresses">Dresses</NavLink>
-              <NavLink to="/categories/sweaters">Sweaters</NavLink>
               <NavLink to="/new-arrivals">New Arrivals</NavLink>
+              <NavLink to="/categories">Categories</NavLink>
             </nav>
           </div>
           
@@ -140,10 +137,8 @@ export function Layout({ children }: LayoutProps) {
               <SearchBar />
               
               <nav className="flex flex-col space-y-4">
-                <MobileNavLink to="/categories/clothing-tops">Tops</MobileNavLink>
-                <MobileNavLink to="/categories/dresses">Dresses</MobileNavLink>
-                <MobileNavLink to="/categories/sweaters">Sweaters</MobileNavLink>
                 <MobileNavLink to="/new-arrivals">New Arrivals</MobileNavLink>
+                <MobileNavLink to="/categories">Categories</MobileNavLink>
               </nav>
               
               <div className="flex space-x-4 pt-4 border-t border-gray-100">
@@ -190,9 +185,7 @@ export function Layout({ children }: LayoutProps) {
               <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Shop</h4>
               <ul className="space-y-2">
                 <li><FooterLink to="/new-arrivals">New Arrivals</FooterLink></li>
-                <li><FooterLink to="/categories/clothing-tops">Tops</FooterLink></li>
-                <li><FooterLink to="/categories/dresses">Dresses</FooterLink></li>
-                <li><FooterLink to="/categories/sweaters">Sweaters</FooterLink></li>
+                <li><FooterLink to="/categories">Categories</FooterLink></li>
               </ul>
             </div>
             
