@@ -1,3 +1,4 @@
+
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
@@ -70,7 +71,7 @@ export function Layout({ children }: LayoutProps) {
             
             <nav className="hidden md:flex items-center space-x-8">
               <NavLink to="/new-arrivals">New Arrivals</NavLink>
-              <NavLink to="/categories">All Products</NavLink>
+              <NavLink to="/all-products">All Products</NavLink>
             </nav>
           </div>
           
@@ -136,7 +137,7 @@ export function Layout({ children }: LayoutProps) {
               
               <nav className="flex flex-col space-y-4">
                 <MobileNavLink to="/new-arrivals">New Arrivals</MobileNavLink>
-                <MobileNavLink to="/categories">All Products</MobileNavLink>
+                <MobileNavLink to="/all-products">All Products</MobileNavLink>
               </nav>
               
               <div className="flex space-x-4 pt-4 border-t border-gray-100">
@@ -183,7 +184,7 @@ export function Layout({ children }: LayoutProps) {
               <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Shop</h4>
               <ul className="space-y-2">
                 <li><FooterLink to="/new-arrivals">New Arrivals</FooterLink></li>
-                <li><FooterLink to="/categories">All Products</FooterLink></li>
+                <li><FooterLink to="/all-products">All Products</FooterLink></li>
               </ul>
             </div>
             

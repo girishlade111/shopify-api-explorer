@@ -76,9 +76,9 @@ export function CategoryNav({
       onCategoryClick(category);
     }
     
-    // Navigate to the category page
+    // Navigate to the category page with the new URL pattern
     const path = getCategoryPath(category.full_path);
-    const categoryUrl = `/categories/${path}`;
+    const categoryUrl = `/all-products/${path}`;
     
     // Only navigate if we're going to a different URL to avoid unnecessary rerenders
     if (location.pathname !== categoryUrl) {
@@ -92,12 +92,14 @@ export function CategoryNav({
     // Get the current URL path from location
     const currentPath = location.pathname;
     
-    // Create the expected category URL for comparison
-    const categoryUrl = `/categories/${categoryPath}`;
+    // Check if the current path matches or starts with the category URL (for both URL patterns)
+    const newCategoryUrl = `/all-products/${categoryPath}`;
+    const oldCategoryUrl = `/categories/${categoryPath}`;
     
-    // Check if the current path matches or starts with the category URL
-    return currentPath === categoryUrl || 
-           currentPath.startsWith(`${categoryUrl}/`);
+    return currentPath === newCategoryUrl || 
+           currentPath.startsWith(`${newCategoryUrl}/`) ||
+           currentPath === oldCategoryUrl || 
+           currentPath.startsWith(`${oldCategoryUrl}/`);
   };
 
   return (
@@ -112,7 +114,7 @@ export function CategoryNav({
             key={category.full_path}
             name={simpleName}
             count={category.count}
-            path={`/categories/${path}`}
+            path={`/all-products/${path}`}
             isActive={isActive}
             onClick={(e) => handleCategoryClick(category, e)}
           />

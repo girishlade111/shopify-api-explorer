@@ -210,11 +210,28 @@ export default function CategoryPage() {
   const handleCategoryClick = (category: Category) => {
     console.log("Category clicked in CategoryPage:", category.full_path);
     setCategoryFullName(category.full_path);
+    
+    const path = category.full_path
+      .split(" > ")
+      .map(part => part.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
+      .join("/");
+      
+    navigate(`/all-products/${path}`);
   };
 
   const breadcrumbSegments = getBreadcrumbSegments();
   const pageTitle = isRootCategory ? "All Products" : 
     (breadcrumbSegments.length > 0 ? breadcrumbSegments[breadcrumbSegments.length - 1].label : "Products");
+
+  useEffect(() => {
+    if (location.pathname === "/categories") {
+      navigate("/all-products", { replace: true });
+    } 
+    else if (location.pathname.startsWith("/categories/")) {
+      const newPath = location.pathname.replace("/categories/", "/all-products/");
+      navigate(newPath, { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   return (
     <Layout>
@@ -232,7 +249,7 @@ export default function CategoryPage() {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to="/categories">All Products</Link>
+                    <Link to="/all-products">All Products</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
               </>
@@ -245,7 +262,9 @@ export default function CategoryPage() {
                   <BreadcrumbPage>{segment.label}</BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link to={segment.path}>{segment.label}</Link>
+                    <Link to={segment.path.replace("/categories/", "/all-products/")}>
+                      {segment.label}
+                    </Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

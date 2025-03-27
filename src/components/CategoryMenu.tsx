@@ -63,7 +63,7 @@ export function CategoryMenu() {
   if (loading) {
     return (
       <NavigationMenuItem>
-        <Link to="/categories" className={navigationMenuTriggerStyle()}>
+        <Link to="/all-products" className={navigationMenuTriggerStyle()}>
           All Products
         </Link>
       </NavigationMenuItem>
@@ -74,14 +74,14 @@ export function CategoryMenu() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <Link to="/categories" className={navigationMenuTriggerStyle()}>
+          <Link to="/all-products" className={navigationMenuTriggerStyle()}>
             All Products
           </Link>
         </NavigationMenuItem>
         
         {mainCategories.map(category => {
           const subcategories = getSubcategories(category.full_path);
-          const categoryPath = `/categories/${getCategoryPath(category.full_path)}`;
+          const categoryPath = `/all-products/${getCategoryPath(category.full_path)}`;
           
           if (subcategories.length === 0) {
             return (
@@ -110,7 +110,7 @@ export function CategoryMenu() {
                   
                   <div className="grid grid-cols-2 gap-3">
                     {subcategories.map(subcat => {
-                      const subcatPath = `/categories/${getCategoryPath(subcat.full_path)}`;
+                      const subcatPath = `/all-products/${getCategoryPath(subcat.full_path)}`;
                       const subcatName = getSimpleCategoryName(subcat.full_path);
                       
                       return (

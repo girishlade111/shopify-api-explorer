@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,16 +28,16 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/products/:handle" element={<ProductDetail />} />
-              {/* Add the base categories route */}
-              <Route path="/categories" element={<CategoryPage />} />
-              <Route path="/categories/:category/*" element={<CategoryPage />} />
+              <Route path="/all-products" element={<CategoryPage />} />
+              <Route path="/all-products/:category/*" element={<CategoryPage />} />
               <Route path="/search" element={<SearchResults />} />
               <Route path="/new-arrivals" element={<NewArrivalsPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/account" element={<NotFound />} /> {/* Temporarily using NotFound for account page */}
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/categories" element={<CategoryPage />} />
+              <Route path="/categories/:category/*" element={<CategoryPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
