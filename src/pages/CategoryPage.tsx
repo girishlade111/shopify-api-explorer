@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -49,11 +48,9 @@ export default function CategoryPage() {
   const [categoryFullName, setCategoryFullName] = useState<string>("");
   const [allCategories, setAllCategories] = useState<Category[]>([]);
 
-  // This is the full path from URL (like "apparel-accessories/clothing/pants")
   const fullPathFromUrl = categoryPath || "";
   const isRootCategory = !fullPathFromUrl;
 
-  // Format path segments for display
   const formatPathSegment = (segment: string): string => {
     return segment
       .split('-')
@@ -61,7 +58,6 @@ export default function CategoryPage() {
       .join(' ');
   };
 
-  // Create breadcrumb path segments
   const getBreadcrumbSegments = (): { label: string, path: string }[] => {
     if (!fullPathFromUrl) return [];
     
@@ -76,7 +72,6 @@ export default function CategoryPage() {
     });
   };
 
-  // Find matching category in the API data based on URL path
   const findMatchingCategory = (categories: Category[], urlPath: string): Category | undefined => {
     if (!urlPath) return undefined;
     
@@ -85,7 +80,6 @@ export default function CategoryPage() {
     
     console.log(`Looking for category matching: ${lastSegment}`);
     
-    // Try to find an exact match for the last segment
     return categories.find(cat => {
       const catSegments = cat.full_path
         .toLowerCase()
@@ -96,7 +90,6 @@ export default function CategoryPage() {
     });
   };
 
-  // Fetch all categories once on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -110,7 +103,6 @@ export default function CategoryPage() {
     fetchCategories();
   }, []);
 
-  // When allCategories or URL path changes, find the matching category
   useEffect(() => {
     if (allCategories.length > 0 && fullPathFromUrl) {
       const matchedCategory = findMatchingCategory(allCategories, fullPathFromUrl);
@@ -125,14 +117,12 @@ export default function CategoryPage() {
     }
   }, [allCategories, fullPathFromUrl]);
 
-  // Fetch products whenever categoryFullName, page, or sort changes
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // If we're at the root categories page, fetch all products
         if (isRootCategory) {
           console.log("Fetching all products (no specific category)");
           const response = await getProducts(
@@ -172,7 +162,6 @@ export default function CategoryPage() {
           setTotalPages(response.pages);
           setCurrentPage(response.page);
         } else if (fullPathFromUrl) {
-          // Fallback if we couldn't determine the category's full name
           const segments = fullPathFromUrl.split('/');
           const lastSegment = segments[segments.length - 1];
           const categoryName = formatPathSegment(lastSegment);
@@ -208,7 +197,6 @@ export default function CategoryPage() {
     fetchProducts();
   }, [categoryFullName, fullPathFromUrl, currentPage, selectedSort, isRootCategory]);
 
-  // Reset to page 1 when changing categories or sort options
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryFullName, fullPathFromUrl, selectedSort]);
@@ -220,7 +208,6 @@ export default function CategoryPage() {
   };
 
   const handleCategoryClick = (category: Category) => {
-    // This will be called from CategoryNav
     console.log("Category clicked in CategoryPage:", category.full_path);
     setCategoryFullName(category.full_path);
   };
@@ -403,7 +390,7 @@ export default function CategoryPage() {
               error={error}
               onRetry={() => {
                 setCurrentPage(1);
-                setCategoryFullName(categoryFullName); // Trigger a refetch
+                setCategoryFullName(categoryFullName);
               }}
               cols={3}
             />

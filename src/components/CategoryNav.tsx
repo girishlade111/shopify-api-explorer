@@ -138,14 +138,15 @@ function CategoryItem({ name, count, path, isActive, onClick }: CategoryItemProp
       className={cn(
         "flex items-center justify-between px-4 py-2 rounded-md transition-colors w-full text-left",
         isActive
-          ? "bg-primary text-white font-medium"
-          : "hover:bg-accent text-secondary"
+          ? "bg-primary/90 text-white font-medium shadow-sm border-l-4 border-primary"
+          : "hover:bg-accent text-secondary hover:border-l-4 hover:border-primary/30"
       )}
+      aria-current={isActive ? "page" : undefined}
     >
       <span>{name}</span>
       <span 
         className={cn(
-          "text-xs rounded-full w-8 h-6 flex items-center justify-center",
+          "text-xs rounded-full w-8 h-6 flex items-center justify-center ml-2",
           isActive 
             ? "bg-white/20 text-white" 
             : "bg-accent/80 text-secondary"
