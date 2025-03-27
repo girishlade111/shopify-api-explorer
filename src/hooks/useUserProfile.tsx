@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+
+import { useEffect, useState, useCallback, useRef } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,6 +60,9 @@ export function useUserProfile() {
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [showSaveInfoDialog, setShowSaveInfoDialog] = useState(false);
   
+  // Add a ref to track if we're currently updating from a saved profile
+  const isLoadingProfile = useRef(false);
+  
   const form = useForm<UserProfileValues>({
     resolver: zodResolver(UserProfileSchema),
     defaultValues,
@@ -68,6 +72,7 @@ export function useUserProfile() {
     const storedProfile = localStorage.getItem(STORAGE_KEY);
     if (storedProfile) {
       try {
+        isLoadingProfile.current = true;
         const parsedProfile = JSON.parse(storedProfile);
         
         if (parsedProfile.birthday) {
@@ -81,14 +86,23 @@ export function useUserProfile() {
         updateUserProfile(parsedProfile);
         
         console.log("User Profile Loaded:", JSON.stringify(parsedProfile, null, 2));
+        
+        // Set isLoadingProfile back to false after a short delay to ensure form reset is complete
+        setTimeout(() => {
+          isLoadingProfile.current = false;
+        }, 100);
       } catch (error) {
         console.error("Failed to parse saved profile", error);
+        isLoadingProfile.current = false;
       }
     }
   }, [form, updateUserProfile]);
 
   useEffect(() => {
     const subscription = form.watch((value) => {
+      // Skip the check if we're loading a profile from storage
+      if (isLoadingProfile.current) return;
+      
       if (!savedProfile) {
         const hasValues = Object.values(value).some(val => {
           if (typeof val === 'string') return val.trim().length > 0;
@@ -128,6 +142,9 @@ export function useUserProfile() {
   );
 
   function onSubmit(data: UserProfileValues) {
+    // Set isLoadingProfile to true to prevent watch from triggering changes
+    isLoadingProfile.current = true;
+    
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     setSavedProfile(data);
     setHasUnsavedChanges(false);
@@ -141,12 +158,21 @@ export function useUserProfile() {
       title: "Profile Saved",
       description: "Your profile has been saved successfully.",
     });
+    
+    // Reset isLoadingProfile after a short delay
+    setTimeout(() => {
+      isLoadingProfile.current = false;
+    }, 100);
   }
 
   function handleReset(e?: React.MouseEvent<HTMLButtonElement>) {
     if (e) {
       e.preventDefault();
     }
+    
+    // Set isLoadingProfile to true to prevent watch from triggering changes
+    isLoadingProfile.current = true;
+    
     localStorage.removeItem(STORAGE_KEY);
     form.reset(defaultValues);
     setSavedProfile(null);
@@ -161,6 +187,11 @@ export function useUserProfile() {
       title: "Profile Reset",
       description: "Your profile has been cleared.",
     });
+    
+    // Reset isLoadingProfile after a short delay
+    setTimeout(() => {
+      isLoadingProfile.current = false;
+    }, 100);
   }
 
   function handleSaveClick(e?: React.MouseEvent<HTMLButtonElement>) {

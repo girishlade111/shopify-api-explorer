@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Form } from "@/components/ui/form";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -59,8 +58,6 @@ export default function UserProfilePage() {
         onSubmit={onSubmit}
         form={form}
         setHasUnsavedChanges={(value) => {
-          // This is a new prop that wasn't in the original code
-          // It's used to reset the hasUnsavedChanges state when discarding changes
           if (!value) {
             form.reset();
           }
