@@ -1,10 +1,16 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
-import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
+import { 
+  createRealtimeConnection, 
+  cleanupConnection, 
+  attemptReconnection,
+  saveConnectionState
+} from './lib/realtimeConnection';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
@@ -26,11 +32,13 @@ export default function VoiceDemo() {
   const [tools, setTools] = useState<any[]>([]);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [connectionRetries, setConnectionRetries] = useState(0);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const connectionRetryTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load persisted settings on component mount
   useEffect(() => {
@@ -47,7 +55,7 @@ export default function VoiceDemo() {
           isInitialConnectionRef.current = false;
           // Use setTimeout to ensure component is fully mounted
           setTimeout(() => {
-            handleToggleConnection();
+            handleReconnection();
           }, 1000);
         }
       } catch (e) {
@@ -55,6 +63,34 @@ export default function VoiceDemo() {
       }
     }
   }, []);
+
+  // Attempt to reconnect when navigating back to a page
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && 
+          sessionStatus === 'DISCONNECTED' && 
+          clientSecret) {
+        console.log("Page became visible, attempting reconnection");
+        handleReconnection();
+      }
+    };
+
+    const handlePageShow = (e: PageTransitionEvent) => {
+      // If the page is being loaded from the back-forward cache
+      if (e.persisted && sessionStatus === 'DISCONNECTED' && clientSecret) {
+        console.log("Page restored from bfcache, attempting reconnection");
+        handleReconnection();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [sessionStatus, clientSecret]);
 
   // Save settings whenever they change
   useEffect(() => {
@@ -91,8 +127,31 @@ export default function VoiceDemo() {
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
       }
+      if (connectionRetryTimerRef.current) {
+        clearTimeout(connectionRetryTimerRef.current);
+      }
+      
+      // When unmounting, save the current state if we're connected
+      if (sessionStatus === 'CONNECTED' && pcRef.current && clientSecret) {
+        saveConnectionState(pcRef.current, clientSecret);
+      }
     };
-  }, []);
+  }, [sessionStatus, clientSecret]);
+
+  // Before unloading the page, save connection state if connected
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (sessionStatus === 'CONNECTED' && pcRef.current && clientSecret) {
+        saveConnectionState(pcRef.current, clientSecret);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [sessionStatus, clientSecret]);
 
   const cleanupResources = () => {
     // Clean up RTCPeerConnection
@@ -116,8 +175,81 @@ export default function VoiceDemo() {
       setInstructions("");
       setTools([]);
       setConnectionRetries(0);
+      setClientSecret(null);
     } else {
       await connectToService();
+    }
+  };
+
+  const handleReconnection = async () => {
+    if (sessionStatus === 'CONNECTED' || sessionStatus === 'CONNECTING') {
+      console.log("Already connected or connecting, skipping reconnection");
+      return;
+    }
+    
+    setError(null);
+    setSessionStatus('CONNECTING');
+    
+    try {
+      // First try to reconnect using saved state
+      const reconnection = await attemptReconnection(
+        audioElementRef, 
+        isAudioEnabled
+      );
+      
+      if (reconnection) {
+        pcRef.current = reconnection.pc;
+        dcRef.current = reconnection.dc;
+        setSessionStatus('CONNECTED');
+        setIsWidgetOpen(true);
+        setConnectionRetries(0);
+        
+        // Fetch session data to get instructions and tools
+        await fetchSessionData();
+        
+        console.log("Successfully reconnected using saved state");
+      } else {
+        // If reconnection fails, try connecting normally
+        console.log("Reconnection with saved state failed, connecting normally");
+        await connectToService();
+      }
+    } catch (error) {
+      console.error("Reconnection error:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to reconnect. Please try again.'
+      );
+      setSessionStatus('DISCONNECTED');
+    }
+  };
+
+  const fetchSessionData = async () => {
+    try {
+      const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const sessionInstructions = data.result?.instructions;
+      const sessionTools = data.result?.tools || [];
+      
+      setInstructions(sessionInstructions || "");
+      setTools(sessionTools);
+      
+      return data;
+    } catch (error) {
+      console.error("Error fetching session data:", error);
+      throw error;
     }
   };
 
@@ -150,11 +282,11 @@ export default function VoiceDemo() {
           }
 
           const data = await response.json();
-          const clientSecret = data.result?.client_secret?.value;
+          const newClientSecret = data.result?.client_secret?.value;
           const sessionInstructions = data.result?.instructions;
           const sessionTools = data.result?.tools || [];
 
-          if (!clientSecret) {
+          if (!newClientSecret) {
             throw new Error('No client secret found in response');
           }
 
@@ -162,13 +294,14 @@ export default function VoiceDemo() {
           cleanupResources();
 
           const { pc, dc } = await createRealtimeConnection(
-            clientSecret,
+            newClientSecret,
             audioElementRef,
             isAudioEnabled
           );
 
           pcRef.current = pc;
           dcRef.current = dc;
+          setClientSecret(newClientSecret);
           setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
@@ -221,7 +354,7 @@ export default function VoiceDemo() {
       // If we haven't exceeded the retry limit, try again after a delay
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
         console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
-        setTimeout(() => {
+        connectionRetryTimerRef.current = setTimeout(() => {
           connectToService();
         }, 2000); // Wait 2 seconds before retrying
       }

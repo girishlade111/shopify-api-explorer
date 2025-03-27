@@ -33,11 +33,63 @@ export function cleanupConnection(pc: RTCPeerConnection | null): void {
   }
 }
 
+// Save WebRTC state for persistence across refreshes
+export function saveConnectionState(
+  pc: RTCPeerConnection | null, 
+  ephemeralKey: string,
+  lastResponseSdp?: string
+): void {
+  if (!pc) return;
+  
+  try {
+    // Save connection information
+    const connectionInfo = {
+      ephemeralKey,
+      status: pc.connectionState,
+      iceConnectionState: pc.iceConnectionState,
+      lastResponseSdp,
+      timestamp: Date.now()
+    };
+    
+    // Store in localStorage
+    localStorage.setItem('voiceWidgetConnectionInfo', JSON.stringify(connectionInfo));
+    console.log("WebRTC connection state saved");
+  } catch (err) {
+    console.error("Error saving connection state:", err);
+  }
+}
+
+// Get saved connection state
+export function getSavedConnectionState(): { 
+  ephemeralKey?: string; 
+  lastResponseSdp?: string;
+  timestamp?: number;
+} {
+  try {
+    const savedInfo = localStorage.getItem('voiceWidgetConnectionInfo');
+    if (!savedInfo) return {};
+    
+    const connectionInfo = JSON.parse(savedInfo);
+    
+    // Check if the saved state is too old (15 minutes)
+    const MAX_AGE = 15 * 60 * 1000; // 15 minutes in milliseconds
+    if (Date.now() - connectionInfo.timestamp > MAX_AGE) {
+      localStorage.removeItem('voiceWidgetConnectionInfo');
+      return {};
+    }
+    
+    return connectionInfo;
+  } catch (err) {
+    console.error("Error retrieving saved connection state:", err);
+    return {};
+  }
+}
+
 export async function createRealtimeConnection(
   EPHEMERAL_KEY: string,
   audioElement: RefObject<HTMLAudioElement | null>,
   isAudioEnabled: boolean = false
-): Promise<{ pc: RTCPeerConnection; dc: RTCDataChannel }> {
+): Promise<{ pc: RTCPeerConnection; dc: RTCDataChannel; responseSdp: string }> {
   // First check if microphone is supported
   await checkMicrophoneSupport();
   
@@ -118,6 +170,7 @@ export async function createRealtimeConnection(
   dc.onclose = () => console.log("Data channel closed");
   dc.onerror = (e) => console.error("Data channel error:", e);
 
+  let responseSdp = '';
   try {
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
@@ -142,12 +195,17 @@ export async function createRealtimeConnection(
     }
 
     const answerSdp = await sdpResponse.text();
+    responseSdp = answerSdp;
+    
     const answer: RTCSessionDescriptionInit = {
       type: "answer",
       sdp: answerSdp,
     };
 
     await pc.setRemoteDescription(answer);
+    
+    // Save connection state for persistence
+    saveConnectionState(pc, EPHEMERAL_KEY, responseSdp);
   } catch (err) {
     // Clean up resources on error
     if (stream) {
@@ -157,5 +215,32 @@ export async function createRealtimeConnection(
     throw new Error("Failed to establish connection. Please check your internet connection and try again.");
   }
 
-  return { pc, dc };
+  return { pc, dc, responseSdp };
+}
+
+// Function to attempt reconnection using saved state
+export async function attemptReconnection(
+  audioElement: RefObject<HTMLAudioElement | null>,
+  isAudioEnabled: boolean = false
+): Promise<{ pc: RTCPeerConnection; dc: RTCDataChannel } | null> {
+  const savedState = getSavedConnectionState();
+  
+  if (!savedState.ephemeralKey) {
+    console.log("No saved connection state found");
+    return null;
+  }
+  
+  try {
+    console.log("Attempting to reconnect using saved state");
+    const connection = await createRealtimeConnection(
+      savedState.ephemeralKey,
+      audioElement,
+      isAudioEnabled
+    );
+    
+    return connection;
+  } catch (err) {
+    console.error("Failed to reconnect:", err);
+    return null;
+  }
 }
