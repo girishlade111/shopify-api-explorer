@@ -1,4 +1,3 @@
-
 import { useCart, CartItem } from "@/contexts/CartContext";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -10,12 +9,6 @@ import { toast } from "sonner";
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCart();
   
-  const handleCheckout = () => {
-    toast.success("Checkout process initiated", {
-      description: "This is a demo. In a real app, you would proceed to checkout.",
-    });
-  };
-
   return (
     <Layout>
       <div className="container-wide py-8 md:py-12">
@@ -89,12 +82,13 @@ export default function CartPage() {
                   </div>
                 </div>
                 
-                <Button 
-                  className="w-full mb-4 flex items-center justify-center gap-2"
-                  onClick={handleCheckout}
-                >
-                  Checkout <ArrowRight size={16} />
-                </Button>
+                <Link to="/checkout">
+                  <Button 
+                    className="w-full mb-4 flex items-center justify-center gap-2"
+                  >
+                    Proceed to Checkout <ArrowRight size={16} />
+                  </Button>
+                </Link>
                 
                 <Link to="/">
                   <Button variant="outline" className="w-full">
