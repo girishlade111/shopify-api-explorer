@@ -1,4 +1,3 @@
-
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
@@ -52,10 +51,7 @@ export function Layout({ children }: LayoutProps) {
   };
 
   const handleFittingRoomClick = () => {
-    toast({
-      title: "Fitting Room",
-      description: "Virtual fitting room is coming soon!",
-    });
+    navigate("/fitting-room");
   };
 
   const cartCount = getCartCount();

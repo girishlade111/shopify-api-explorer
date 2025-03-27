@@ -15,6 +15,7 @@ import NewArrivalsPage from "./pages/NewArrivalsPage";
 import WishlistPage from "./pages/WishlistPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import FittingRoomPage from "./pages/FittingRoomPage";
 import VoiceWidget from "./components/VoiceWidget";
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/wishlist" element={<WishlistPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/fitting-room" element={<FittingRoomPage />} />
               <Route path="/account" element={<NotFound />} /> {/* Temporarily using NotFound for account page */}
               <Route path="/categories" element={<CategoryPage />} />
               <Route path="/categories/:category/*" element={<CategoryPage />} />
