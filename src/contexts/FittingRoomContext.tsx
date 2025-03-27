@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 export interface FittingRoomProduct {
   title: string;
@@ -25,12 +25,30 @@ const FittingRoomContext = createContext<FittingRoomContextType>({
 export const FittingRoomProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<FittingRoomProduct[]>([]);
 
+  // Load products from localStorage on initial render
+  useEffect(() => {
+    const storedProducts = localStorage.getItem('fittingRoomProducts');
+    if (storedProducts) {
+      try {
+        const parsedProducts = JSON.parse(storedProducts);
+        setProducts(parsedProducts);
+      } catch (error) {
+        console.error("Error parsing stored products:", error);
+      }
+    }
+  }, []);
+
   const addProducts = (newProducts: FittingRoomProduct[]) => {
+    // Save to state
     setProducts(newProducts);
+    
+    // Save to localStorage
+    localStorage.setItem('fittingRoomProducts', JSON.stringify(newProducts));
   };
 
   const clearProducts = () => {
     setProducts([]);
+    localStorage.removeItem('fittingRoomProducts');
   };
 
   return (

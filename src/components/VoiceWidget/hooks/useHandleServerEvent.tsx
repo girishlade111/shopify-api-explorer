@@ -86,7 +86,7 @@ const fns = {
   },
   navigate_to_cart: () => {
     try {
-      window.location.href = '/cart';
+      navigate('/cart');
       return { success: true };
     } catch (error) {
       console.error("Error navigating to cart:", error);
@@ -98,7 +98,7 @@ const fns = {
   },
   navigate_to_wishlist: () => {
     try {
-      window.location.href = '/wishlist';
+      navigate('/wishlist');
       return { success: true };
     } catch (error) {
       console.error("Error navigating to wishlist:", error);
@@ -214,8 +214,8 @@ const fns = {
       console.log("variants_info", variants_info);
 
       if (variants_info.length > 0) {
-        localStorage.setItem('fittingRoomProducts', JSON.stringify(variants_info));
-        window.location.href = '/fitting-room';
+        fittingRoom.addProducts(variants_info);
+        navigate('/fitting-room');
       }
 
       return {

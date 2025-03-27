@@ -1,6 +1,4 @@
 
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useFittingRoom } from "@/contexts/FittingRoomContext";
 import { formatPrice } from "@/lib/api";
@@ -10,24 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FittingRoomIcon from "@/components/icons/FittingRoom";
 import { ArrowLeft, ExternalLink, ShoppingBag } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { Link } from "react-router-dom";
 
 export default function FittingRoomPage() {
-  const { products, addProducts } = useFittingRoom();
+  const { products } = useFittingRoom();
   const { addToCart } = useCart();
-
-  // Load products from localStorage on component mount
-  useEffect(() => {
-    const storedProducts = localStorage.getItem('fittingRoomProducts');
-    if (storedProducts && (!products || products.length === 0)) {
-      try {
-        const parsedProducts = JSON.parse(storedProducts);
-        console.log("Loading products from localStorage:", parsedProducts);
-        addProducts(parsedProducts);
-      } catch (error) {
-        console.error("Error parsing stored products:", error);
-      }
-    }
-  }, [addProducts, products]);
 
   const handleAddToCart = (productId: number, variantId: number) => {
     // We don't have the full product data here, so we create a minimal version
