@@ -99,8 +99,7 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
 
   // Update user activity and log to console
   const updateUserActivity = (updates: Partial<UserActivity>) => {
-    // Skip logging if we're currently in the middle of a userProfile update
-    // This prevents loops when profile updates trigger more profile updates
+    // Skip logging if we're currently in the middle of a userProfile update that was triggered internally
     if (isUpdatingProfile.current && 'userProfile' in updates) {
       return;
     }
@@ -112,9 +111,11 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
         lastUpdated: new Date().toISOString()
       };
       
-      // Only log if something other than lastUpdated has changed
+      // Only log if something meaningful has changed (comparing without lastUpdated field)
       const prevCopy = { ...prev, lastUpdated: newActivity.lastUpdated };
-      if (JSON.stringify(prevCopy) !== JSON.stringify(newActivity)) {
+      const hasChanges = JSON.stringify(prevCopy) !== JSON.stringify(newActivity);
+      
+      if (hasChanges) {
         // Log the updated activity to console
         console.log("User Activity Updated:", JSON.stringify(newActivity, null, 2));
       }
@@ -123,10 +124,14 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
     });
   };
 
-  // Function to update user profile
+  // Function to update user profile with proper synchronization
   const updateUserProfile = (profile: UserProfileValues | null) => {
+    // Set the flag to prevent duplicate updates
     isUpdatingProfile.current = true;
+    
+    // Update the user activity with the new profile data
     updateUserActivity({ userProfile: profile });
+    
     // Reset the flag after a short delay to allow state updates to complete
     setTimeout(() => {
       isUpdatingProfile.current = false;

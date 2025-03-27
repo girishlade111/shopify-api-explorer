@@ -53,7 +53,7 @@ export const defaultValues: UserProfileValues = {
 
 export function useUserProfile() {
   const { toast } = useToast();
-  const { updateUserProfile } = useUserActivity();
+  const { updateUserProfile, userActivity } = useUserActivity();
   
   const [savedProfile, setSavedProfile] = useState<UserProfileValues | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -62,6 +62,7 @@ export function useUserProfile() {
   
   // Add a ref to track if we're currently updating from a saved profile
   const isLoadingProfile = useRef(false);
+  const isManuallyUpdatingProfile = useRef(false);
   
   const form = useForm<UserProfileValues>({
     resolver: zodResolver(UserProfileSchema),
@@ -149,6 +150,7 @@ export function useUserProfile() {
   function onSubmit(data: UserProfileValues) {
     // Set isLoadingProfile to true to prevent watch from triggering changes
     isLoadingProfile.current = true;
+    isManuallyUpdatingProfile.current = true;
     
     // Store in localStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -169,6 +171,7 @@ export function useUserProfile() {
     // Reset isLoadingProfile after a short delay
     setTimeout(() => {
       isLoadingProfile.current = false;
+      isManuallyUpdatingProfile.current = false;
     }, 100);
   }
 
@@ -180,6 +183,7 @@ export function useUserProfile() {
     
     // Set isLoadingProfile to true to prevent watch from triggering changes
     isLoadingProfile.current = true;
+    isManuallyUpdatingProfile.current = true;
     
     // Clear localStorage and form
     localStorage.removeItem(STORAGE_KEY);
@@ -201,6 +205,7 @@ export function useUserProfile() {
     // Reset isLoadingProfile after a short delay
     setTimeout(() => {
       isLoadingProfile.current = false;
+      isManuallyUpdatingProfile.current = false;
     }, 100);
   }
 
