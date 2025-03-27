@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Category } from "@/types";
 import { getCategories } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ export function CategoryNav({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -66,15 +67,18 @@ export function CategoryNav({
       .join("/");
   };
 
-  const handleCategoryClick = (category: Category) => {
+  const handleCategoryClick = (category: Category, event: React.MouseEvent) => {
+    // Prevent default link behavior
+    event.preventDefault();
+    
     // If onCategoryClick prop exists, call it
     if (onCategoryClick) {
       onCategoryClick(category);
-    } else {
-      // Otherwise, navigate directly to the category page
-      const path = getCategoryPath(category.full_path);
-      navigate(`/categories/${path}`);
-    }
+    } 
+    
+    // Navigate to the category page regardless
+    const path = getCategoryPath(category.full_path);
+    navigate(`/categories/${path}`);
   };
 
   // Function to check if a category is active
@@ -104,7 +108,7 @@ export function CategoryNav({
             count={category.count}
             path={`/categories/${path}`}
             isActive={isActive}
-            onClick={() => handleCategoryClick(category)}
+            onClick={(e) => handleCategoryClick(category, e)}
           />
         );
       })}
@@ -117,13 +121,13 @@ interface CategoryItemProps {
   count: number;
   path: string;
   isActive?: boolean;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent) => void;
 }
 
 function CategoryItem({ name, count, path, isActive, onClick }: CategoryItemProps) {
-  // Use button instead of Link if onClick is provided
   return (
-    <button
+    <a
+      href={path}
       onClick={onClick}
       className={cn(
         "flex items-center justify-between px-4 py-2 rounded-md transition-colors w-full text-left",
@@ -143,6 +147,6 @@ function CategoryItem({ name, count, path, isActive, onClick }: CategoryItemProp
       >
         {count}
       </span>
-    </button>
+    </a>
   );
 }

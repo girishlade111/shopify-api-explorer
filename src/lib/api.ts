@@ -64,7 +64,7 @@ export const getCategories = async (limit = 10): Promise<Category[]> => {
 };
 
 export const getProductsByCategory = async (
-  categoryName: string,
+  categoryPath: string,
   page = 1,
   size = 12,
   sortBy?: string,
@@ -78,13 +78,12 @@ export const getProductsByCategory = async (
   if (sortBy) params.append("sort_by", sortBy);
   if (sortOrder) params.append("sort_order", sortOrder);
   
-  const categoryNameOnly = categoryName.includes(" > ") 
-    ? categoryName.split(" > ").pop() || categoryName
-    : categoryName;
+  const pathParts = categoryPath.split(" > ");
+  const categoryName = pathParts[pathParts.length - 1];
   
-  console.log(`Fetching products for category name: ${categoryNameOnly}`);
+  console.log(`Making API call with category name: ${categoryName}`);
   
-  const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryNameOnly)}/products?${params}`);
+  const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryName)}/products?${params}`);
   return handleApiResponse<PaginatedResponse<Product>>(response);
 };
 

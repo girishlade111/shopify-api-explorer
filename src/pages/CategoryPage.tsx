@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryNav } from "@/components/CategoryNav";
@@ -8,6 +9,14 @@ import { getCategories, getProductsByCategory } from "@/lib/api";
 import { Category, Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, SlidersHorizontal, ChevronRight } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 type SortOption = {
   label: string;
@@ -25,6 +34,7 @@ const sortOptions: SortOption[] = [
 
 export default function CategoryPage() {
   const { category } = useParams<{ category: string }>();
+  const location = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,45 +46,84 @@ export default function CategoryPage() {
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [categoryPath, setCategoryPath] = useState<string[]>([]);
   const [categoryFullName, setCategoryFullName] = useState<string>("");
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+
+  // Get the full path from URL
+  const getFullPathFromUrl = (): string => {
+    // Remove leading/trailing slashes and split by '/'
+    const path = location.pathname
+      .replace(/^\/categories\//, '')
+      .replace(/\/$/, '');
+    
+    return path;
+  };
+
+  // Format path segments for display
+  const formatPathSegment = (segment: string): string => {
+    return segment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Create breadcrumb path segments
+  const getBreadcrumbSegments = (): { label: string, path: string }[] => {
+    const fullPath = getFullPathFromUrl();
+    const segments = fullPath.split('/');
+    
+    return segments.map((segment, index) => {
+      const path = '/categories/' + segments.slice(0, index + 1).join('/');
+      return {
+        label: formatPathSegment(segment),
+        path
+      };
+    });
+  };
 
   useEffect(() => {
-    const fetchCategoryInfo = async () => {
-      if (!category) return;
-      
+    const fetchCategories = async () => {
       try {
         const categories = await getCategories(100);
+        setAllCategories(categories);
         
-        const urlPathSegments = category.split("/");
-        const lastSegment = urlPathSegments[urlPathSegments.length - 1]
-          .replace(/-/g, " ")
-          .toLowerCase();
-        
-        const matchedCategory = categories.find(cat => {
-          const catLastPart = cat.full_path.split(" > ").pop()?.toLowerCase() || "";
-          return catLastPart === lastSegment;
-        });
-        
-        if (matchedCategory) {
-          setCategoryFullName(matchedCategory.full_path);
-        } else {
-          console.error("Could not find matching category:", lastSegment);
+        // Now that we have categories, find the matching one
+        if (category) {
+          const urlPath = getFullPathFromUrl();
+          const urlSegments = urlPath.split('/');
+          const lastSegment = urlSegments[urlSegments.length - 1];
+          
+          // Try to find an exact match for the last segment
+          const matchedCategory = categories.find(cat => {
+            const catSegments = cat.full_path
+              .toLowerCase()
+              .split(' > ')
+              .map(seg => seg.replace(/[^a-z0-9]+/g, '-'));
+            
+            return catSegments.includes(lastSegment);
+          });
+          
+          if (matchedCategory) {
+            console.log("Found matching category:", matchedCategory.full_path);
+            setCategoryFullName(matchedCategory.full_path);
+          } else {
+            console.error("Could not find matching category in:", categories);
+          }
         }
-        
-        setCategoryPath(urlPathSegments);
       } catch (error) {
-        console.error("Error fetching category information:", error);
+        console.error("Failed to fetch categories:", error);
       }
     };
     
-    fetchCategoryInfo();
+    fetchCategories();
   }, [category]);
-  
+
   useEffect(() => {
-    if (category) {
-      const parts = category.split("/");
-      setCategoryPath(parts);
+    if (location.pathname.includes('/categories/')) {
+      const path = getFullPathFromUrl();
+      const segments = path.split('/');
+      setCategoryPath(segments);
     }
-  }, [category]);
+  }, [location.pathname]);
   
   const fetchProducts = async (page: number = 1) => {
     if (!category) return;
@@ -104,8 +153,9 @@ export default function CategoryPage() {
         setTotalPages(response.pages);
         setCurrentPage(response.page);
       } else {
-        const lastSegment = category.split("/").pop() || category;
-        const categoryName = lastSegment.replace(/-/g, " ");
+        const segments = getFullPathFromUrl().split('/');
+        const lastSegment = segments[segments.length - 1];
+        const categoryName = formatPathSegment(lastSegment);
         
         console.log("Fallback: Fetching products for category name:", categoryName);
         
@@ -147,33 +197,44 @@ export default function CategoryPage() {
       fetchProducts(currentPage + 1);
     }
   };
-  
-  const getCategoryName = (path: string): string => {
-    return path.split("-").map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(" ");
-  };
+
+  const breadcrumbSegments = getBreadcrumbSegments();
+  const categoryTitle = breadcrumbSegments.length > 0 
+    ? breadcrumbSegments[breadcrumbSegments.length - 1].label 
+    : "Products";
 
   return (
     <Layout>
       <div className="container-wide py-4">
-        <nav className="flex items-center text-sm text-muted">
-          <Link to="/" className="hover:text-primary">Home</Link>
-          <ChevronRight className="h-3 w-3 mx-2" />
-          
-          {categoryPath.map((part, index) => (
-            <div key={part} className="flex items-center">
-              {index > 0 && <ChevronRight className="h-3 w-3 mx-2" />}
-              <span className="text-dark">{getCategoryName(part)}</span>
-            </div>
-          ))}
-        </nav>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            
+            {breadcrumbSegments.map((segment, index) => (
+              <BreadcrumbItem key={segment.path}>
+                {index === breadcrumbSegments.length - 1 ? (
+                  <BreadcrumbPage>{segment.label}</BreadcrumbPage>
+                ) : (
+                  <>
+                    <BreadcrumbLink href={segment.path}>
+                      {segment.label}
+                    </BreadcrumbLink>
+                  </>
+                )}
+                {index < breadcrumbSegments.length - 1 && <BreadcrumbSeparator />}
+              </BreadcrumbItem>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
       
       <Section>
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl md:text-4xl font-semibold">
-            {categoryPath.length > 0 ? getCategoryName(categoryPath[categoryPath.length - 1]) : "Products"}
+            {categoryTitle}
           </h1>
           
           <div className="flex items-center gap-4">
@@ -243,7 +304,7 @@ export default function CategoryPage() {
             <div className="space-y-8">
               <div>
                 <h3 className="text-lg font-semibold mb-4">Categories</h3>
-                <CategoryNav activeCategory={category} />
+                <CategoryNav activeCategory={getFullPathFromUrl()} />
               </div>
               
               <div>
