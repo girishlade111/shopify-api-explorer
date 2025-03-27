@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -96,7 +95,7 @@ export default function VoiceDemo() {
       setError(null);
 
       try {
-        const response = await fetch('https://conv-engine-testing.ngrok.io/openai-realtime/session/appella-dev.myshopify.com', {
+        const response = await fetch(`${import.meta.env.VITE_NGROK_URL}/openai-realtime/session/${import.meta.env.VITE_STORE_URL}`, {
           method: 'GET',
           mode: 'cors',
           headers: {
