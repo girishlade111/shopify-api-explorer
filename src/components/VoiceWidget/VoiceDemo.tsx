@@ -18,6 +18,41 @@ export default function VoiceDemo() {
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
+  const isInitialConnectionRef = useRef<boolean>(true);
+
+  // Load persisted settings on component mount
+  useEffect(() => {
+    const storedSettings = localStorage.getItem('voiceWidgetSettings');
+    if (storedSettings) {
+      try {
+        const settings = JSON.parse(storedSettings);
+        setIsTranscriptionEnabled(settings.isTranscriptionEnabled ?? false);
+        setIsAudioEnabled(settings.isAudioEnabled ?? false);
+        setIsWidgetOpen(settings.isWidgetOpen ?? false);
+        
+        // Auto-connect if it was previously connected
+        if (settings.wasConnected && isInitialConnectionRef.current) {
+          isInitialConnectionRef.current = false;
+          // Use setTimeout to ensure component is fully mounted
+          setTimeout(() => {
+            handleToggleConnection();
+          }, 500);
+        }
+      } catch (e) {
+        console.error('Error parsing stored voice widget settings:', e);
+      }
+    }
+  }, []);
+
+  // Save settings whenever they change
+  useEffect(() => {
+    localStorage.setItem('voiceWidgetSettings', JSON.stringify({
+      isTranscriptionEnabled,
+      isAudioEnabled,
+      isWidgetOpen,
+      wasConnected: sessionStatus === 'CONNECTED'
+    }));
+  }, [isTranscriptionEnabled, isAudioEnabled, isWidgetOpen, sessionStatus]);
 
   useEffect(() => {
     if (!audioElementRef.current) {
