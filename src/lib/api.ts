@@ -1,3 +1,4 @@
+
 import { Category, PaginatedResponse, Product, SearchSuggestionsResponse } from "@/types";
 
 const API_BASE_URL = "https://shopifyproducts.ngrok.io";
@@ -78,6 +79,8 @@ export const getProductsByCategory = async (
   if (sortBy) params.append("sort_by", sortBy);
   if (sortOrder) params.append("sort_order", sortOrder);
   
+  // Extract just the category name from the full path
+  // The API expects just the name, not the full hierarchical path
   const pathParts = categoryPath.split(" > ");
   const categoryName = pathParts[pathParts.length - 1];
   

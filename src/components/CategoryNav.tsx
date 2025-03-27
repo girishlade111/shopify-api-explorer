@@ -74,11 +74,17 @@ export function CategoryNav({
     // If onCategoryClick prop exists, call it
     if (onCategoryClick) {
       onCategoryClick(category);
-    } 
+    }
     
-    // Navigate to the category page regardless
+    // Navigate to the category page
     const path = getCategoryPath(category.full_path);
-    navigate(`/categories/${path}`);
+    const categoryUrl = `/categories/${path}`;
+    
+    // Only navigate if we're going to a different URL to avoid unnecessary rerenders
+    if (location.pathname !== categoryUrl) {
+      console.log(`Navigating to: ${categoryUrl}`);
+      navigate(categoryUrl);
+    }
   };
 
   // Function to check if a category is active

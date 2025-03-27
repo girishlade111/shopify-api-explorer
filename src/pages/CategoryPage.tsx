@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryNav } from "@/components/CategoryNav";
@@ -33,8 +33,10 @@ const sortOptions: SortOption[] = [
 ];
 
 export default function CategoryPage() {
-  const { category } = useParams<{ category: string }>();
+  const { "*": categoryPath } = useParams<{ "*": string }>();
   const location = useLocation();
+  const navigate = useNavigate();
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,19 +46,11 @@ export default function CategoryPage() {
   const [selectedSort, setSelectedSort] = useState<SortOption>(sortOptions[0]);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
-  const [categoryPath, setCategoryPath] = useState<string[]>([]);
   const [categoryFullName, setCategoryFullName] = useState<string>("");
   const [allCategories, setAllCategories] = useState<Category[]>([]);
 
-  // Get the full path from URL
-  const getFullPathFromUrl = (): string => {
-    // Remove leading/trailing slashes and split by '/'
-    const path = location.pathname
-      .replace(/^\/categories\//, '')
-      .replace(/\/$/, '');
-    
-    return path;
-  };
+  // This is the full path from URL (like "apparel-accessories/clothing/pants")
+  const fullPathFromUrl = categoryPath || "";
 
   // Format path segments for display
   const formatPathSegment = (segment: string): string => {
@@ -68,8 +62,9 @@ export default function CategoryPage() {
 
   // Create breadcrumb path segments
   const getBreadcrumbSegments = (): { label: string, path: string }[] => {
-    const fullPath = getFullPathFromUrl();
-    const segments = fullPath.split('/');
+    if (!fullPathFromUrl) return [];
+    
+    const segments = fullPathFromUrl.split('/');
     
     return segments.map((segment, index) => {
       const path = '/categories/' + segments.slice(0, index + 1).join('/');
@@ -80,122 +75,136 @@ export default function CategoryPage() {
     });
   };
 
+  // Find matching category in the API data based on URL path
+  const findMatchingCategory = (categories: Category[], urlPath: string): Category | undefined => {
+    if (!urlPath) return undefined;
+    
+    const urlSegments = urlPath.split('/');
+    const lastSegment = urlSegments[urlSegments.length - 1];
+    
+    console.log(`Looking for category matching: ${lastSegment}`);
+    
+    // Try to find an exact match for the last segment
+    return categories.find(cat => {
+      const catSegments = cat.full_path
+        .toLowerCase()
+        .split(' > ')
+        .map(seg => seg.replace(/[^a-z0-9]+/g, '-'));
+      
+      return catSegments.includes(lastSegment);
+    });
+  };
+
+  // Fetch all categories once on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const categories = await getCategories(100);
         setAllCategories(categories);
-        
-        // Now that we have categories, find the matching one
-        if (category) {
-          const urlPath = getFullPathFromUrl();
-          const urlSegments = urlPath.split('/');
-          const lastSegment = urlSegments[urlSegments.length - 1];
-          
-          // Try to find an exact match for the last segment
-          const matchedCategory = categories.find(cat => {
-            const catSegments = cat.full_path
-              .toLowerCase()
-              .split(' > ')
-              .map(seg => seg.replace(/[^a-z0-9]+/g, '-'));
-            
-            return catSegments.includes(lastSegment);
-          });
-          
-          if (matchedCategory) {
-            console.log("Found matching category:", matchedCategory.full_path);
-            setCategoryFullName(matchedCategory.full_path);
-          } else {
-            console.error("Could not find matching category in:", categories);
-          }
-        }
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
     };
     
     fetchCategories();
-  }, [category]);
+  }, []);
 
+  // When allCategories or URL path changes, find the matching category
   useEffect(() => {
-    if (location.pathname.includes('/categories/')) {
-      const path = getFullPathFromUrl();
-      const segments = path.split('/');
-      setCategoryPath(segments);
-    }
-  }, [location.pathname]);
-  
-  const fetchProducts = async (page: number = 1) => {
-    if (!category) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (categoryFullName) {
-        console.log("Fetching products for category full name:", categoryFullName);
-        
-        const response = await getProductsByCategory(
-          categoryFullName,
-          page,
-          12,
-          selectedSort.value,
-          selectedSort.order
-        );
-        
-        if (page === 1) {
-          setProducts(response.items);
-        } else {
-          setProducts(prev => [...prev, ...response.items]);
-        }
-        
-        setTotalProducts(response.total);
-        setTotalPages(response.pages);
-        setCurrentPage(response.page);
+    if (allCategories.length > 0 && fullPathFromUrl) {
+      const matchedCategory = findMatchingCategory(allCategories, fullPathFromUrl);
+      
+      if (matchedCategory) {
+        console.log("Found matching category:", matchedCategory.full_path);
+        setCategoryFullName(matchedCategory.full_path);
       } else {
-        const segments = getFullPathFromUrl().split('/');
-        const lastSegment = segments[segments.length - 1];
-        const categoryName = formatPathSegment(lastSegment);
-        
-        console.log("Fallback: Fetching products for category name:", categoryName);
-        
-        const response = await getProductsByCategory(
-          categoryName,
-          page,
-          12,
-          selectedSort.value,
-          selectedSort.order
-        );
-        
-        if (page === 1) {
-          setProducts(response.items);
-        } else {
-          setProducts(prev => [...prev, ...response.items]);
-        }
-        
-        setTotalProducts(response.total);
-        setTotalPages(response.pages);
-        setCurrentPage(response.page);
+        console.error("Could not find matching category for path:", fullPathFromUrl);
+        setCategoryFullName("");
       }
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-      setError("Failed to load products. Please try again later.");
-    } finally {
-      setLoading(false);
     }
-  };
-  
+  }, [allCategories, fullPathFromUrl]);
+
+  // Fetch products whenever categoryFullName, page, or sort changes
   useEffect(() => {
-    window.scrollTo(0, 0);
-    if (category) {
-      fetchProducts(1);
-    }
-  }, [category, selectedSort, categoryFullName]);
-  
+    const fetchProducts = async () => {
+      if (!fullPathFromUrl) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        if (categoryFullName) {
+          console.log("Fetching products for category full name:", categoryFullName);
+          
+          const response = await getProductsByCategory(
+            categoryFullName,
+            currentPage,
+            12,
+            selectedSort.value,
+            selectedSort.order
+          );
+          
+          if (currentPage === 1) {
+            setProducts(response.items);
+          } else {
+            setProducts(prev => [...prev, ...response.items]);
+          }
+          
+          setTotalProducts(response.total);
+          setTotalPages(response.pages);
+          setCurrentPage(response.page);
+        } else if (fullPathFromUrl) {
+          // Fallback if we couldn't determine the category's full name
+          const segments = fullPathFromUrl.split('/');
+          const lastSegment = segments[segments.length - 1];
+          const categoryName = formatPathSegment(lastSegment);
+          
+          console.log("Fallback: Fetching products for category name:", categoryName);
+          
+          const response = await getProductsByCategory(
+            categoryName,
+            currentPage,
+            12,
+            selectedSort.value,
+            selectedSort.order
+          );
+          
+          if (currentPage === 1) {
+            setProducts(response.items);
+          } else {
+            setProducts(prev => [...prev, ...response.items]);
+          }
+          
+          setTotalProducts(response.total);
+          setTotalPages(response.pages);
+          setCurrentPage(response.page);
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        setError("Failed to load products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProducts();
+  }, [categoryFullName, fullPathFromUrl, currentPage, selectedSort]);
+
+  // Reset to page 1 when changing categories or sort options
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFullName, fullPathFromUrl, selectedSort]);
+
   const loadMore = () => {
     if (currentPage < totalPages) {
-      fetchProducts(currentPage + 1);
+      setCurrentPage(prev => prev + 1);
     }
+  };
+
+  const handleCategoryClick = (category: Category) => {
+    // This will be called from CategoryNav
+    console.log("Category clicked in CategoryPage:", category.full_path);
+    setCategoryFullName(category.full_path);
   };
 
   const breadcrumbSegments = getBreadcrumbSegments();
@@ -209,22 +218,28 @@ export default function CategoryPage() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <Link to="/">Home</Link>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/categories">Categories</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            
             {breadcrumbSegments.map((segment, index) => (
               <BreadcrumbItem key={segment.path}>
+                <BreadcrumbSeparator />
                 {index === breadcrumbSegments.length - 1 ? (
                   <BreadcrumbPage>{segment.label}</BreadcrumbPage>
                 ) : (
-                  <>
-                    <BreadcrumbLink href={segment.path}>
-                      {segment.label}
-                    </BreadcrumbLink>
-                  </>
+                  <BreadcrumbLink asChild>
+                    <Link to={segment.path}>{segment.label}</Link>
+                  </BreadcrumbLink>
                 )}
-                {index < breadcrumbSegments.length - 1 && <BreadcrumbSeparator />}
               </BreadcrumbItem>
             ))}
           </BreadcrumbList>
@@ -304,7 +319,10 @@ export default function CategoryPage() {
             <div className="space-y-8">
               <div>
                 <h3 className="text-lg font-semibold mb-4">Categories</h3>
-                <CategoryNav activeCategory={getFullPathFromUrl()} />
+                <CategoryNav 
+                  activeCategory={fullPathFromUrl}
+                  onCategoryClick={handleCategoryClick}
+                />
               </div>
               
               <div>
@@ -362,7 +380,10 @@ export default function CategoryPage() {
               products={products}
               loading={loading}
               error={error}
-              onRetry={() => fetchProducts()}
+              onRetry={() => {
+                setCurrentPage(1);
+                setCategoryFullName(categoryFullName); // Trigger a refetch
+              }}
               cols={3}
             />
             
