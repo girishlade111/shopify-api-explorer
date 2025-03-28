@@ -35,6 +35,11 @@ function CopilotDemoApp(props: AppProps) {
   const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
   const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] = useState<boolean>(false);
 
+  // Log instructions whenever they change
+  useEffect(() => {
+    console.log("CopilotDemoApp - Current Instructions:", props.instructions);
+  }, [props.instructions]);
+
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (props.dataChannel && props.dataChannel.readyState === "open") {
       logClientEvent(eventObj, eventNameSuffix);
@@ -170,7 +175,8 @@ function CopilotDemoApp(props: AppProps) {
       },
     };
 
-    console.log("Sending session update event:", sessionUpdateEvent);
+    console.log("Sending session update event with instructions:", props.instructions);
+    console.log("Session update event full details:", sessionUpdateEvent);
     sendClientEvent(sessionUpdateEvent);
   };
 
