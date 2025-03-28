@@ -1,9 +1,9 @@
+
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Heart, User, Menu, X } from "lucide-react";
-import FittingRoom from "./icons/FittingRoom";
+import { ShoppingBag, Heart, User, Menu, X, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
@@ -66,7 +66,7 @@ export function Layout({ children }: LayoutProps) {
         <div className="container-wide flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center">
-              <span className="text-xl font-semibold tracking-tight">STORE</span>
+              <span className="text-xl font-semibold tracking-tight">ATELIER</span>
             </Link>
             
             <nav className="hidden md:flex items-center space-x-8">
@@ -110,9 +110,9 @@ export function Layout({ children }: LayoutProps) {
               <button 
                 onClick={handleFittingRoomClick}
                 className="p-2 hover:text-primary transition-colors rounded-full"
-                aria-label="Fitting Room"
+                aria-label="AI Fitting Room"
               >
-                <FittingRoom className="h-5 w-5" />
+                <Sparkles className="h-5 w-5" />
               </button>
               
               <button 
@@ -167,8 +167,8 @@ export function Layout({ children }: LayoutProps) {
                   className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleFittingRoomClick}
                 >
-                  <FittingRoom className="h-5 w-5" />
-                  <span>Fitting Room</span>
+                  <Sparkles className="h-5 w-5" />
+                  <span>AI Fitting Room</span>
                 </button>
                 <button
                   className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
@@ -189,10 +189,14 @@ export function Layout({ children }: LayoutProps) {
         <div className="container-wide py-12 md:py-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">STORE</h3>
+              <h3 className="text-lg font-semibold mb-4">ATELIER</h3>
               <p className="text-muted text-sm">
                 Discover the perfect blend of fashion and functionality with our curated collection.
               </p>
+              <div className="mt-6">
+                <p className="text-sm text-muted">© {new Date().getFullYear()} Atelier. All rights reserved.</p>
+                <p className="text-xs text-muted mt-1">123 Fashion Avenue, New York, NY 10001</p>
+              </div>
             </div>
             
             <div>
@@ -200,6 +204,10 @@ export function Layout({ children }: LayoutProps) {
               <ul className="space-y-2">
                 <li><FooterLink to="/new-arrivals">New Arrivals</FooterLink></li>
                 <li><FooterLink to="/all-products">All Products</FooterLink></li>
+                <li><FooterLink to="/all-products/women">Women</FooterLink></li>
+                <li><FooterLink to="/all-products/men">Men</FooterLink></li>
+                <li><FooterLink to="/all-products/accessories">Accessories</FooterLink></li>
+                <li><FooterLink to="/all-products/sale">Sale</FooterLink></li>
               </ul>
             </div>
             
@@ -207,25 +215,44 @@ export function Layout({ children }: LayoutProps) {
               <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Company</h4>
               <ul className="space-y-2">
                 <li><FooterLink to="/about">About Us</FooterLink></li>
-                <li><FooterLink to="/contact">Contact</FooterLink></li>
+                <li><FooterLink to="/sustainability">Sustainability</FooterLink></li>
                 <li><FooterLink to="/careers">Careers</FooterLink></li>
+                <li><FooterLink to="/stores">Store Locator</FooterLink></li>
                 <li><FooterLink to="/privacy">Privacy Policy</FooterLink></li>
+                <li><FooterLink to="/terms">Terms & Conditions</FooterLink></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Connect</h4>
-              <div className="flex space-x-4">
-                <IconButton aria-label="Instagram">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                </IconButton>
-                <IconButton aria-label="Twitter">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-                </IconButton>
-                <IconButton aria-label="Facebook">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                </IconButton>
+              <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Customer Service</h4>
+              <ul className="space-y-2">
+                <li><FooterLink to="/contact">Contact Us</FooterLink></li>
+                <li><FooterLink to="/faq">FAQs</FooterLink></li>
+                <li><FooterLink to="/shipping">Shipping & Returns</FooterLink></li>
+                <li><FooterLink to="/size-guide">Size Guide</FooterLink></li>
+              </ul>
+              
+              <div className="mt-8">
+                <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Connect</h4>
+                <div className="flex space-x-4">
+                  <IconButton aria-label="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                  </IconButton>
+                  <IconButton aria-label="Twitter">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                  </IconButton>
+                  <IconButton aria-label="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                  </IconButton>
+                  <IconButton aria-label="Pinterest">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 11.67c.15-.4.6-.9 1.3-.9 1.5 0 2.2 1.4 2.2 3.04 0 1.3-.5 2.54-1.7 2.54-.8 0-1.3-.6-1.1-1.42m.8-2.5c-.4 1.76-.2 3.37.2 3.77.2.2.6.05.8-.3.3-.5.4-1.4.3-2.4"/><path d="M12 21c5 0 9-4 9-9s-4-9-9-9-9 4-9 9c0 2 .6 3.9 1.7 5.5"/></svg>
+                  </IconButton>
+                  <IconButton aria-label="YouTube">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/><path d="M15 8a7 7 0 0 0-4.3 7.3h.3c1 0 2.3.4 3.3 1.3l1.3-1.3a7 7 0 0 0-.6-7.3z"/><path d="M12 19v-9l-5 7h3v9l5-7h-3z"/></svg>
+                  </IconButton>
+                </div>
               </div>
+              
               <div className="mt-6">
                 <h4 className="text-sm font-semibold mb-2">Subscribe to our newsletter</h4>
                 <div className="flex">
@@ -242,8 +269,19 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
           
-          <div className="border-t border-gray-200 mt-12 pt-8 text-center text-muted text-sm">
-            <p>© {new Date().getFullYear()} STORE. All rights reserved.</p>
+          <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <div className="flex space-x-6 mb-4 md:mb-0">
+              <FooterLink to="/privacy">Privacy</FooterLink>
+              <FooterLink to="/terms">Terms</FooterLink>
+              <FooterLink to="/accessibility">Accessibility</FooterLink>
+              <FooterLink to="/cookies">Cookie Preferences</FooterLink>
+            </div>
+            <div className="flex items-center space-x-4">
+              <img src="https://via.placeholder.com/40x25" alt="Visa" className="h-8" />
+              <img src="https://via.placeholder.com/40x25" alt="Mastercard" className="h-8" />
+              <img src="https://via.placeholder.com/40x25" alt="American Express" className="h-8" />
+              <img src="https://via.placeholder.com/40x25" alt="PayPal" className="h-8" />
+            </div>
           </div>
         </div>
       </footer>
