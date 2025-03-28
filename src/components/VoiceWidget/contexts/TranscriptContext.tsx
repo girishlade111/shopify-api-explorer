@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useRef } from "react";
 import { TranscriptItem } from "../types";
 
 interface TranscriptContextType {
@@ -38,6 +38,8 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [transcriptItems, setTranscriptItems] = useState<TranscriptItem[]>([]);
+  // Add a counter for breadcrumbs to ensure unique IDs
+  const breadcrumbCounter = useRef<number>(0);
 
   const addTranscriptMessage = (
     itemId: string,
@@ -77,7 +79,11 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     title: string,
     data?: Record<string, any>
   ) => {
-    const itemId = `breadcrumb-${transcriptItems.length}-${Date.now()}`;
+    // Use a combination of a counter, timestamp, and a random string to ensure uniqueness
+    const uniqueCounter = breadcrumbCounter.current++;
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const itemId = `breadcrumb-${uniqueCounter}-${Date.now()}-${randomSuffix}`;
+    
     const now = new Date();
     const timestamp = now.toLocaleTimeString([], {
       hour: "2-digit",

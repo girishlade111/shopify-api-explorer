@@ -3,9 +3,13 @@ import { ServerEvent, SessionStatus } from "../types";
 import { useTranscript } from "../contexts/TranscriptContext";
 import { useEvent } from "../contexts/EventContext";
 
-// Global variable for the ngrok address
-const NGROK_URL = import.meta.env.VITE_NGROK_URL;
-const STORE_URL = import.meta.env.VITE_STORE_URL;
+// Default values for environment variables
+const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
+const DEFAULT_STORE_URL = "appella-test.myshopify.com";
+
+// Use environment variables or fallback to defaults
+const NGROK_URL = import.meta.env.VITE_NGROK_URL || DEFAULT_NGROK_URL;
+const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 
 interface ProductVariant {
   title: string;

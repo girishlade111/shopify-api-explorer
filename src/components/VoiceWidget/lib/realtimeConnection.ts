@@ -7,6 +7,32 @@ async function checkMicrophoneSupport() {
   }
 }
 
+// Add a cleanup function to properly close connections
+export function cleanupConnection(pc: RTCPeerConnection | null): void {
+  if (pc) {
+    try {
+      // Close all transceivers
+      pc.getTransceivers().forEach(transceiver => {
+        if (transceiver.sender.track) {
+          transceiver.sender.track.stop();
+        }
+      });
+      
+      // Close all senders
+      pc.getSenders().forEach(sender => {
+        if (sender.track) {
+          sender.track.stop();
+        }
+      });
+      
+      // Close the peer connection
+      pc.close();
+    } catch (err) {
+      console.error("Error during connection cleanup:", err);
+    }
+  }
+}
+
 export async function createRealtimeConnection(
   EPHEMERAL_KEY: string,
   audioElement: RefObject<HTMLAudioElement | null>,
@@ -15,6 +41,19 @@ export async function createRealtimeConnection(
   // First check if microphone is supported
   await checkMicrophoneSupport();
   
+  // Log user profile at session start
+  try {
+    const userProfileStorage = localStorage.getItem("user-profile");
+    if (userProfileStorage) {
+      const userProfile = JSON.parse(userProfileStorage);
+      console.log("WebRTC Session Start - User Profile:", JSON.stringify(userProfile, null, 2));
+    } else {
+      console.log("WebRTC Session Start - No User Profile Found");
+    }
+  } catch (error) {
+    console.error("Error loading user profile during WebRTC session start:", error);
+  }
+  
   const pc = new RTCPeerConnection({
     iceServers: [
       {
@@ -22,6 +61,21 @@ export async function createRealtimeConnection(
       }
     ]
   });
+
+  // Track connection state for debugging
+  pc.onconnectionstatechange = () => {
+    console.log(`RTCPeerConnection state: ${pc.connectionState}`);
+  };
+
+  // Track ICE connection state for debugging
+  pc.oniceconnectionstatechange = () => {
+    console.log(`ICE connection state: ${pc.iceConnectionState}`);
+  };
+
+  // Handle ICE candidate errors
+  pc.onicecandidateerror = (event) => {
+    console.warn("ICE candidate error:", event);
+  };
 
   pc.ontrack = (e) => {
     if (audioElement.current) {
@@ -36,9 +90,10 @@ export async function createRealtimeConnection(
     }
   };
 
+  let stream: MediaStream | null = null;
   try {
     // Request microphone access with specific constraints for better quality
-    const stream = await navigator.mediaDevices.getUserMedia({ 
+    stream = await navigator.mediaDevices.getUserMedia({ 
       audio: {
         echoCancellation: true,
         noiseSuppression: true,
@@ -51,7 +106,7 @@ export async function createRealtimeConnection(
 
     // Add all audio tracks from the stream
     stream.getAudioTracks().forEach(track => {
-      pc.addTrack(track, stream);
+      pc.addTrack(track, stream!);
     });
   } catch (err) {
     if (err instanceof Error) {
@@ -66,7 +121,15 @@ export async function createRealtimeConnection(
     throw new Error("Failed to access microphone. Please check your microphone settings and try again.");
   }
 
-  const dc = pc.createDataChannel("oai-events");
+  // Create data channel with more reliable options
+  const dc = pc.createDataChannel("oai-events", {
+    ordered: true
+  });
+
+  // Log data channel state changes
+  dc.onopen = () => console.log("Data channel opened");
+  dc.onclose = () => console.log("Data channel closed");
+  dc.onerror = (e) => console.error("Data channel error:", e);
 
   try {
     const offer = await pc.createOffer();
@@ -84,7 +147,11 @@ export async function createRealtimeConnection(
     });
 
     if (!sdpResponse.ok) {
-      throw new Error("Failed to establish connection. Please try again.");
+      // Clean up the stream if response is not OK
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      throw new Error(`Failed to establish connection: ${sdpResponse.status} ${sdpResponse.statusText}`);
     }
 
     const answerSdp = await sdpResponse.text();
@@ -95,7 +162,11 @@ export async function createRealtimeConnection(
 
     await pc.setRemoteDescription(answer);
   } catch (err) {
-    pc.close();
+    // Clean up resources on error
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    cleanupConnection(pc);
     throw new Error("Failed to establish connection. Please check your internet connection and try again.");
   }
 
