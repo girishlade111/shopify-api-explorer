@@ -267,4 +267,3 @@ function CopilotDemoApp(props: AppProps) {
 }
 
 export default CopilotDemoApp;
-

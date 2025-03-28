@@ -159,10 +159,6 @@ export default function VoiceDemo() {
             throw new Error('No client secret found in response');
           }
 
-          // Log the instructions being received from the server
-          console.log('Received instructions from server:', sessionInstructions);
-          console.log('Received tools from server:', sessionTools);
-
           // Clean up any existing connections before creating a new one
           cleanupResources();
 
@@ -359,4 +355,3 @@ export default function VoiceDemo() {
     </>
   );
 }
-
