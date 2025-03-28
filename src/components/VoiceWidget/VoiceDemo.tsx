@@ -328,13 +328,6 @@ export default function VoiceDemo() {
               <span className="text-sm">{error}</span>
             </div>
           )}
-          
-          {instructions && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm">
-              <p className="font-semibold mb-1">Current Instructions:</p>
-              <p className="text-gray-700">{instructions}</p>
-            </div>
-          )}
         </div>
 
         <TranscriptProvider>
