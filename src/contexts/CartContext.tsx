@@ -69,12 +69,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const removeFromCart = (cartItemId: string) => {
-    const item = cart.find(item => item.id === cartItemId);
-    setCart(prev => prev.filter(item => item.id !== cartItemId));
+    const itemToRemove = cart.find(item => item.id === cartItemId);
     
-    if (item) {
+    if (itemToRemove) {
+      setCart(prev => prev.filter(item => item.id !== cartItemId));
+      
       toast.info("Removed from cart", {
-        description: `${item.product.title} has been removed from your cart.`,
+        description: `${itemToRemove.product.title} has been removed from your cart.`,
       });
     }
   };

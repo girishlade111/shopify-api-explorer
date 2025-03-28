@@ -160,9 +160,12 @@ export function useHandleServerEvent({
     },
     clear_cart: () => {
       try {
-        // Dispatch a custom event that can be listened to by the cart management system
-        // window.dispatchEvent(new CustomEvent('clearCart'));
-        return { success: true };
+        const { clearCart } = useCart();
+        clearCart();
+        return { 
+          success: true,
+          message: "Cart has been cleared successfully" 
+        };
       } catch (error) {
         console.error("Error clearing cart:", error);
         return { 
@@ -173,7 +176,6 @@ export function useHandleServerEvent({
     },
     clear_wishlist: () => {
       try {
-        // Call the clearWishlist function from WishlistContext
         clearWishlist();
         return { 
           success: true,
@@ -502,22 +504,68 @@ export function useHandleServerEvent({
     },
     remove_from_cart: async ({ cart_items, sessionId }: { cart_items: CartItem[], sessionId: string }) => {
       try {
-        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/remove_from_cart`, {
+        if (!cart_items || !Array.isArray(cart_items) || cart_items.length === 0) {
+          return {
+            success: false,
+            error: "No cart items provided",
+            sessionId
+          };
+        }
+
+        // Get product variants information
+        const products_list = {
+          products: cart_items.map(item => ({
+            product_id: item.product.product_id,
+            color: item.product.color || null,
+            size: item.product.size || null
+          }))
+        };
+
+        const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ cart_items }),
+          body: JSON.stringify({ 
+            products_list,
+            max_variants: cart_items.length
+          }),
         });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data = await response.json() as GetVariantsResponse;
+        
+        // Remove each item from the cart
+        const removedItems = [];
+        for (const productId in data.artifact) {
+          const product = data.artifact[productId];
+          
+          if (product) {
+            // Create cart item ID in the format used by the cart context
+            const cartItemId = `${product.product_id}-${product.variant_id}`;
+            // Use the removeFromCart function from the cart context
+            removeFromCart(cartItemId);
+            
+            removedItems.push({
+              title: product.title,
+              price: product.price,
+              image_url: product.image_url,
+              link: product.link,
+              product_id: product.product_id,
+              variant_id: product.variant_id,
+              quantity: 1,
+              operation: "delete"
+            });
+          }
+        }
+
         return {
           success: true,
-          ...data,
+          context: `Removed ${removedItems.length} item(s) from cart`,
+          artifact: removedItems,
           sessionId
         };
       } catch (error) {
