@@ -24,6 +24,7 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
+    mobileNumber: "+44 7911 123456", // Added mobile number with UK format
     address: "123 Main Street",
     city: "New York",
     zipCode: "10001",
@@ -37,11 +38,39 @@ export default function CheckoutPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const sendOrderConfirmationSMS = async (phoneNumber: string, orderNumber: string) => {
+    try {
+      // Only send SMS if the phone number has been changed from the mock data
+      if (phoneNumber !== "+44 7911 123456") {
+        const response = await fetch("https://conv-engine-testing.ngrok.io/twilio/send_sms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to_number: phoneNumber,
+            message_body: `Thank you for your order! Your order #${orderNumber} has been confirmed. - Appella`
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error("SMS sending failed:", data.error);
+        } else {
+          console.log("SMS sent successfully:", data);
+        }
+      }
+    } catch (error) {
+      console.error("Error sending SMS:", error);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.address || 
-        !formData.city || !formData.zipCode || !formData.cardNumber) {
+        !formData.city || !formData.zipCode || !formData.cardNumber || !formData.mobileNumber) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -61,6 +90,9 @@ export default function CheckoutPage() {
       });
       
       setOrderComplete(true);
+      
+      // Send SMS confirmation if the user provided a real mobile number
+      sendOrderConfirmationSMS(formData.mobileNumber, orderNumber);
       
       // Clear the cart
       clearCart();
@@ -118,6 +150,11 @@ export default function CheckoutPage() {
               
               <div className="text-sm text-muted-foreground mb-6">
                 A confirmation email has been sent to {formData.email}
+                {formData.mobileNumber !== "+44 7911 123456" && (
+                  <div className="mt-1">
+                    A confirmation SMS has been sent to {formData.mobileNumber}
+                  </div>
+                )}
               </div>
             </div>
             
@@ -144,6 +181,19 @@ export default function CheckoutPage() {
                           value={formData.name} 
                           onChange={handleChange} 
                           required 
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="mobileNumber">Mobile Number *</Label>
+                        <Input 
+                          id="mobileNumber" 
+                          name="mobileNumber" 
+                          type="tel" 
+                          value={formData.mobileNumber} 
+                          onChange={handleChange} 
+                          required 
+                          placeholder="+1 (234) 567-8901"
                         />
                       </div>
                       
