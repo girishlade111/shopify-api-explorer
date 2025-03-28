@@ -110,11 +110,13 @@ function CopilotDemoApp(props: AppProps) {
       props.instructions &&
       props.dataChannel?.readyState === "open"
     ) {
+      console.log("Adding instructions to transcript:", props.instructions);
       addTranscriptBreadcrumb(
         `Instructions`,
         { content: props.instructions }
       );
       if (props.tools && props.tools.length > 0) {
+        console.log("Adding tools to transcript:", props.tools);
         addTranscriptBreadcrumb(
           `Available Tools`,
           { tools: props.tools }
@@ -168,6 +170,7 @@ function CopilotDemoApp(props: AppProps) {
       },
     };
 
+    console.log("Sending session update event:", sessionUpdateEvent);
     sendClientEvent(sessionUpdateEvent);
   };
 

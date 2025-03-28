@@ -159,6 +159,10 @@ export default function VoiceDemo() {
             throw new Error('No client secret found in response');
           }
 
+          // Log the instructions being received from the server
+          console.log('Received instructions from server:', sessionInstructions);
+          console.log('Received tools from server:', sessionTools);
+
           // Clean up any existing connections before creating a new one
           cleanupResources();
 
@@ -328,6 +332,13 @@ export default function VoiceDemo() {
               <span className="text-sm">{error}</span>
             </div>
           )}
+          
+          {instructions && (
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm">
+              <p className="font-semibold mb-1">Current Instructions:</p>
+              <p className="text-gray-700">{instructions}</p>
+            </div>
+          )}
         </div>
 
         <TranscriptProvider>
@@ -348,3 +359,4 @@ export default function VoiceDemo() {
     </>
   );
 }
+
