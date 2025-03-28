@@ -15,7 +15,7 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
       </div>
 
-      <div className="relative h-full container-wide flex flex-col justify-center">
+      <div className="relative h-full container-wide flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-24">
         <div className="max-w-xl">
           <h1 className="text-white text-5xl md:text-6xl font-bold tracking-tight mb-4">
             Summer Collection
