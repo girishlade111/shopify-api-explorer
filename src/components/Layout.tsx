@@ -7,6 +7,7 @@ import { ShoppingBag, Heart, User, Menu, X, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
+import { Separator } from "./ui/separator";
 
 interface LayoutProps {
   children: ReactNode;
@@ -68,11 +69,6 @@ export function Layout({ children }: LayoutProps) {
             <Link to="/" className="flex items-center">
               <span className="text-xl font-semibold tracking-tight">ATELIER</span>
             </Link>
-            
-            <nav className="hidden md:flex items-center space-x-8">
-              <NavLink to="/new-arrivals">New Arrivals</NavLink>
-              <NavLink to="/all-products">All Products</NavLink>
-            </nav>
           </div>
           
           <div className="hidden md:flex items-center gap-6">
@@ -138,12 +134,36 @@ export function Layout({ children }: LayoutProps) {
           </button>
         </div>
         
+        {/* Secondary Navigation Bar */}
+        <div className="w-full bg-white border-b border-gray-200">
+          <div className="container-wide h-12">
+            <nav className="hidden md:flex items-center justify-center h-full">
+              <SecondaryNavLink to="/">Home</SecondaryNavLink>
+              <SecondaryNavLink to="/new-arrivals">New In</SecondaryNavLink>
+              <SecondaryNavLink to="/all-products/women">Women</SecondaryNavLink>
+              <SecondaryNavLink to="/all-products/men">Men</SecondaryNavLink>
+              <SecondaryNavLink to="/all-products/beauty">Beauty</SecondaryNavLink>
+              <SecondaryNavLink to="/all-products/food">Food</SecondaryNavLink>
+              <SecondaryNavLink to="/services">Services</SecondaryNavLink>
+              <SecondaryNavLink to="/new-arrivals">New Arrivals</SecondaryNavLink>
+              <SecondaryNavLink to="/all-products">All Products</SecondaryNavLink>
+            </nav>
+          </div>
+        </div>
+
         {mobileMenuOpen && (
           <div className="md:hidden fixed inset-0 z-50 bg-white pt-16 animate-fade-in">
             <div className="container-wide py-6 flex flex-col space-y-6">
               <SearchBar />
               
               <nav className="flex flex-col space-y-4">
+                <MobileNavLink to="/">Home</MobileNavLink>
+                <MobileNavLink to="/new-arrivals">New In</MobileNavLink>
+                <MobileNavLink to="/all-products/women">Women</MobileNavLink>
+                <MobileNavLink to="/all-products/men">Men</MobileNavLink>
+                <MobileNavLink to="/all-products/beauty">Beauty</MobileNavLink>
+                <MobileNavLink to="/all-products/food">Food</MobileNavLink>
+                <MobileNavLink to="/services">Services</MobileNavLink>
                 <MobileNavLink to="/new-arrivals">New Arrivals</MobileNavLink>
                 <MobileNavLink to="/all-products">All Products</MobileNavLink>
               </nav>
@@ -306,6 +326,28 @@ const NavLink = ({ to, children }: { to: string; children: ReactNode }) => {
       {children}
       {isActive && (
         <span className="absolute bottom-0 left-0 right-0 mx-auto w-1/2 h-0.5 bg-primary rounded-full" />
+      )}
+    </Link>
+  );
+};
+
+const SecondaryNavLink = ({ to, children }: { to: string; children: ReactNode }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to || location.pathname.startsWith(`${to}/`);
+  
+  return (
+    <Link
+      to={to}
+      className={cn(
+        "text-sm font-medium transition-colors px-4 py-2 relative mx-1",
+        isActive 
+          ? "text-primary" 
+          : "text-dark hover:text-primary"
+      )}
+    >
+      {children}
+      {isActive && (
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
       )}
     </Link>
   );
