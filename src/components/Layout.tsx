@@ -1,4 +1,3 @@
-
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
@@ -59,9 +58,7 @@ export function Layout({ children }: LayoutProps) {
       <header 
         className={cn(
           "sticky top-0 z-40 w-full transition-all duration-200",
-          scrolled 
-            ? "bg-white/80 backdrop-blur-md border-b border-gray-200/80 shadow-sm" 
-            : "bg-transparent"
+          "bg-secondary text-white"
         )}
       >
         <div className="container-wide flex h-16 items-center justify-between">
@@ -145,7 +142,6 @@ export function Layout({ children }: LayoutProps) {
               <SecondaryNavLink to="/all-products/beauty">Beauty</SecondaryNavLink>
               <SecondaryNavLink to="/all-products/food">Food</SecondaryNavLink>
               <SecondaryNavLink to="/services">Services</SecondaryNavLink>
-              <SecondaryNavLink to="/new-arrivals">New Arrivals</SecondaryNavLink>
               <SecondaryNavLink to="/all-products">All Products</SecondaryNavLink>
             </nav>
           </div>
@@ -164,7 +160,6 @@ export function Layout({ children }: LayoutProps) {
                 <MobileNavLink to="/all-products/beauty">Beauty</MobileNavLink>
                 <MobileNavLink to="/all-products/food">Food</MobileNavLink>
                 <MobileNavLink to="/services">Services</MobileNavLink>
-                <MobileNavLink to="/new-arrivals">New Arrivals</MobileNavLink>
                 <MobileNavLink to="/all-products">All Products</MobileNavLink>
               </nav>
               
