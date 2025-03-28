@@ -48,8 +48,8 @@ export default function Index() {
       
       <NewArrivals />
 
-      <Section className="w-full">
-        <div className="container-wide">
+      <Section className="w-full bg-white">
+        <div className="max-w-[90%] mx-auto">
           <div className="flex items-center justify-between mb-8">
             <SectionHeader 
               title="Top Picks For Today" 
@@ -75,7 +75,7 @@ export default function Index() {
       </Section>
       
       <Section className="w-full bg-accent">
-        <div className="container-wide">
+        <div className="max-w-[90%] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -111,8 +111,8 @@ export default function Index() {
         </div>
       </Section>
       
-      <Section className="w-full">
-        <div className="container-wide">
+      <Section className="w-full bg-white">
+        <div className="max-w-[90%] mx-auto">
           <SectionHeader 
             title="Explore Our Categories" 
             subtitle="Find your perfect style in our curated collections"
@@ -120,7 +120,7 @@ export default function Index() {
             className="mb-10"
           />
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             <CategoryCard 
               title="Women" 
               image="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f"
@@ -151,7 +151,7 @@ export default function Index() {
       </Section>
       
       <Section className="w-full bg-secondary text-white">
-        <div className="container-wide">
+        <div className="max-w-[90%] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <div className="order-2 md:order-1">
               <span className="inline-block bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
@@ -207,8 +207,8 @@ export default function Index() {
         </div>
       </Section>
       
-      <Section className="w-full">
-        <div className="container-wide">
+      <Section className="w-full bg-white">
+        <div className="max-w-[90%] mx-auto">
           <SectionHeader 
             title="Trending Products" 
             subtitle="Our most popular items based on sales"
@@ -225,7 +225,7 @@ export default function Index() {
       </Section>
       
       <Section className="bg-accent w-full">
-        <div className="container-wide">
+        <div className="max-w-[90%] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FeatureCard 
               icon={<ShoppingBag className="h-8 w-8" />}
@@ -251,8 +251,8 @@ export default function Index() {
         </div>
       </Section>
       
-      <Section className="w-full">
-        <div className="container-wide">
+      <Section className="w-full bg-white">
+        <div className="max-w-[90%] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="lg:col-span-3">
               <h3 className="text-xl font-semibold mb-4">Shop by Category</h3>
@@ -290,7 +290,7 @@ export default function Index() {
       </Section>
       
       <Section className="bg-dark text-white w-full">
-        <div className="container-wide">
+        <div className="max-w-[90%] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">

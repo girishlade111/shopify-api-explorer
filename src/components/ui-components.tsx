@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
@@ -13,9 +12,7 @@ export const Section = ({
   fullWidth?: boolean;
 }) => (
   <section className={cn("py-12 md:py-16", className)}>
-    <div className={cn(fullWidth ? "px-4 sm:px-6 lg:px-8" : "container-tight")}>
-      {children}
-    </div>
+    {children}
   </section>
 );
 
