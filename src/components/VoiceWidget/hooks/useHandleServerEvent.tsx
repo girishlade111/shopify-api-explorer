@@ -1,3 +1,4 @@
+
 import { useRef } from "react";
 import { ServerEvent, SessionStatus } from "../types";
 import { useTranscript } from "../contexts/TranscriptContext";
@@ -60,8 +61,8 @@ export function useHandleServerEvent({
   const { logServerEvent } = useEvent();
   const fittingRoom = useFittingRoom();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, clearWishlist } = useWishlist();
+  const cart = useCart();
+  const wishlist = useWishlist();
   const currentSessionId = useRef<string | null>(null);
 
   const fns = {
@@ -160,8 +161,8 @@ export function useHandleServerEvent({
     },
     clear_cart: () => {
       try {
-        const { clearCart } = useCart();
-        clearCart();
+        // Access clearCart from the cart context object, not as a hook
+        cart.clearCart();
         return { 
           success: true,
           message: "Cart has been cleared successfully" 
@@ -176,7 +177,8 @@ export function useHandleServerEvent({
     },
     clear_wishlist: () => {
       try {
-        clearWishlist();
+        // Access clearWishlist from the wishlist context object, not directly
+        wishlist.clearWishlist();
         return { 
           success: true,
           message: "Wishlist has been cleared successfully" 
@@ -472,7 +474,8 @@ export function useHandleServerEvent({
               price: product.price.toString(),
             };
 
-            addToCart(minimalProduct as any, minimalVariant as any, cartItem.quantity || 1);
+            // Use addToCart from cart context object
+            cart.addToCart(minimalProduct as any, minimalVariant as any, cartItem.quantity || 1);
             
             addedItems.push({
               title: product.title,
@@ -546,8 +549,8 @@ export function useHandleServerEvent({
           if (product) {
             // Create cart item ID in the format used by the cart context
             const cartItemId = `${product.product_id}-${product.variant_id}`;
-            // Use the removeFromCart function from the cart context
-            removeFromCart(cartItemId);
+            // Use removeFromCart from cart context object
+            cart.removeFromCart(cartItemId);
             
             removedItems.push({
               title: product.title,
@@ -633,7 +636,8 @@ export function useHandleServerEvent({
               }]
             };
 
-            addToWishlist(minimalProduct as any);
+            // Use addToWishlist from wishlist context object
+            wishlist.addToWishlist(minimalProduct as any);
             
             addedItems.push({
               title: product.title,
@@ -704,8 +708,8 @@ export function useHandleServerEvent({
           const product = data.artifact[productId];
           
           if (product) {
-            // Remove from wishlist using product ID
-            removeFromWishlist(product.product_id);
+            // Use removeFromWishlist from wishlist context object
+            wishlist.removeFromWishlist(product.product_id);
             
             removedItems.push({
               title: product.title,
