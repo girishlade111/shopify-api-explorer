@@ -110,18 +110,7 @@ function CopilotDemoApp(props: AppProps) {
       props.instructions &&
       props.dataChannel?.readyState === "open"
     ) {
-      console.log("Adding instructions to transcript:", props.instructions);
-      addTranscriptBreadcrumb(
-        `Instructions`,
-        { content: props.instructions }
-      );
-      if (props.tools && props.tools.length > 0) {
-        console.log("Adding tools to transcript:", props.tools);
-        addTranscriptBreadcrumb(
-          `Available Tools`,
-          { tools: props.tools }
-        );
-      }
+      // Removed console.log about instructions
       updateSession();
     }
   }, [props.instructions, props.tools, sessionStatus, props.dataChannel?.readyState]);
@@ -170,7 +159,7 @@ function CopilotDemoApp(props: AppProps) {
       },
     };
 
-    console.log("Sending session update event:", sessionUpdateEvent);
+    console.log("Session update event full details:", sessionUpdateEvent);
     sendClientEvent(sessionUpdateEvent);
   };
 
@@ -278,3 +267,4 @@ function CopilotDemoApp(props: AppProps) {
 }
 
 export default CopilotDemoApp;
+
