@@ -22,6 +22,7 @@ interface FittingRoomContextType {
   tabs: FittingRoomTab[];
   addProducts: (products: FittingRoomProduct[]) => void;
   clearProducts: () => void;
+  resetFittingRoom: () => void;
 }
 
 const FittingRoomContext = createContext<FittingRoomContextType>({
@@ -29,6 +30,7 @@ const FittingRoomContext = createContext<FittingRoomContextType>({
   tabs: [],
   addProducts: () => {},
   clearProducts: () => {},
+  resetFittingRoom: () => {},
 });
 
 export const FittingRoomProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -88,9 +90,14 @@ export const FittingRoomProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.removeItem('fittingRoomProducts');
     localStorage.removeItem('fittingRoomTabs');
   };
+  
+  // New function that's an alias to clearProducts for semantic clarity
+  const resetFittingRoom = () => {
+    clearProducts();
+  };
 
   return (
-    <FittingRoomContext.Provider value={{ products, tabs, addProducts, clearProducts }}>
+    <FittingRoomContext.Provider value={{ products, tabs, addProducts, clearProducts, resetFittingRoom }}>
       {children}
     </FittingRoomContext.Provider>
   );

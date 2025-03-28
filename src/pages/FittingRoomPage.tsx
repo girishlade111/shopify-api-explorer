@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FittingRoomIcon from "@/components/icons/FittingRoom";
-import { ArrowLeft, ExternalLink, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, RefreshCcw, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function FittingRoomPage() {
-  const { products, tabs, clearProducts } = useFittingRoom();
+  const { products, tabs, clearProducts, resetFittingRoom } = useFittingRoom();
   const { addToCart } = useCart();
   const [viewType, setViewType] = useState<"grid" | "compare">("grid");
   const [activeTabId, setActiveTabId] = useState<string>("");
@@ -45,6 +46,11 @@ export default function FittingRoomPage() {
     };
 
     addToCart(minimalProduct as any, minimalVariant as any, 1);
+  };
+  
+  const handleReset = () => {
+    resetFittingRoom();
+    toast.success("Fitting room has been reset");
   };
 
   const renderProductGrid = (productSet: FittingRoomProduct[]) => (
@@ -141,10 +147,16 @@ export default function FittingRoomPage() {
           </div>
           <div className="flex gap-2">
             {products.length > 0 && (
-              <Button variant="outline" size="sm" onClick={clearProducts}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Clear All
-              </Button>
+              <>
+                <Button variant="outline" size="sm" onClick={handleReset}>
+                  <RefreshCcw className="mr-2 h-4 w-4" />
+                  Reset
+                </Button>
+                <Button variant="outline" size="sm" onClick={clearProducts}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Clear All
+                </Button>
+              </>
             )}
             <Button variant="outline" size="sm" asChild>
               <Link to="/">
