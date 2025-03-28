@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -33,15 +34,6 @@ function CopilotDemoApp(props: AppProps) {
   const [userText, setUserText] = useState<string>("");
   const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
   const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] = useState<boolean>(false);
-  const lastInstructionsRef = useRef<string>(props.instructions);
-
-  // Only log instructions when they change
-  useEffect(() => {
-    if (props.instructions !== lastInstructionsRef.current) {
-      console.log("CopilotDemoApp - Instructions updated:", props.instructions);
-      lastInstructionsRef.current = props.instructions;
-    }
-  }, [props.instructions]);
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (props.dataChannel && props.dataChannel.readyState === "open") {
@@ -178,9 +170,7 @@ function CopilotDemoApp(props: AppProps) {
       },
     };
 
-    // Always log the full session update event details
-    console.log("Session update event full details:", sessionUpdateEvent);
-    
+    console.log("Sending session update event:", sessionUpdateEvent);
     sendClientEvent(sessionUpdateEvent);
   };
 

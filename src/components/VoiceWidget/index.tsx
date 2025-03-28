@@ -1,5 +1,5 @@
 
-import { useState, memo } from 'react';
+import { useState } from 'react';
 import { Mic, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
 
@@ -17,11 +17,10 @@ const VoiceWidget = () => {
         {isOpen ? <X className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
       </button>
 
-      {/* Voice Widget Container - Only mount when needed */}
+      {/* Voice Widget Container */}
       {isOpen && <VoiceDemo />}
     </>
   );
 };
 
-// Memoize to prevent unnecessary re-renders
-export default memo(VoiceWidget);
+export default VoiceWidget;
