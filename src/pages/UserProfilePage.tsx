@@ -25,7 +25,7 @@ export default function UserProfilePage() {
 
   return (
     <Layout>
-      <div className="container mx-auto py-10">
+      <div className="container-wide py-10">
         <h1 className="text-3xl font-bold mb-8">My Profile</h1>
         <Form {...form}>
           <form onSubmit={(e) => {

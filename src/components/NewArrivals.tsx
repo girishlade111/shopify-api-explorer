@@ -44,7 +44,7 @@ export function NewArrivals() {
   };
 
   return (
-    <section className="py-16">
+    <section className="py-16 w-full">
       <div className="container-wide">
         <div className="flex items-center justify-between mb-8">
           <SectionHeader 
