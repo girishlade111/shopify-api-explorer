@@ -110,7 +110,6 @@ function CopilotDemoApp(props: AppProps) {
       props.instructions &&
       props.dataChannel?.readyState === "open"
     ) {
-      // Removed console.log about instructions
       updateSession();
     }
   }, [props.instructions, props.tools, sessionStatus, props.dataChannel?.readyState]);

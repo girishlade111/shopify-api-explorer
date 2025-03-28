@@ -6,6 +6,7 @@ import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
+import { useUserActivity } from '@/contexts/UserActivityContext';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -19,11 +20,12 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 const MAX_CONNECTION_RETRIES = 3;
 
 export default function VoiceDemo() {
+  const { userActivity } = useUserActivity();
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [instructions, setInstructions] = useState<string>("");
+  const [baseInstructions, setBaseInstructions] = useState<string>("");
   const [tools, setTools] = useState<any[]>([]);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [connectionRetries, setConnectionRetries] = useState(0);
@@ -32,6 +34,16 @@ export default function VoiceDemo() {
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Function to get combined instructions with user activity
+  const getCombinedInstructions = () => {
+    if (!baseInstructions) return "";
+    
+    // Format user activity as a string
+    const userActivityString = `\n\n# Customer Context\n${JSON.stringify(userActivity, null, 2)}`;
+    
+    return baseInstructions + userActivityString;
+  };
 
   // Load persisted settings on component mount
   useEffect(() => {
@@ -85,6 +97,13 @@ export default function VoiceDemo() {
     }
   }, [isAudioEnabled]);
 
+  // Update session when user activity changes
+  useEffect(() => {
+    if (sessionStatus === 'CONNECTED' && dcRef.current?.readyState === 'open') {
+      updateSession();
+    }
+  }, [userActivity]);
+
   // Clean up resources when component unmounts
   useEffect(() => {
     return () => {
@@ -114,7 +133,7 @@ export default function VoiceDemo() {
       cleanupResources();
       setSessionStatus('DISCONNECTED');
       setError(null);
-      setInstructions("");
+      setBaseInstructions("");
       setTools([]);
       setConnectionRetries(0);
     } else {
@@ -170,7 +189,7 @@ export default function VoiceDemo() {
 
           pcRef.current = pc;
           dcRef.current = dc;
-          setInstructions(sessionInstructions || "");
+          setBaseInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
           setIsWidgetOpen(true);
@@ -275,6 +294,58 @@ export default function VoiceDemo() {
     </button>
   );
 
+  const updateSession = () => {
+    if (!dcRef.current || dcRef.current.readyState !== "open") {
+      console.warn("Cannot update session - data channel not ready");
+      return;
+    }
+
+    sendClientEvent(
+      { type: "input_audio_buffer.clear" },
+      "clear audio buffer on session update"
+    );
+
+    const turnDetection = isPTTActive || !isTranscriptionEnabled
+      ? null
+      : {
+          type: "server_vad",
+          threshold: 0.5,
+          prefix_padding_ms: 300,
+          silence_duration_ms: 540,
+          create_response: true,
+        };
+
+    const sessionUpdateEvent = {
+      type: "session.update",
+      session: {
+        modalities: ["text", "audio"],
+        instructions: getCombinedInstructions(),
+        tools: tools || [],
+        voice: "alloy",
+        input_audio_format: "pcm16",
+        output_audio_format: "pcm16",
+        input_audio_transcription: isTranscriptionEnabled ? { model: "whisper-1" } : null,
+        turn_detection: turnDetection,
+      },
+    };
+
+    console.log("Session update event full details:", sessionUpdateEvent);
+    sendClientEvent(sessionUpdateEvent);
+  };
+
+  const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
+    if (dcRef.current && dcRef.current.readyState === "open") {
+      dcRef.current.send(JSON.stringify(eventObj));
+    } else {
+      console.error(
+        "Failed to send message - no data channel available",
+        eventObj
+      );
+    }
+  };
+
+  const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
+
   return (
     <>
       {/* Chat Widget Toggle Button */}
@@ -339,7 +410,7 @@ export default function VoiceDemo() {
               dataChannel={dcRef.current}
               isTranscriptionEnabled={isTranscriptionEnabled}
               isAudioEnabled={isAudioEnabled}
-              instructions={instructions}
+              instructions={getCombinedInstructions()}
               tools={tools}
             />
           </EventProvider>
