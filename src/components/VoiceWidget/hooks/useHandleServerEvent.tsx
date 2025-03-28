@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 
 // Default values for environment variables
-const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
+const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
 const DEFAULT_STORE_URL = "appella-test.myshopify.com";
 
 // Use environment variables or fallback to defaults

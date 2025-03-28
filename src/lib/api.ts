@@ -1,7 +1,6 @@
-
 import { Category, PaginatedResponse, Product, SearchSuggestionsResponse } from "@/types";
 
-const API_BASE_URL = "https://shopifyproducts.ngrok.io";
+const API_BASE_URL = "https://shopify-demo-data.dev.appellatech.net";
 
 // Utility to handle API errors
 const handleApiResponse = async <T>(response: Response): Promise<T> => {

@@ -42,7 +42,7 @@ export default function CheckoutPage() {
     try {
       // Only send SMS if the phone number has been changed from the mock data
       if (phoneNumber !== "+44 7911 123456") {
-        const response = await fetch("https://conv-engine-testing.ngrok.io/twilio/send_sms", {
+        const response = await fetch("https://voice-conversation-engine.dev.appellatech.net/twilio/send_sms", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

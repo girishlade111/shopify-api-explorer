@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -7,7 +8,7 @@ import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
 
 // Default values for environment variables
-const DEFAULT_NGROK_URL = "https://conv-engine-testing.ngrok.io";
+const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
 const DEFAULT_STORE_URL = "appella-test.myshopify.com";
 
 // Use environment variables or fallback to defaults
