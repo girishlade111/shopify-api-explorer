@@ -1,12 +1,14 @@
+
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Heart, User, Menu, X, Sparkles } from "lucide-react";
+import { ShoppingBag, Heart, User, Menu, X, Sparkles, Languages } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
 import { Separator } from "./ui/separator";
+import FittingRoom from "./icons/FittingRoom";
 
 interface LayoutProps {
   children: ReactNode;
@@ -56,65 +58,70 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <header 
-        className={cn(
-          "sticky top-0 z-40 w-full transition-all duration-200",
-          "bg-secondary text-white"
-        )}
+        className="sticky top-0 z-40 w-full transition-all duration-200 bg-secondary text-white"
       >
         <div className="container-wide flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
+          {/* Left Section - Language Selector */}
+          <div className="flex items-center">
+            <button className="flex items-center space-x-1 text-sm hover:text-primary transition-colors">
+              <Languages className="h-4 w-4" />
+              <span className="hidden sm:inline">English</span>
+            </button>
+          </div>
+          
+          {/* Center Section - Logo */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link to="/" className="flex items-center">
-              <span className="text-xl font-semibold tracking-tight">ATELIER</span>
+              <span className="text-2xl font-bold tracking-tight">ATELIER</span>
             </Link>
           </div>
           
-          <div className="hidden md:flex items-center gap-6">
-            <div className="w-64">
-              <SearchBar />
-            </div>
+          {/* Right Section - Icons */}
+          <div className="hidden md:flex items-center gap-4">
+            <button 
+              onClick={handleFittingRoomClick}
+              className="p-2 hover:text-primary transition-colors rounded-full"
+              aria-label="AI Fitting Room"
+            >
+              <Sparkles className="h-5 w-5" />
+            </button>
             
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={handleWishlistClick}
-                className="relative p-2 hover:text-primary transition-colors rounded-full"
-                aria-label="Wishlist"
-              >
-                <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
-              </button>
-              
-              <button 
-                onClick={handleCartClick}
-                className="relative p-2 hover:text-primary transition-colors rounded-full"
-                aria-label="Shopping Bag"
-              >
-                <ShoppingBag className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartCount > 99 ? '99+' : cartCount}
-                  </span>
-                )}
-              </button>
-              
-              <button 
-                onClick={handleFittingRoomClick}
-                className="p-2 hover:text-primary transition-colors rounded-full"
-                aria-label="AI Fitting Room"
-              >
-                <Sparkles className="h-5 w-5" />
-              </button>
-              
-              <button 
-                onClick={handleAccountClick}
-                className="p-2 hover:text-primary transition-colors rounded-full"
-                aria-label="Account"
-              >
-                <User className="h-5 w-5" />
-              </button>
+            <button 
+              onClick={handleWishlistClick}
+              className="relative p-2 hover:text-primary transition-colors rounded-full"
+              aria-label="Wishlist"
+            >
+              <Heart className="h-5 w-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+            
+            <button 
+              onClick={handleAccountClick}
+              className="p-2 hover:text-primary transition-colors rounded-full"
+              aria-label="Account"
+            >
+              <User className="h-5 w-5" />
+            </button>
+            
+            <button 
+              onClick={handleCartClick}
+              className="relative p-2 hover:text-primary transition-colors rounded-full"
+              aria-label="Shopping Bag"
+            >
+              <ShoppingBag className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </button>
+            
+            <div className="pl-2 w-48">
+              <SearchBar />
             </div>
           </div>
           
@@ -166,20 +173,6 @@ export function Layout({ children }: LayoutProps) {
               <div className="flex space-x-4 pt-4 border-t border-gray-100">
                 <button
                   className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
-                  onClick={handleWishlistClick}
-                >
-                  <Heart className="h-5 w-5" />
-                  <span>Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</span>
-                </button>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
-                  onClick={handleCartClick}
-                >
-                  <ShoppingBag className="h-5 w-5" />
-                  <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
-                </button>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleFittingRoomClick}
                 >
                   <Sparkles className="h-5 w-5" />
@@ -187,10 +180,24 @@ export function Layout({ children }: LayoutProps) {
                 </button>
                 <button
                   className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
+                  onClick={handleWishlistClick}
+                >
+                  <Heart className="h-5 w-5" />
+                  <span>Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</span>
+                </button>
+                <button
+                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleAccountClick}
                 >
                   <User className="h-5 w-5" />
                   <span>Account</span>
+                </button>
+                <button
+                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
+                  onClick={handleCartClick}
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
                 </button>
               </div>
             </div>
