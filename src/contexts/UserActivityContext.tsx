@@ -37,6 +37,7 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
   const { cart } = useCart();
   const { wishlist } = useWishlist();
   const isUpdatingProfile = useRef(false);
+  const previousActivityRef = useRef<UserActivity | null>(null);
   
   // Initialize user profile from localStorage
   const initializeUserProfile = (): UserProfileValues | null => {
@@ -65,6 +66,11 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
     userProfile: initializeUserProfile(),
     lastUpdated: new Date().toISOString()
   });
+
+  // Set initial previous activity
+  useEffect(() => {
+    previousActivityRef.current = userActivity;
+  }, []);
 
   // Track page changes
   useEffect(() => {
@@ -97,7 +103,32 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
     updateUserActivity({ wishlistItems });
   }, [wishlist]);
 
-  // Update user activity and log to console
+  // Check if activity has actually changed
+  const hasActivityChanged = (newActivity: Partial<UserActivity>, prevActivity: UserActivity): boolean => {
+    for (const key in newActivity) {
+      const typedKey = key as keyof UserActivity;
+      
+      // Skip lastUpdated comparison
+      if (typedKey === 'lastUpdated') continue;
+      
+      // For objects, compare JSON strings
+      if (
+        typeof newActivity[typedKey] === 'object' && 
+        newActivity[typedKey] !== null
+      ) {
+        const newValue = JSON.stringify(newActivity[typedKey]);
+        const prevValue = JSON.stringify(prevActivity[typedKey]);
+        if (newValue !== prevValue) return true;
+      } 
+      // For primitive values, direct comparison
+      else if (newActivity[typedKey] !== prevActivity[typedKey]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Update user activity and log to console only if there are actual changes
   const updateUserActivity = (updates: Partial<UserActivity>) => {
     // Skip if we're currently in the middle of a userProfile update that was triggered internally
     if (isUpdatingProfile.current && 'userProfile' in updates) {
@@ -111,8 +142,15 @@ export function UserActivityProvider({ children }: { children: React.ReactNode }
         lastUpdated: new Date().toISOString()
       };
       
-      // Always log user activity updates
-      console.log("User Activity Updated:", JSON.stringify(newActivity, null, 2));
+      // Check if there's an actual change
+      const hasChanged = previousActivityRef.current ? 
+        hasActivityChanged(updates, previousActivityRef.current) : true;
+      
+      // Only log if there's an actual change
+      if (hasChanged) {
+        console.log("User Activity Updated:", JSON.stringify(newActivity, null, 2));
+        previousActivityRef.current = newActivity;
+      }
       
       return newActivity;
     });
