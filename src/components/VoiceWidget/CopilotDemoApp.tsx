@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -179,11 +178,8 @@ function CopilotDemoApp(props: AppProps) {
       },
     };
 
-    // Only log once when sending session update
-    console.log("Sending session update with instructions length:", props.instructions.length);
-    if (process.env.NODE_ENV === 'development') {
-      console.log("Session update event details:", sessionUpdateEvent);
-    }
+    // Always log the full session update event details
+    console.log("Session update event full details:", sessionUpdateEvent);
     
     sendClientEvent(sessionUpdateEvent);
   };
