@@ -1,4 +1,3 @@
-
 import { useRef } from "react";
 import { ServerEvent, SessionStatus } from "../types";
 import { useTranscript } from "../contexts/TranscriptContext";
@@ -814,6 +813,7 @@ export function useHandleServerEvent({
         if (serverEvent.session?.id) {
           currentSessionId.current = serverEvent.session.id;
           setSessionStatus("CONNECTED");
+          console.log(`Session created with ID: ${serverEvent.session.id}`);
           addTranscriptBreadcrumb(
             `session.id: ${
               serverEvent.session.id
@@ -878,7 +878,9 @@ export function useHandleServerEvent({
       }
 
       case "response.done": {
-        console.log("response.done", serverEvent);
+        if (process.env.NODE_ENV === 'development') {
+          console.log("Response completed:", serverEvent);
+        }
         break;
       }
 

@@ -34,10 +34,14 @@ function CopilotDemoApp(props: AppProps) {
   const [userText, setUserText] = useState<string>("");
   const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
   const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] = useState<boolean>(false);
+  const lastInstructionsRef = useRef<string>(props.instructions);
 
-  // Log instructions whenever they change
+  // Only log instructions when they change
   useEffect(() => {
-    console.log("CopilotDemoApp - Current Instructions:", props.instructions);
+    if (props.instructions !== lastInstructionsRef.current) {
+      console.log("CopilotDemoApp - Instructions updated:", props.instructions);
+      lastInstructionsRef.current = props.instructions;
+    }
   }, [props.instructions]);
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
@@ -175,8 +179,12 @@ function CopilotDemoApp(props: AppProps) {
       },
     };
 
-    console.log("Sending session update event with instructions:", props.instructions);
-    console.log("Session update event full details:", sessionUpdateEvent);
+    // Only log once when sending session update
+    console.log("Sending session update with instructions length:", props.instructions.length);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Session update event details:", sessionUpdateEvent);
+    }
+    
     sendClientEvent(sessionUpdateEvent);
   };
 
