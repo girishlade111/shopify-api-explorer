@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Hero } from "@/components/Hero";
@@ -9,25 +8,30 @@ import { SectionHeader, Section } from "@/components/ui-components";
 import { getProducts, getCategories } from "@/lib/api";
 import { Product, Category } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingBag, Clock, Truck, Shield } from "lucide-react";
+import { ShoppingBag, Clock, Truck, Shield, Sparkles, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Index() {
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [topPicks, setTopPicks] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchTrendingProducts = async () => {
+    const fetchProducts = async () => {
       try {
-        const response = await getProducts(1, 6);
-        setTrendingProducts(response.items);
+        const trending = await getProducts(1, 6);
+        setTrendingProducts(trending.items);
+        
+        const picks = await getProducts(2, 4);
+        setTopPicks(picks.items);
       } catch (error) {
-        console.error("Failed to fetch trending products:", error);
-        setError("Failed to load trending products. Please try again later.");
+        console.error("Failed to fetch products:", error);
+        setError("Failed to load products. Please try again later.");
         toast({
           title: "Error",
-          description: "Failed to load trending products. Please try again later.",
+          description: "Failed to load products. Please try again later.",
           variant: "destructive",
         });
       } finally {
@@ -35,7 +39,7 @@ export default function Index() {
       }
     };
 
-    fetchTrendingProducts();
+    fetchProducts();
   }, [toast]);
 
   return (
@@ -43,6 +47,165 @@ export default function Index() {
       <Hero />
       
       <NewArrivals />
+
+      <Section className="w-full">
+        <div className="container-wide">
+          <div className="flex items-center justify-between mb-8">
+            <SectionHeader 
+              title="Top Picks For Today" 
+              subtitle="Curated selection of our favorite items"
+            />
+            
+            <Link 
+              to="/all-products?sort=popular" 
+              className="hidden md:inline-flex items-center text-sm font-medium text-primary hover:underline"
+            >
+              View All <ChevronRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
+          
+          <ProductGrid 
+            products={topPicks} 
+            loading={loading} 
+            error={error}
+            onRetry={() => window.location.reload()}
+            cols={4}
+          />
+        </div>
+      </Section>
+      
+      <Section className="w-full bg-accent">
+        <div className="container-wide">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                What's New at ATELIER
+              </h2>
+              <p className="text-muted mb-6">
+                Discover our latest collections and exclusive designer collaborations.
+                We've partnered with renowned designers to bring you unique and exclusive pieces.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link 
+                  to="/new-arrivals" 
+                  className="bg-primary text-white px-6 py-3 rounded-md inline-block font-medium hover:bg-primary/90 transition-colors text-center"
+                >
+                  Shop New Arrivals
+                </Link>
+                <Link 
+                  to="/about" 
+                  className="bg-transparent border border-dark text-dark px-6 py-3 rounded-md inline-block font-medium hover:bg-dark hover:text-white transition-colors text-center"
+                >
+                  Our Story
+                </Link>
+              </div>
+            </div>
+            <div className="relative h-[400px] rounded-lg overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d" 
+                alt="Fashion collection" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </Section>
+      
+      <Section className="w-full">
+        <div className="container-wide">
+          <SectionHeader 
+            title="Explore Our Categories" 
+            subtitle="Find your perfect style in our curated collections"
+            center
+            className="mb-10"
+          />
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <CategoryCard 
+              title="Women" 
+              image="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f"
+              link="/all-products/women"
+            />
+            <CategoryCard 
+              title="Men" 
+              image="https://images.unsplash.com/photo-1488161628813-04466f872be2"
+              link="/all-products/men"
+            />
+            <CategoryCard 
+              title="Beauty" 
+              image="https://images.unsplash.com/photo-1596462502278-27bfdc403348"
+              link="/all-products/beauty"
+            />
+            <CategoryCard 
+              title="Food" 
+              image="https://images.unsplash.com/photo-1526470498-9ae73c665de8"
+              link="/all-products/food"
+            />
+            <CategoryCard 
+              title="Services" 
+              image="https://images.unsplash.com/photo-1595475207225-428b62bda831"
+              link="/services"
+            />
+          </div>
+        </div>
+      </Section>
+      
+      <Section className="w-full bg-secondary text-white">
+        <div className="container-wide">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <div className="order-2 md:order-1">
+              <span className="inline-block bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
+                NEW FEATURE
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Try Before You Buy with AI
+              </h2>
+              <p className="text-white/80 mb-6">
+                Experience our revolutionary AI Fitting Room. See how clothes look on you before making a purchase.
+                No more returns due to fit issues!
+              </p>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start">
+                  <span className="bg-primary/20 p-1 rounded-full mr-3 mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>Upload your photo or choose from our models</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-primary/20 p-1 rounded-full mr-3 mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>Try on any item from our collection</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-primary/20 p-1 rounded-full mr-3 mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                  <span>Visualize complete outfits in seconds</span>
+                </li>
+              </ul>
+              <Link 
+                to="/fitting-room" 
+                className="bg-primary text-white px-6 py-3 rounded-md inline-flex items-center font-medium hover:bg-primary/90 transition-colors"
+              >
+                Try Fitting Room <Sparkles className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
+            <div className="relative order-1 md:order-2">
+              <div className="bg-primary/10 rounded-lg p-4">
+                <img 
+                  src="https://images.unsplash.com/photo-1538329972958-465d6d2144ed" 
+                  alt="AI Fitting Room" 
+                  className="rounded-lg shadow-lg"
+                />
+                <div className="absolute -bottom-4 -right-4 bg-primary text-white rounded-lg p-3 shadow-lg">
+                  <Sparkles className="h-10 w-10" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Section>
       
       <Section className="w-full">
         <div className="container-wide">
@@ -204,4 +367,22 @@ const SocialButton = ({ children, ...props }: { children: React.ReactNode, [key:
   >
     {children}
   </button>
+);
+
+const CategoryCard = ({ title, image, link }: { title: string, image: string, link: string }) => (
+  <Link to={link} className="group relative rounded-lg overflow-hidden bg-accent aspect-[3/4] transition-transform hover:scale-[1.02]">
+    <img 
+      src={image} 
+      alt={title} 
+      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
+      <div className="w-full">
+        <h3 className="text-white text-xl font-semibold">{title}</h3>
+        <span className="text-white/80 text-sm flex items-center mt-1">
+          Explore <ChevronRight className="h-4 w-4 ml-1" />
+        </span>
+      </div>
+    </div>
+  </Link>
 );
