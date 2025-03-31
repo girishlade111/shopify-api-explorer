@@ -322,7 +322,7 @@ export default function VoiceDemo() {
             isAudioEnabled={isAudioEnabled}
             instructions={instructions}
             tools={tools}
-            isVoiceMode={true} // Set this to true for voice mode
+            isVoiceMode={true} // This is a voice-only mode
           />
         </EventProvider>
       </TranscriptProvider>

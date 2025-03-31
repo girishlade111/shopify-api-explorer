@@ -113,15 +113,18 @@ function CopilotDemoApp(props: AppProps) {
       props.instructions &&
       props.dataChannel?.readyState === "open"
     ) {
-      addTranscriptBreadcrumb(
-        `Instructions`,
-        { content: props.instructions }
-      );
-      if (props.tools && props.tools.length > 0) {
+      // Only add instructions to transcript if not in voice-only mode
+      if (!props.isVoiceMode) {
         addTranscriptBreadcrumb(
-          `Available Tools`,
-          { tools: props.tools }
+          `Instructions`,
+          { content: props.instructions }
         );
+        if (props.tools && props.tools.length > 0) {
+          addTranscriptBreadcrumb(
+            `Available Tools`,
+            { tools: props.tools }
+          );
+        }
       }
       updateSession();
     }
@@ -261,6 +264,7 @@ function CopilotDemoApp(props: AppProps) {
             props.dataChannel?.readyState === "open"
           }
           showTextInput={!props.isVoiceMode} // Hide the text input in voice mode
+          isVoiceMode={props.isVoiceMode} // Pass the voice mode flag to the Transcript component
         />
       </div>
     </div>

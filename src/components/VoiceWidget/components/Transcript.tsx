@@ -8,10 +8,18 @@ interface TranscriptProps {
   setUserText: (text: string) => void;
   onSendMessage: () => void;
   canSend: boolean;
-  showTextInput?: boolean; // Add this prop to control visibility of the text input
+  showTextInput?: boolean; // Controls visibility of the text input
+  isVoiceMode?: boolean; // Controls if we're in voice-only mode
 }
 
-function Transcript({ userText, setUserText, onSendMessage, canSend, showTextInput = true }: TranscriptProps) {
+function Transcript({ 
+  userText, 
+  setUserText, 
+  onSendMessage, 
+  canSend, 
+  showTextInput = true,
+  isVoiceMode = false 
+}: TranscriptProps) {
   const { transcriptItems } = useTranscript();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -49,6 +57,22 @@ function Transcript({ userText, setUserText, onSendMessage, canSend, showTextInp
       }
     }
   };
+
+  // In voice-only mode, we show a simplified interface
+  if (isVoiceMode) {
+    return (
+      <div className="flex flex-col w-full h-full">
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-center text-gray-500">
+            Use the microphone to start talking with Atelier
+          </p>
+        </div>
+        <div className="p-4 border-t bg-gray-50 text-center">
+          <p className="text-gray-500">Talk to Atelier here</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -112,8 +136,8 @@ function Transcript({ userText, setUserText, onSendMessage, canSend, showTextInp
         </div>
       )}
 
-      {/* When in voice mode, show an assistance message at the bottom */}
-      {!showTextInput && (
+      {/* When in voice mode but not voice-only mode, show an assistance message at the bottom */}
+      {!showTextInput && !isVoiceMode && (
         <div className="p-4 border-t bg-gray-50 text-center">
           <p className="text-gray-500">Talk to Atelier here</p>
         </div>
