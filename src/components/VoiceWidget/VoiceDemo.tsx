@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, AlertCircle } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
@@ -25,7 +25,6 @@ export default function VoiceDemo() {
   const [error, setError] = useState<string | null>(null);
   const [instructions, setInstructions] = useState<string>("");
   const [tools, setTools] = useState<any[]>([]);
-  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [connectionRetries, setConnectionRetries] = useState(0);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
@@ -39,9 +38,9 @@ export default function VoiceDemo() {
     if (storedSettings) {
       try {
         const settings = JSON.parse(storedSettings);
-        // Don't auto-enable mic and speaker
-        // Only persist open/closed state
-        setIsWidgetOpen(settings.isWidgetOpen ?? false);
+        // Don't auto-enable mic and speaker to avoid unexpected behavior
+        setIsTranscriptionEnabled(false);
+        setIsAudioEnabled(false);
       } catch (e) {
         console.error('Error parsing stored voice widget settings:', e);
       }
@@ -53,10 +52,9 @@ export default function VoiceDemo() {
     localStorage.setItem('voiceWidgetSettings', JSON.stringify({
       isTranscriptionEnabled,
       isAudioEnabled,
-      isWidgetOpen,
       wasConnected: sessionStatus === 'CONNECTED'
     }));
-  }, [isTranscriptionEnabled, isAudioEnabled, isWidgetOpen, sessionStatus]);
+  }, [isTranscriptionEnabled, isAudioEnabled, sessionStatus]);
 
   useEffect(() => {
     if (!audioElementRef.current) {
@@ -164,7 +162,6 @@ export default function VoiceDemo() {
           setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
-          setIsWidgetOpen(true);
           setConnectionRetries(0); // Reset retries on successful connection
 
           if (audioElementRef.current && isAudioEnabled) {
@@ -271,77 +268,58 @@ export default function VoiceDemo() {
   );
 
   return (
-    <>
-      {/* Chat Widget Toggle Button */}
-      <button
-        onClick={() => setIsWidgetOpen(!isWidgetOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-[#5856d6] text-white p-4 rounded-full shadow-lg hover:bg-[#4745ac] transition-all duration-200"
-      >
-        {isWidgetOpen ? (
-          <X className="w-6 h-6" />
-        ) : (
-          <MessageCircle className="w-6 h-6" />
-        )}
-      </button>
-
-      {/* Chat Widget Container */}
-      <div
-        className={`fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform ${
-          isWidgetOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="p-4 border-b">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Atelier Assistant</h2>
-            <div className="flex gap-2">
-              <IconButton
-                checked={isTranscriptionEnabled}
-                onChange={setIsTranscriptionEnabled}
-                icon={Mic}
-                iconOff={MicOff}
-                disabled={sessionStatus !== 'CONNECTED'}
-              />
-              <IconButton
-                checked={isAudioEnabled}
-                onChange={setIsAudioEnabled}
-                icon={Volume2}
-                iconOff={VolumeX}
-                disabled={sessionStatus !== 'CONNECTED'}
-              />
-            </div>
+    <div className="fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
+      <div className="p-4 border-b">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Atelier Assistant</h2>
+          <div className="flex gap-2">
+            <IconButton
+              checked={isTranscriptionEnabled}
+              onChange={setIsTranscriptionEnabled}
+              icon={Mic}
+              iconOff={MicOff}
+              disabled={sessionStatus !== 'CONNECTED'}
+            />
+            <IconButton
+              checked={isAudioEnabled}
+              onChange={setIsAudioEnabled}
+              icon={Volume2}
+              iconOff={VolumeX}
+              disabled={sessionStatus !== 'CONNECTED'}
+            />
           </div>
-
-          <button
-            onClick={handleToggleConnection}
-            className={`w-full ${getConnectionButtonClasses()}`}
-            disabled={sessionStatus === 'CONNECTING'}
-          >
-            {getConnectionButtonLabel()}
-          </button>
-
-          {error && (
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">{error}</span>
-            </div>
-          )}
         </div>
 
-        <TranscriptProvider>
-          <EventProvider>
-            <CopilotDemoApp
-              initialSessionStatus={sessionStatus}
-              onSessionStatusChange={setSessionStatus}
-              peerConnection={pcRef.current}
-              dataChannel={dcRef.current}
-              isTranscriptionEnabled={isTranscriptionEnabled}
-              isAudioEnabled={isAudioEnabled}
-              instructions={instructions}
-              tools={tools}
-            />
-          </EventProvider>
-        </TranscriptProvider>
+        <button
+          onClick={handleToggleConnection}
+          className={`w-full ${getConnectionButtonClasses()}`}
+          disabled={sessionStatus === 'CONNECTING'}
+        >
+          {getConnectionButtonLabel()}
+        </button>
+
+        {error && (
+          <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm">{error}</span>
+          </div>
+        )}
       </div>
-    </>
+
+      <TranscriptProvider>
+        <EventProvider>
+          <CopilotDemoApp
+            initialSessionStatus={sessionStatus}
+            onSessionStatusChange={setSessionStatus}
+            peerConnection={pcRef.current}
+            dataChannel={dcRef.current}
+            isTranscriptionEnabled={isTranscriptionEnabled}
+            isAudioEnabled={isAudioEnabled}
+            instructions={instructions}
+            tools={tools}
+          />
+        </EventProvider>
+      </TranscriptProvider>
+    </div>
   );
 }
