@@ -27,7 +27,7 @@ interface AppProps {
 }
 
 function CopilotDemoApp(props: AppProps) {
-  const { transcriptItems, addTranscriptMessage, addTranscriptBreadcrumb } = useTranscript();
+  const { transcriptItems, addTranscriptMessage } = useTranscript();
   const { logClientEvent } = useEvent();
 
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
@@ -113,7 +113,6 @@ function CopilotDemoApp(props: AppProps) {
       props.instructions &&
       props.dataChannel?.readyState === "open"
     ) {
-      // No longer adding instructions or tools to the transcript
       updateSession();
     }
   }, [props.instructions, props.tools, sessionStatus, props.dataChannel?.readyState]);
@@ -241,7 +240,7 @@ function CopilotDemoApp(props: AppProps) {
   }, [isPTTActive]);
 
   return (
-    <div className={`flex flex-col bg-white ${props.isVoiceMode ? 'h-0' : 'h-[500px]'}`}>
+    <div className={`flex flex-col bg-white ${props.isVoiceMode ? 'h-0' : 'h-full'}`}>
       <div className={`flex flex-1 overflow-hidden relative ${props.isVoiceMode ? 'min-h-0' : ''}`}>
         <Transcript
           userText={userText}
@@ -251,8 +250,8 @@ function CopilotDemoApp(props: AppProps) {
             sessionStatus === "CONNECTED" &&
             props.dataChannel?.readyState === "open"
           }
-          showTextInput={!props.isVoiceMode} // Hide the text input in voice mode
-          isVoiceMode={props.isVoiceMode} // Pass the voice mode flag to the Transcript component
+          showTextInput={!props.isVoiceMode}
+          isVoiceMode={props.isVoiceMode}
         />
       </div>
     </div>
