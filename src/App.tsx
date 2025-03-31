@@ -24,7 +24,7 @@ import { WishlistProvider } from '@/contexts/WishlistContext';
 import { FittingRoomProvider } from '@/contexts/FittingRoomContext';
 
 import { ScrollToTop } from '@/components/ScrollToTop';
-import CopilotDemoApp from '@/components/VoiceWidget/CopilotDemoApp';
+import VoiceWidget from '@/components/VoiceWidget';
 
 import './App.css';
 
@@ -56,7 +56,7 @@ function App() {
                     <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>
-                <CopilotDemoApp />
+                <VoiceWidget />
               </UserActivityProvider>
             </FittingRoomProvider>
           </WishlistProvider>

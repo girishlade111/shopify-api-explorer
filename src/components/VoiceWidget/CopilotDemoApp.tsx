@@ -1,6 +1,6 @@
 
 import React from "react";
-import VoiceDemo from "./VoiceDemo";
+import VoiceWidget from "./index";
 import { TranscriptProvider } from "./contexts/TranscriptContext";
 import { EventProvider } from "./contexts/EventContext";
 import { SessionStatus } from "./types";
@@ -16,12 +16,12 @@ interface CopilotDemoAppProps {
   tools?: any[];
 }
 
-export const CopilotDemoApp: React.FC<CopilotDemoAppProps> = (props) => {
+export const CopilotDemoApp: React.FC<CopilotDemoAppProps> = () => {
   return (
     <div className="fixed bottom-4 left-4 z-50">
       <EventProvider>
         <TranscriptProvider>
-          <VoiceDemo {...props} />
+          <VoiceWidget />
         </TranscriptProvider>
       </EventProvider>
     </div>
