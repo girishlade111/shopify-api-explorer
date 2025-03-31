@@ -11,7 +11,7 @@ export function MensSection() {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden">
               <img 
-                src="https://cdn.media.amplience.net/i/liberty/250313-Mens-SC2-Coats-and-Jackets-min?fmt=auto&qlt=default&w=360&h=450" 
+                src="https://media.endclothing.com/end-features/f_auto,q_auto:eco,w_780/prodfeatures/Z8baXBsAHJWomFck_03-03-25_SpringEditorial-MW_Features_EB012.jpg?auto=format,compress" 
                 alt="Men's Collection" 
                 className="w-full aspect-[4/5] object-cover"
               />

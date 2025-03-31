@@ -9,27 +9,27 @@ export function CategorySection({ className }: CategorySectionProps) {
   const categories = [
     {
       name: "Mens",
-      image: "https://images.prismic.io/end-features/Z-UxJndAxsiBv-DI_19-03-25_MW-Curates__BrandPage_2400x1350.jpg",
+      image: "https://cdn.media.amplience.net/i/liberty/250213-Homepage-R2E8-Mens-min?fmt=auto&qlt=default&w=800&h=1000",
       link: "/all-products/men"
     },
     {
       name: "Womens",
-      image: "https://assets.armani.com/image/upload/v1737391559/SS25_AX_ADV_FASHION_GLOBAL_MW_03_1080x1350.jpg",
+      image: "https://cdn.media.amplience.net/i/liberty/250213-Homepage-R2E2-Dresses-min?fmt=auto&qlt=default&w=800&h=1000",
       link: "/all-products/women"
     },
     {
       name: "Beauty",
-      image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/GA_2025_EA-SWY-Parfum_Pack-with-Ingredients_1x1_RVB-4000",
+      image: "https://images.selfridges.com/is/image/selfridges/250310_CLP_BEAUTY_BANNER_2_D1?wid=1232&hei=528&fmt=webp&qlt=80,1&dpr=on,2&fit=crop",
       link: "/all-products/beauty"
     },
     {
       name: "Food",
-      image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/Armani-Dolci-Ramadan-01",
+      image: "https://images.selfridges.com/is/image/selfridges/240417_JACKSON_BOXER_CORNER_RESTAURANT_ASSET_UPDATE?wid=1920&fmt=jpg&fit=constrain&qlt=95,1",
       link: "/all-products/food"
     },
     {
       name: "Services",
-      image: "https://assets.armani.com/image/upload/v1728401835/ARMANI_RESTAURANT_FALL_WINTER_2024.jpg",
+      image: "https://images.selfridges.com/is/image/selfridges/2209_HP_Event_03?wid=402&hei=301&fmt=webp&qlt=80,1&dpr=on,2&fit=crop",
       link: "/services"
     }
   ];
