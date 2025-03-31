@@ -1,4 +1,3 @@
-
 import { useRef } from "react";
 import { ServerEvent, SessionStatus } from "../types";
 import { useTranscript } from "../contexts/TranscriptContext";
@@ -76,7 +75,6 @@ export function useHandleServerEvent({
       sessionId: string;
     }) => {
       try {
-        // First get the variant information
         const response = await fetch(`${NGROK_URL}/api/${STORE_URL}/${sessionId}/get_variants`, {
           method: "POST",
           headers: {
@@ -105,12 +103,10 @@ export function useHandleServerEvent({
           throw new Error("No link found for the specified product variant");
         }
 
-        // Extract the product handle from the link
         const urlParts = productInfo.link.split('/products/');
         let productHandle = '';
         
         if (urlParts.length > 1) {
-          // Remove any query parameters
           productHandle = urlParts[1].split('?')[0];
         }
         
@@ -118,7 +114,6 @@ export function useHandleServerEvent({
           throw new Error("Could not extract product handle from link");
         }
 
-        // Navigate to the product using React Router
         navigate(`/products/${productHandle}`);
 
         return {
@@ -161,7 +156,6 @@ export function useHandleServerEvent({
     },
     clear_cart: () => {
       try {
-        // Access clearCart from the cart context object, not as a hook
         cart.clearCart();
         return { 
           success: true,
@@ -177,7 +171,6 @@ export function useHandleServerEvent({
     },
     clear_wishlist: () => {
       try {
-        // Access clearWishlist from the wishlist context object, not directly
         wishlist.clearWishlist();
         return { 
           success: true,
@@ -264,7 +257,6 @@ export function useHandleServerEvent({
 
         const data = await response.json() as GetVariantsResponse;
         
-        // Transform the artifact data into an array of product info
         const variants_info = Object.values(data.artifact || {}).map(product => ({
           title: product.title,
           price: product.price,
@@ -426,7 +418,6 @@ export function useHandleServerEvent({
           };
         }
 
-        // Get product variants information
         const products_list = {
           products: cart_items.map(item => ({
             product_id: item.product.product_id,
@@ -452,14 +443,12 @@ export function useHandleServerEvent({
 
         const data = await response.json() as GetVariantsResponse;
         
-        // Add each item to the cart
         const addedItems = [];
         for (const productId in data.artifact) {
           const product = data.artifact[productId];
           const cartItem = cart_items.find(item => item.product.product_id === product.product_id);
           
           if (product && cartItem) {
-            // Create minimal product and variant objects required by addToCart
             const minimalProduct = {
               id: product.product_id,
               title: product.title,
@@ -474,7 +463,6 @@ export function useHandleServerEvent({
               price: product.price.toString(),
             };
 
-            // Use addToCart from cart context object
             cart.addToCart(minimalProduct as any, minimalVariant as any, cartItem.quantity || 1);
             
             addedItems.push({
@@ -515,7 +503,6 @@ export function useHandleServerEvent({
           };
         }
 
-        // Get product variants information
         const products_list = {
           products: cart_items.map(item => ({
             product_id: item.product.product_id,
@@ -541,15 +528,12 @@ export function useHandleServerEvent({
 
         const data = await response.json() as GetVariantsResponse;
         
-        // Remove each item from the cart
         const removedItems = [];
         for (const productId in data.artifact) {
           const product = data.artifact[productId];
           
           if (product) {
-            // Create cart item ID in the format used by the cart context
             const cartItemId = `${product.product_id}-${product.variant_id}`;
-            // Use removeFromCart from cart context object
             cart.removeFromCart(cartItemId);
             
             removedItems.push({
@@ -590,7 +574,6 @@ export function useHandleServerEvent({
           };
         }
 
-        // Get product variants information
         const products_list = {
           products: cart_items.map(item => ({
             product_id: item.product.product_id,
@@ -616,13 +599,11 @@ export function useHandleServerEvent({
 
         const data = await response.json() as GetVariantsResponse;
         
-        // Add each item to the wishlist
         const addedItems = [];
         for (const productId in data.artifact) {
           const product = data.artifact[productId];
           
           if (product) {
-            // Create minimal product object required by addToWishlist
             const minimalProduct = {
               id: product.product_id,
               title: product.title,
@@ -636,7 +617,6 @@ export function useHandleServerEvent({
               }]
             };
 
-            // Use addToWishlist from wishlist context object
             wishlist.addToWishlist(minimalProduct as any);
             
             addedItems.push({
@@ -676,7 +656,6 @@ export function useHandleServerEvent({
           };
         }
 
-        // Get product variants information
         const products_list = {
           products: cart_items.map(item => ({
             product_id: item.product.product_id,
@@ -702,13 +681,11 @@ export function useHandleServerEvent({
 
         const data = await response.json() as GetVariantsResponse;
         
-        // Remove each item from the wishlist
         const removedItems = [];
         for (const productId in data.artifact) {
           const product = data.artifact[productId];
           
           if (product) {
-            // Use removeFromWishlist from wishlist context object
             wishlist.removeFromWishlist(product.product_id);
             
             removedItems.push({
@@ -748,7 +725,6 @@ export function useHandleServerEvent({
     let args;
     try {
       args = JSON.parse(functionCallParams.arguments);
-      // Add session ID to arguments if available
       if (currentSessionId.current) {
         args = { ...args, sessionId: currentSessionId.current };
       }
@@ -767,7 +743,6 @@ export function useHandleServerEvent({
     if (fn !== undefined) {
       try {
         result = await fn(args);
-        // Add function call result to transcript
         addTranscriptBreadcrumb(`function result: ${functionCallParams.name}`, {
           ...result
         });
@@ -778,7 +753,6 @@ export function useHandleServerEvent({
           error: error instanceof Error ? error.message : "Unknown error",
           sessionId: currentSessionId.current
         };
-        // Add error result to transcript
         addTranscriptBreadcrumb(`function error: ${functionCallParams.name}`, {
           ...result
         });
@@ -789,7 +763,6 @@ export function useHandleServerEvent({
         error: `Function ${functionCallParams.name} not found`,
         sessionId: currentSessionId.current
       };
-      // Add not found error to transcript
       addTranscriptBreadcrumb(`function not found: ${functionCallParams.name}`, {
         ...result
       });
@@ -814,11 +787,6 @@ export function useHandleServerEvent({
         if (serverEvent.session?.id) {
           currentSessionId.current = serverEvent.session.id;
           setSessionStatus("CONNECTED");
-          addTranscriptBreadcrumb(
-            `session.id: ${
-              serverEvent.session.id
-            }\nStarted at: ${new Date().toLocaleString()}`
-          );
         }
         break;
       }
