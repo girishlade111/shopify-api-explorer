@@ -1,4 +1,3 @@
-
 import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
@@ -67,14 +66,14 @@ export function Layout({ children }: LayoutProps) {
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           scrolled 
             ? "bg-white border-b border-gray-200 text-dark py-2" 
-            : "bg-black/50 backdrop-blur-sm text-white py-4"
+            : "bg-transparent text-white py-4"
         }`}
       >
         <div className="container-wide flex items-center justify-between">
           {/* Left Section - Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <span className={`font-serif text-2xl sm:text-3xl tracking-tight ${!scrolled ? "text-white" : ""}`}>ATELIER</span>
+              <span className={`font-serif text-3xl sm:text-4xl tracking-tight ${!scrolled ? "text-white" : ""}`}>ATELIER</span>
             </Link>
           </div>
           
@@ -354,7 +353,8 @@ const NavLink = ({ to, children }: { to: string; children: ReactNode }) => {
     <Link
       to={to}
       className={cn(
-        "text-sm tracking-wider transition-colors relative px-1 py-1 font-light",
+        "text-sm tracking-wider transition-colors relative px-1 py-1",
+        scrolled ? "font-normal" : "font-medium",
         isActive 
           ? scrolled ? "text-primary" : "text-white" 
           : scrolled ? "text-dark hover:text-primary" : "text-white hover:text-white/80"
