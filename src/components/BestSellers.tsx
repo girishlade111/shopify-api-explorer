@@ -15,9 +15,8 @@ export function BestSellers() {
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
-        // In a real app, you would have a dedicated endpoint for best sellers
-        // For now, we'll use the regular products endpoint with different filters to get different products
-        const response = await getProducts(2, 8, "price", "desc");
+        // Using different offset and parameters to get different products
+        const response = await getProducts(1, 8, "created_at", "desc");
         setProducts(response.items);
       } catch (error) {
         console.error("Failed to fetch best sellers:", error);
