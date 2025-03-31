@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
 import { MessageCircle, X } from 'lucide-react';
+import { TranscriptProvider } from './contexts/TranscriptContext';
+import { EventProvider } from './contexts/EventContext';
 import VoiceDemo from './VoiceDemo';
 
 const VoiceWidget = () => {
@@ -18,7 +20,13 @@ const VoiceWidget = () => {
       </button>
 
       {/* Voice Widget Container */}
-      {isOpen && <VoiceDemo />}
+      {isOpen && (
+        <EventProvider>
+          <TranscriptProvider>
+            <VoiceDemo />
+          </TranscriptProvider>
+        </EventProvider>
+      )}
     </>
   );
 };
