@@ -5,7 +5,7 @@ import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
-import { AlertCircle, Menu, X } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -18,11 +18,7 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 // Maximum number of connection retries
 const MAX_CONNECTION_RETRIES = 3;
 
-interface AtelierChatProps {
-  onSwitchToVoice?: () => void; // New prop for switching to voice mode
-}
-
-export default function AtelierChat({ onSwitchToVoice }: AtelierChatProps) {
+export default function AtelierChat() {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
   const [error, setError] = useState<string | null>(null);
   const [instructions, setInstructions] = useState<string>("");
@@ -159,30 +155,20 @@ export default function AtelierChat({ onSwitchToVoice }: AtelierChatProps) {
     }
   };
 
-  const handleSwitchToVoice = () => {
-    if (onSwitchToVoice) {
-      onSwitchToVoice();
-    }
-  };
-
   return (
-    <div className="fixed bottom-24 right-6 z-40 w-[320px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
-      <div className="p-4 border-b flex items-center justify-between">
-        <button className="p-1">
-          <Menu size={20} />
-        </button>
-        <h2 className="text-xl font-semibold">Enzo AI</h2>
-        <button className="p-1">
-          <X size={20} />
-        </button>
-      </div>
-
-      {error && (
-        <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
-          <AlertCircle className="w-5 h-5 flex-shrink-0" />
-          <span className="text-sm">{error}</span>
+    <div className="fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
+      <div className="p-4 border-b">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Atelier Chat</h2>
         </div>
-      )}
+
+        {error && (
+          <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm">{error}</span>
+          </div>
+        )}
+      </div>
 
       <TranscriptProvider>
         <EventProvider>
@@ -195,8 +181,6 @@ export default function AtelierChat({ onSwitchToVoice }: AtelierChatProps) {
             isAudioEnabled={false} // Always false for text chat
             instructions={instructions}
             tools={tools}
-            isVoiceMode={false}
-            onSwitchToVoice={handleSwitchToVoice}
           />
         </EventProvider>
       </TranscriptProvider>
