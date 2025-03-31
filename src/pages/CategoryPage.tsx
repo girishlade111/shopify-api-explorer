@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -8,7 +9,6 @@ import { Category, Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { CategoryPageEnhancement } from "@/components/CategoryPageEnhancement";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 type SortOption = {
   label: string;
@@ -17,41 +17,18 @@ type SortOption = {
 };
 
 const sortOptions: SortOption[] = [
-  {
-    label: "Newest",
-    value: "created_at",
-    order: "desc"
-  },
-  {
-    label: "Price: Low to High",
-    value: "price",
-    order: "asc"
-  },
-  {
-    label: "Price: High to Low",
-    value: "price",
-    order: "desc"
-  },
-  {
-    label: "Alphabetical: A-Z",
-    value: "title",
-    order: "asc"
-  },
-  {
-    label: "Alphabetical: Z-A",
-    value: "title",
-    order: "desc"
-  }
+  { label: "Newest", value: "created_at", order: "desc" },
+  { label: "Price: Low to High", value: "price", order: "asc" },
+  { label: "Price: High to Low", value: "price", order: "desc" },
+  { label: "Alphabetical: A-Z", value: "title", order: "asc" },
+  { label: "Alphabetical: Z-A", value: "title", order: "desc" },
 ];
 
 export default function CategoryPage() {
-  const {
-    "*": categoryPath
-  } = useParams<{
-    "*": string;
-  }>();
+  const { "*": categoryPath } = useParams<{ "*": string }>();
   const location = useLocation();
   const navigate = useNavigate();
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,17 +40,22 @@ export default function CategoryPage() {
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [categoryFullName, setCategoryFullName] = useState<string>("");
   const [allCategories, setAllCategories] = useState<Category[]>([]);
+
   const fullPathFromUrl = categoryPath || "";
   const isRootCategory = !fullPathFromUrl;
+
   const formatPathSegment = (segment: string): string => {
-    return segment.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return segment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
-  const getBreadcrumbSegments = (): {
-    label: string;
-    path: string;
-  }[] => {
+
+  const getBreadcrumbSegments = (): { label: string, path: string }[] => {
     if (!fullPathFromUrl) return [];
+    
     const segments = fullPathFromUrl.split('/');
+    
     return segments.map((segment, index) => {
       const path = '/all-products/' + segments.slice(0, index + 1).join('/');
       return {
@@ -82,16 +64,25 @@ export default function CategoryPage() {
       };
     });
   };
+
   const findMatchingCategory = (categories: Category[], urlPath: string): Category | undefined => {
     if (!urlPath) return undefined;
+    
     const urlSegments = urlPath.split('/');
     const lastSegment = urlSegments[urlSegments.length - 1];
+    
     console.log(`Looking for category matching: ${lastSegment}`);
+    
     return categories.find(cat => {
-      const catSegments = cat.full_path.toLowerCase().split(' > ').map(seg => seg.replace(/[^a-z0-9]+/g, '-'));
+      const catSegments = cat.full_path
+        .toLowerCase()
+        .split(' > ')
+        .map(seg => seg.replace(/[^a-z0-9]+/g, '-'));
+      
       return catSegments.includes(lastSegment);
     });
   };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -101,11 +92,14 @@ export default function CategoryPage() {
         console.error("Failed to fetch categories:", error);
       }
     };
+    
     fetchCategories();
   }, []);
+
   useEffect(() => {
     if (allCategories.length > 0 && fullPathFromUrl) {
       const matchedCategory = findMatchingCategory(allCategories, fullPathFromUrl);
+      
       if (matchedCategory) {
         console.log("Found matching category:", matchedCategory.full_path);
         setCategoryFullName(matchedCategory.full_path);
@@ -115,30 +109,48 @@ export default function CategoryPage() {
       }
     }
   }, [allCategories, fullPathFromUrl]);
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
+      
       try {
         if (isRootCategory) {
           console.log("Fetching all products (no specific category)");
-          const response = await getProducts(currentPage, 12, selectedSort.value, selectedSort.order);
+          const response = await getProducts(
+            currentPage,
+            12,
+            selectedSort.value,
+            selectedSort.order
+          );
+          
           if (currentPage === 1) {
             setProducts(response.items);
           } else {
             setProducts(prev => [...prev, ...response.items]);
           }
+          
           setTotalProducts(response.total);
           setTotalPages(response.pages);
           setCurrentPage(response.page);
         } else if (categoryFullName) {
           console.log("Fetching products for category full name:", categoryFullName);
-          const response = await getProductsByCategory(categoryFullName, currentPage, 12, selectedSort.value, selectedSort.order);
+          
+          const response = await getProductsByCategory(
+            categoryFullName,
+            currentPage,
+            12,
+            selectedSort.value,
+            selectedSort.order
+          );
+          
           if (currentPage === 1) {
             setProducts(response.items);
           } else {
             setProducts(prev => [...prev, ...response.items]);
           }
+          
           setTotalProducts(response.total);
           setTotalPages(response.pages);
           setCurrentPage(response.page);
@@ -146,13 +158,23 @@ export default function CategoryPage() {
           const segments = fullPathFromUrl.split('/');
           const lastSegment = segments[segments.length - 1];
           const categoryName = formatPathSegment(lastSegment);
+          
           console.log("Fallback: Fetching products for category name:", categoryName);
-          const response = await getProductsByCategory(categoryName, currentPage, 12, selectedSort.value, selectedSort.order);
+          
+          const response = await getProductsByCategory(
+            categoryName,
+            currentPage,
+            12,
+            selectedSort.value,
+            selectedSort.order
+          );
+          
           if (currentPage === 1) {
             setProducts(response.items);
           } else {
             setProducts(prev => [...prev, ...response.items]);
           }
+          
           setTotalProducts(response.total);
           setTotalPages(response.pages);
           setCurrentPage(response.page);
@@ -164,34 +186,43 @@ export default function CategoryPage() {
         setLoading(false);
       }
     };
+    
     fetchProducts();
   }, [categoryFullName, fullPathFromUrl, currentPage, selectedSort, isRootCategory]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryFullName, fullPathFromUrl, selectedSort]);
+
   const loadMore = () => {
     if (currentPage < totalPages) {
       setCurrentPage(prev => prev + 1);
     }
   };
+
   const handleCategoryClick = (category: Category) => {
     console.log("Category clicked in CategoryPage:", category.full_path);
     setCategoryFullName(category.full_path);
-    const path = category.full_path.split(" > ").map(part => part.toLowerCase().replace(/[^a-z0-9]+/g, "-")).join("/");
+    
+    const path = category.full_path
+      .split(" > ")
+      .map(part => part.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
+      .join("/");
+      
     navigate(`/all-products/${path}`);
   };
+
   const breadcrumbSegments = getBreadcrumbSegments();
-  const pageTitle = isRootCategory ? "All Products" : breadcrumbSegments.length > 0 ? breadcrumbSegments[breadcrumbSegments.length - 1].label : "Products";
+  const pageTitle = isRootCategory ? "All Products" : 
+    (breadcrumbSegments.length > 0 ? breadcrumbSegments[breadcrumbSegments.length - 1].label : "Products");
+
   useEffect(() => {
     if (location.pathname === "/categories") {
-      navigate("/all-products", {
-        replace: true
-      });
-    } else if (location.pathname.startsWith("/categories/")) {
+      navigate("/all-products", { replace: true });
+    } 
+    else if (location.pathname.startsWith("/categories/")) {
       const newPath = location.pathname.replace("/categories/", "/all-products/");
-      navigate(newPath, {
-        replace: true
-      });
+      navigate(newPath, { replace: true });
     }
   }, [location.pathname, navigate]);
 
@@ -202,16 +233,19 @@ export default function CategoryPage() {
         const target = event.target as Node;
         const sortButtons = document.querySelectorAll('.sort-dropdown');
         let shouldClose = true;
+        
         sortButtons.forEach(button => {
           if (button.contains(target)) {
             shouldClose = false;
           }
         });
+        
         if (shouldClose) {
           setShowSortDropdown(false);
         }
       }
     };
+    
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -223,35 +257,38 @@ export default function CategoryPage() {
       <div className="category-content">
         <CategoryPageEnhancement />
         
-        <Section className="pt-0 pb-8">
+        <Section>
           <div className="flex flex-col h-full">
-            {/* Sticky header with filters - fixed positioning below subcategory nav */}
-            <div className="sticky top-[72px] bg-white z-20 mb-4 py-2 shadow-sm">
-              <div className="flex items-center justify-between py-2">
+            {/* Sticky header with filters - Updated positioning */}
+            <div className="sticky top-[104px] bg-white z-20 py-4 border-b border-gray-100 mb-8">
+              <div className="flex items-center justify-between">
                 <h1 className="text-3xl md:text-4xl font-semibold">
                   {pageTitle}
                 </h1>
                 
                 <div className="flex items-center gap-4">
                   <div className="relative sort-dropdown">
-                    <button onClick={() => setShowSortDropdown(!showSortDropdown)} className="flex items-center gap-2 text-sm">
+                    <button
+                      onClick={() => setShowSortDropdown(!showSortDropdown)}
+                      className="flex items-center gap-2 text-sm"
+                    >
                       Sort by: <span className="font-medium">{selectedSort.label}</span>
                       <ChevronDown className="h-4 w-4" />
                     </button>
                     
                     {showSortDropdown && (
-                      <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium py-2 z-40 min-w-[200px]">
+                      <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium border border-gray-100 py-2 z-40 min-w-[200px]">
                         {sortOptions.map(option => (
-                          <button 
-                            key={option.label} 
+                          <button
+                            key={option.label}
                             onClick={() => {
                               setSelectedSort(option);
                               setShowSortDropdown(false);
-                            }} 
+                            }}
                             className={cn(
-                              "w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors", 
-                              option.value === selectedSort.value && option.order === selectedSort.order 
-                                ? "text-primary font-medium" 
+                              "w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors",
+                              option.value === selectedSort.value && option.order === selectedSort.order
+                                ? "text-primary font-medium"
                                 : "text-dark"
                             )}
                           >
@@ -262,7 +299,10 @@ export default function CategoryPage() {
                     )}
                   </div>
                   
-                  <button onClick={() => setShowFilterSidebar(!showFilterSidebar)} className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md">
+                  <button
+                    onClick={() => setShowFilterSidebar(!showFilterSidebar)}
+                    className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md"
+                  >
                     <SlidersHorizontal className="h-4 w-4" />
                     Filters
                   </button>
@@ -270,67 +310,74 @@ export default function CategoryPage() {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              <div className={cn(
-                "md:col-span-3", 
-                showFilterSidebar 
-                  ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" 
-                  : "hidden md:block"
-              )}>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+              <div 
+                className={cn(
+                  "md:col-span-3",
+                  showFilterSidebar 
+                    ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" 
+                    : "hidden md:block"
+                )}
+              >
                 {showFilterSidebar && (
-                  <div className="flex items-center justify-between mb-4 md:hidden">
+                  <div className="flex items-center justify-between mb-6 md:hidden">
                     <h2 className="text-xl font-semibold">Filters</h2>
-                    <button onClick={() => setShowFilterSidebar(false)} className="p-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
+                    <button 
+                      onClick={() => setShowFilterSidebar(false)}
+                      className="p-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                   </div>
                 )}
                 
-                {/* Use ScrollArea to keep sidebar content scrollable but contained */}
-                <div className="sticky top-[120px]">
-                  <ScrollArea className="h-[calc(100vh-160px)] pr-4">
-                    <div className="space-y-6 pb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3">Categories</h3>
-                        <CategoryNav activeCategory={fullPathFromUrl} onCategoryClick={handleCategoryClick} />
-                      </div>
-                      
-                      {showFilterSidebar && (
-                        <div className="md:hidden mt-6">
-                          <button onClick={() => setShowFilterSidebar(false)} className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors">
-                            Apply Filters
-                          </button>
-                        </div>
-                      )}
+                {/* Make category nav sticky too, but positioned below the filter header */}
+                <div className="space-y-8 sticky top-[172px]">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Categories</h3>
+                    <CategoryNav 
+                      activeCategory={fullPathFromUrl}
+                      onCategoryClick={handleCategoryClick}
+                    />
+                  </div>
+                  
+                  {showFilterSidebar && (
+                    <div className="md:hidden mt-6">
+                      <button
+                        onClick={() => setShowFilterSidebar(false)}
+                        className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors"
+                      >
+                        Apply Filters
+                      </button>
                     </div>
-                  </ScrollArea>
+                  )}
                 </div>
               </div>
               
               <div className="md:col-span-9">
                 {!loading && !error && products.length > 0 && (
-                  <div className="text-sm text-muted mb-4">
+                  <div className="text-sm text-muted mb-6">
                     Showing {products.length} of {totalProducts} products
                   </div>
                 )}
                 
-                <ProductGrid 
-                  products={products} 
-                  loading={loading} 
-                  error={error} 
+                <ProductGrid
+                  products={products}
+                  loading={loading}
+                  error={error}
                   onRetry={() => {
                     setCurrentPage(1);
                     setCategoryFullName(categoryFullName);
-                  }} 
-                  cols={3} 
+                  }}
+                  cols={3}
                 />
                 
                 {!loading && !error && products.length > 0 && currentPage < totalPages && (
-                  <div className="mt-10 text-center">
-                    <button onClick={loadMore} className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors">
+                  <div className="mt-12 text-center">
+                    <button
+                      onClick={loadMore}
+                      className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors"
+                    >
                       Load More Products
                     </button>
                   </div>

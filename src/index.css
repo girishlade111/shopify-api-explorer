@@ -141,24 +141,3 @@ h1, h2, h3, h4, h5, h6, .serif {
   transform: scaleX(1);
   transform-origin: left;
 }
-
-/* Fix for category sidebar */
-.category-sidebar-scroll {
-  max-height: calc(100vh - 160px);
-  overflow-y: auto;
-  padding-right: 1rem;
-  scrollbar-width: thin;
-}
-
-.category-sidebar-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-
-.category-sidebar-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.category-sidebar-scroll::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 4px;
-}
