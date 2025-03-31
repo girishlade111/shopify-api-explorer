@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -377,7 +376,7 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
       {/* Chat Widget Toggle Button */}
       <button
         onClick={() => setIsWidgetOpen(!isWidgetOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-[#5856d6] text-white p-4 rounded-full shadow-lg hover:bg-[#4745ac] transition-all duration-200"
+        className="fixed bottom-6 left-6 z-50 bg-[#5856d6] text-white p-4 rounded-full shadow-lg hover:bg-[#4745ac] transition-all duration-200"
       >
         {isWidgetOpen ? (
           <X className="w-6 h-6" />
@@ -388,7 +387,7 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
 
       {/* Chat Widget Container */}
       <div
-        className={`fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform ${
+        className={`fixed bottom-24 left-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform ${
           isWidgetOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 pointer-events-none'
         }`}
       >
