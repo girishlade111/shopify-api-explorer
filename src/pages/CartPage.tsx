@@ -1,3 +1,4 @@
+
 import { useCart, CartItem } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
@@ -17,7 +18,7 @@ export default function CartPage() {
           <Button 
             variant="outline" 
             onClick={clearCart}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-black"
           >
             <Trash2 size={16} />
             Clear Cart
@@ -32,7 +33,7 @@ export default function CartPage() {
             Looks like you haven't added any products to your cart yet.
           </p>
           <Link to="/">
-            <Button>
+            <Button className="text-white">
               Start Shopping
             </Button>
           </Link>
@@ -82,14 +83,14 @@ export default function CartPage() {
               
               <Link to="/checkout">
                 <Button 
-                  className="w-full mb-4 flex items-center justify-center gap-2"
+                  className="w-full mb-4 flex items-center justify-center gap-2 text-white"
                 >
                   Proceed to Checkout <ArrowRight size={16} />
                 </Button>
               </Link>
               
               <Link to="/">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full text-black">
                   Continue Shopping
                 </Button>
               </Link>

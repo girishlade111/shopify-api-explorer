@@ -10,6 +10,7 @@ import { FittingRoomProvider } from "@/contexts/FittingRoomContext";
 import { UserActivityProvider } from "@/contexts/UserActivityContext";
 import { Layout } from "@/components/Layout";
 import { AppEnhancement } from "@/components/AppEnhancement";
+import { ScrollToTop } from "@/components/ScrollToTop"; // Add the import for ScrollToTop
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
@@ -34,6 +35,7 @@ const App = () => (
           <BrowserRouter>
             <UserActivityProvider>
               <TooltipProvider>
+                <ScrollToTop /> {/* Add ScrollToTop component here */}
                 <Toaster />
                 <Sonner />
                 <Layout>

@@ -15,9 +15,11 @@ export function BestSellers() {
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
+        setLoading(true);
         // Using different offset and parameters to get different products
-        const response = await getProducts(1, 8, "created_at", "desc");
+        const response = await getProducts(1, 8, "popularity", "desc");
         setProducts(response.items);
+        setError(null);
       } catch (error) {
         console.error("Failed to fetch best sellers:", error);
         setError("Failed to load best sellers. Please try again later.");

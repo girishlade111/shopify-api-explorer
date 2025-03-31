@@ -1,3 +1,4 @@
+
 import { useFittingRoom, FittingRoomProduct } from "@/contexts/FittingRoomContext";
 import { formatPrice } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -67,14 +68,14 @@ export default function FittingRoomPage() {
             <p className="font-semibold text-primary">{formatPrice(product.price.toString())}</p>
           </CardContent>
           <CardFooter className="p-4 pt-0 flex gap-2">
-            <Button variant="outline" className="flex-1" asChild>
+            <Button variant="outline" className="flex-1 text-black" asChild>
               <a href={product.link} target="_blank" rel="noopener noreferrer">
                 View Details
                 <ExternalLink className="ml-2 h-4 w-4" />
               </a>
             </Button>
             <Button 
-              className="flex-1"
+              className="flex-1 text-white"
               onClick={() => handleAddToCart(product.product_id, product.variant_id)}
             >
               <ShoppingBag className="mr-2 h-4 w-4" />

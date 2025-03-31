@@ -19,7 +19,7 @@ export default function WishlistPage() {
             <Button 
               variant="outline" 
               onClick={clearWishlist}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-black"
             >
               <Trash2 size={16} />
               Clear Wishlist
@@ -34,7 +34,7 @@ export default function WishlistPage() {
               Browse our catalog and mark your favorite items to add them to your wishlist.
             </p>
             <Link to="/">
-              <Button>
+              <Button className="text-white">
                 Continue Shopping
               </Button>
             </Link>

@@ -12,7 +12,7 @@ export function Hero() {
       subtitle: "The new collection has arrived",
       buttonText: "Shop the Collection",
       buttonLink: "/new-arrivals",
-      alignment: "left"
+      alignment: "center" // Changed from left to center
     },
     {
       image: "https://assets.armani.com/image/upload/v1738145290/SS25_EA_ADV_GLOBAL_FASHION_M_01_1080_x_1350.jpg",
@@ -28,7 +28,7 @@ export function Hero() {
       subtitle: "Discover the art of Italian craftsmanship",
       buttonText: "Shop Now",
       buttonLink: "/all-products/women",
-      alignment: "right"
+      alignment: "center" // Changed from right to center
     }
   ];
 
