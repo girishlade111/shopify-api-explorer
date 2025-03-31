@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -64,7 +65,7 @@ export default function CategoryPage() {
     const segments = fullPathFromUrl.split('/');
     
     return segments.map((segment, index) => {
-      const path = '/categories/' + segments.slice(0, index + 1).join('/');
+      const path = '/all-products/' + segments.slice(0, index + 1).join('/');
       return {
         label: formatPathSegment(segment),
         path
@@ -238,15 +239,8 @@ export default function CategoryPage() {
       <div className="container-wide py-4">
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            
             {!isRootCategory && (
               <>
-                <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
                     <Link to="/all-products">All Products</Link>
@@ -257,7 +251,7 @@ export default function CategoryPage() {
             
             {breadcrumbSegments.map((segment, index) => (
               <BreadcrumbItem key={segment.path}>
-                <BreadcrumbSeparator />
+                {index > 0 || !isRootCategory ? <BreadcrumbSeparator /> : null}
                 {index === breadcrumbSegments.length - 1 ? (
                   <BreadcrumbPage>{segment.label}</BreadcrumbPage>
                 ) : (
