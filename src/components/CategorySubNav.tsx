@@ -13,7 +13,7 @@ interface CategorySubNavProps {
 
 export function CategorySubNav({ categories, currentCategory, className }: CategorySubNavProps) {
   return (
-    <div className={`bg-white border-b border-gray-100 sticky top-16 z-20 ${className}`}>
+    <div className={`bg-white border-b border-gray-100 sticky top-16 z-30 ${className}`}>
       <div className="container-wide overflow-x-auto">
         <div className="flex justify-center space-x-6 py-4 min-w-max mx-auto">
           {categories.map((category) => (

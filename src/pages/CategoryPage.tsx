@@ -259,8 +259,8 @@ export default function CategoryPage() {
         
         <Section>
           <div className="flex flex-col h-full">
-            {/* Sticky header with filters - THE KEY CHANGE IS HERE */}
-            <div className="sticky top-16 bg-white z-30 py-4 border-b border-gray-100 mb-8">
+            {/* Sticky header with filters - Updated positioning */}
+            <div className="sticky top-[104px] bg-white z-20 py-4 border-b border-gray-100 mb-8">
               <div className="flex items-center justify-between">
                 <h1 className="text-3xl md:text-4xl font-semibold">
                   {pageTitle}
@@ -331,8 +331,8 @@ export default function CategoryPage() {
                   </div>
                 )}
                 
-                {/* Make category nav sticky too */}
-                <div className="space-y-8 sticky top-36">
+                {/* Make category nav sticky too, but positioned below the filter header */}
+                <div className="space-y-8 sticky top-[172px]">
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Categories</h3>
                     <CategoryNav 
