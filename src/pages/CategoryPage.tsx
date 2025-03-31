@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -8,32 +9,41 @@ import { Category, Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { CategoryPageEnhancement } from "@/components/CategoryPageEnhancement";
+
 type SortOption = {
   label: string;
   value: string;
   order: "asc" | "desc";
 };
-const sortOptions: SortOption[] = [{
-  label: "Newest",
-  value: "created_at",
-  order: "desc"
-}, {
-  label: "Price: Low to High",
-  value: "price",
-  order: "asc"
-}, {
-  label: "Price: High to Low",
-  value: "price",
-  order: "desc"
-}, {
-  label: "Alphabetical: A-Z",
-  value: "title",
-  order: "asc"
-}, {
-  label: "Alphabetical: Z-A",
-  value: "title",
-  order: "desc"
-}];
+
+const sortOptions: SortOption[] = [
+  {
+    label: "Newest",
+    value: "created_at",
+    order: "desc"
+  },
+  {
+    label: "Price: Low to High",
+    value: "price",
+    order: "asc"
+  },
+  {
+    label: "Price: High to Low",
+    value: "price",
+    order: "desc"
+  },
+  {
+    label: "Alphabetical: A-Z",
+    value: "title",
+    order: "asc"
+  },
+  {
+    label: "Alphabetical: Z-A",
+    value: "title",
+    order: "desc"
+  }
+];
+
 export default function CategoryPage() {
   const {
     "*": categoryPath
@@ -207,14 +217,16 @@ export default function CategoryPage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showSortDropdown]);
-  return <>
+
+  return (
+    <>
       <div className="category-content">
         <CategoryPageEnhancement />
         
         <Section>
           <div className="flex flex-col h-full">
-            {/* Sticky header with filters - Updated positioning */}
-            <div className="sticky top-[104px] bg-white z-20 border-b border-gray-100 mb-8 py-0">
+            {/* Sticky header with filters - fixed positioning below subcategory nav */}
+            <div className="sticky top-[104px] bg-white z-20 mb-8 py-0 shadow-sm">
               <div className="flex items-center justify-between py-[20px]">
                 <h1 className="text-3xl md:text-4xl font-semibold">
                   {pageTitle}
@@ -227,14 +239,27 @@ export default function CategoryPage() {
                       <ChevronDown className="h-4 w-4" />
                     </button>
                     
-                    {showSortDropdown && <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium border border-gray-100 py-2 z-40 min-w-[200px]">
-                        {sortOptions.map(option => <button key={option.label} onClick={() => {
-                      setSelectedSort(option);
-                      setShowSortDropdown(false);
-                    }} className={cn("w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors", option.value === selectedSort.value && option.order === selectedSort.order ? "text-primary font-medium" : "text-dark")}>
+                    {showSortDropdown && (
+                      <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium py-2 z-40 min-w-[200px]">
+                        {sortOptions.map(option => (
+                          <button 
+                            key={option.label} 
+                            onClick={() => {
+                              setSelectedSort(option);
+                              setShowSortDropdown(false);
+                            }} 
+                            className={cn(
+                              "w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors", 
+                              option.value === selectedSort.value && option.order === selectedSort.order 
+                                ? "text-primary font-medium" 
+                                : "text-dark"
+                            )}
+                          >
                             {option.label}
-                          </button>)}
-                      </div>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   
                   <button onClick={() => setShowFilterSidebar(!showFilterSidebar)} className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md">
@@ -246,13 +271,23 @@ export default function CategoryPage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-              <div className={cn("md:col-span-3", showFilterSidebar ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" : "hidden md:block")}>
-                {showFilterSidebar && <div className="flex items-center justify-between mb-6 md:hidden">
+              <div className={cn(
+                "md:col-span-3", 
+                showFilterSidebar 
+                  ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" 
+                  : "hidden md:block"
+              )}>
+                {showFilterSidebar && (
+                  <div className="flex items-center justify-between mb-6 md:hidden">
                     <h2 className="text-xl font-semibold">Filters</h2>
                     <button onClick={() => setShowFilterSidebar(false)} className="p-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
                     </button>
-                  </div>}
+                  </div>
+                )}
                 
                 {/* Make category nav sticky too, but positioned below the filter header */}
                 <div className="space-y-8 sticky top-[172px]">
@@ -261,33 +296,46 @@ export default function CategoryPage() {
                     <CategoryNav activeCategory={fullPathFromUrl} onCategoryClick={handleCategoryClick} />
                   </div>
                   
-                  {showFilterSidebar && <div className="md:hidden mt-6">
+                  {showFilterSidebar && (
+                    <div className="md:hidden mt-6">
                       <button onClick={() => setShowFilterSidebar(false)} className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors">
                         Apply Filters
                       </button>
-                    </div>}
+                    </div>
+                  )}
                 </div>
               </div>
               
               <div className="md:col-span-9">
-                {!loading && !error && products.length > 0 && <div className="text-sm text-muted mb-6">
+                {!loading && !error && products.length > 0 && (
+                  <div className="text-sm text-muted mb-6">
                     Showing {products.length} of {totalProducts} products
-                  </div>}
+                  </div>
+                )}
                 
-                <ProductGrid products={products} loading={loading} error={error} onRetry={() => {
-                setCurrentPage(1);
-                setCategoryFullName(categoryFullName);
-              }} cols={3} />
+                <ProductGrid 
+                  products={products} 
+                  loading={loading} 
+                  error={error} 
+                  onRetry={() => {
+                    setCurrentPage(1);
+                    setCategoryFullName(categoryFullName);
+                  }} 
+                  cols={3} 
+                />
                 
-                {!loading && !error && products.length > 0 && currentPage < totalPages && <div className="mt-12 text-center">
+                {!loading && !error && products.length > 0 && currentPage < totalPages && (
+                  <div className="mt-12 text-center">
                     <button onClick={loadMore} className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors">
                       Load More Products
                     </button>
-                  </div>}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </Section>
       </div>
-    </>;
+    </>
+  );
 }
