@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 
 const Index = () => {
   return (
-    <div>
+    <div className="flex flex-col">
       <Hero />
       <NewArrivals />
       <Separator className="max-w-screen-lg mx-auto" />
