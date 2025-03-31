@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -83,7 +82,7 @@ export function Hero() {
   };
 
   return (
-    <div className="relative w-full h-[100vh] overflow-hidden bg-black">
+    <div className="relative w-full h-[100vh] overflow-hidden bg-black top-0 left-0 right-0">
       {heroSlides.map((slide, index) => (
         <div 
           key={index}
