@@ -34,10 +34,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <UserActivityProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <FittingRoomProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <FittingRoomProvider>
+              <UserActivityProvider>
                 <ScrollToTop />
                 <Toaster position="top-right" richColors />
                 <Routes>
@@ -57,10 +57,10 @@ function App() {
                   </Route>
                 </Routes>
                 <CopilotDemoApp />
-              </FittingRoomProvider>
-            </WishlistProvider>
-          </CartProvider>
-        </UserActivityProvider>
+              </UserActivityProvider>
+            </FittingRoomProvider>
+          </WishlistProvider>
+        </CartProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

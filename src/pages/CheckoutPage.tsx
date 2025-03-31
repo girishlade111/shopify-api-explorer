@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
-import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,227 +103,223 @@ export default function CheckoutPage() {
   // If cart is empty and order not complete, redirect to cart
   if (cart.length === 0 && !orderComplete) {
     return (
-      <Layout>
-        <div className="container-wide py-12 text-center">
-          <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
-          <p className="mb-8">Add some items to your cart before proceeding to checkout.</p>
-          <Link to="/cart">
-            <Button>Go to Cart</Button>
-          </Link>
-        </div>
-      </Layout>
+      <div className="container-wide py-12 text-center">
+        <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
+        <p className="mb-8">Add some items to your cart before proceeding to checkout.</p>
+        <Link to="/cart">
+          <Button>Go to Cart</Button>
+        </Link>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="container-wide max-w-4xl mx-auto py-8 md:py-12">
-        {orderComplete ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 md:p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check size={32} className="text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">Thank You for Your Purchase!</h2>
-            <p className="text-muted-foreground mb-6">
-              Your order #{orderDetails.orderNumber} has been confirmed.
-            </p>
-            
-            <div className="mb-8 max-w-md mx-auto">
-              <div className="border border-gray-100 rounded-lg p-4 mb-4">
-                <h3 className="font-semibold text-lg mb-2">Order Summary</h3>
-                <div className="flex justify-between mb-2">
-                  <span>Total:</span>
+    <div className="container-wide max-w-4xl mx-auto py-8 md:py-12">
+      {orderComplete ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 md:p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Check size={32} className="text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Thank You for Your Purchase!</h2>
+          <p className="text-muted-foreground mb-6">
+            Your order #{orderDetails.orderNumber} has been confirmed.
+          </p>
+          
+          <div className="mb-8 max-w-md mx-auto">
+            <div className="border border-gray-100 rounded-lg p-4 mb-4">
+              <h3 className="font-semibold text-lg mb-2">Order Summary</h3>
+              <div className="flex justify-between mb-2">
+                <span>Total:</span>
+                <span className="font-medium">{formatPrice(orderDetails.total.toString())}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Shipping:</span>
+                <span className="font-medium">Free</span>
+              </div>
+              <div className="border-t pt-2 mt-2">
+                <div className="flex justify-between">
+                  <span className="font-medium">Grand Total:</span>
                   <span className="font-medium">{formatPrice(orderDetails.total.toString())}</span>
                 </div>
-                <div className="flex justify-between mb-2">
-                  <span>Shipping:</span>
-                  <span className="font-medium">Free</span>
-                </div>
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between">
-                    <span className="font-medium">Grand Total:</span>
-                    <span className="font-medium">{formatPrice(orderDetails.total.toString())}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="text-sm text-muted-foreground mb-6">
-                A confirmation email has been sent to {formData.email}
-                {formData.mobileNumber !== "+44 7911 123456" && (
-                  <div className="mt-1">
-                    A confirmation SMS has been sent to {formData.mobileNumber}
-                  </div>
-                )}
               </div>
             </div>
             
-            <Button onClick={() => navigate("/")} className="mx-auto">
-              Continue Shopping
-            </Button>
+            <div className="text-sm text-muted-foreground mb-6">
+              A confirmation email has been sent to {formData.email}
+              {formData.mobileNumber !== "+44 7911 123456" && (
+                <div className="mt-1">
+                  A confirmation SMS has been sent to {formData.mobileNumber}
+                </div>
+              )}
+            </div>
           </div>
-        ) : (
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-8 text-center">Express Checkout</h1>
-            
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-              <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 gap-6 mb-6">
-                  {/* Customer Information */}
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
-                    <div className="grid grid-cols-1 gap-4 mb-4">
+          
+          <Button onClick={() => navigate("/")} className="mx-auto">
+            Continue Shopping
+          </Button>
+        </div>
+      ) : (
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold mb-8 text-center">Express Checkout</h1>
+          
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 gap-6 mb-6">
+                {/* Customer Information */}
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
+                  <div className="grid grid-cols-1 gap-4 mb-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name *</Label>
+                      <Input 
+                        id="name" 
+                        name="name" 
+                        value={formData.name} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="mobileNumber">Mobile Number *</Label>
+                      <Input 
+                        id="mobileNumber" 
+                        name="mobileNumber" 
+                        type="tel" 
+                        value={formData.mobileNumber} 
+                        onChange={handleChange} 
+                        required 
+                        placeholder="+1 (234) 567-8901"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email Address *</Label>
+                      <Input 
+                        id="email" 
+                        name="email" 
+                        type="email" 
+                        value={formData.email} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Shipping Information */}
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Address *</Label>
+                      <Input 
+                        id="address" 
+                        name="address" 
+                        value={formData.address} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City *</Label>
+                      <Input 
+                        id="city" 
+                        name="city" 
+                        value={formData.city} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="zipCode">Zip Code *</Label>
+                      <Input 
+                        id="zipCode" 
+                        name="zipCode" 
+                        value={formData.zipCode} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Payment Information */}
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="cardNumber">Card Number *</Label>
+                      <Input 
+                        id="cardNumber" 
+                        name="cardNumber"
+                        value={formData.cardNumber} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="name">Full Name *</Label>
+                        <Label htmlFor="cardExpiry">Expiry Date *</Label>
                         <Input 
-                          id="name" 
-                          name="name" 
-                          value={formData.name} 
+                          id="cardExpiry" 
+                          name="cardExpiry" 
+                          value={formData.cardExpiry} 
                           onChange={handleChange} 
+                          placeholder="MM/YY" 
                           required 
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="mobileNumber">Mobile Number *</Label>
+                        <Label htmlFor="cardCvv">CVV *</Label>
                         <Input 
-                          id="mobileNumber" 
-                          name="mobileNumber" 
-                          type="tel" 
-                          value={formData.mobileNumber} 
+                          id="cardCvv" 
+                          name="cardCvv" 
+                          value={formData.cardCvv} 
                           onChange={handleChange} 
-                          required 
-                          placeholder="+1 (234) 567-8901"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email Address *</Label>
-                        <Input 
-                          id="email" 
-                          name="email" 
-                          type="email" 
-                          value={formData.email} 
-                          onChange={handleChange} 
+                          placeholder="123" 
                           required 
                         />
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Shipping Information */}
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="address">Address *</Label>
-                        <Input 
-                          id="address" 
-                          name="address" 
-                          value={formData.address} 
-                          onChange={handleChange} 
-                          required 
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="city">City *</Label>
-                        <Input 
-                          id="city" 
-                          name="city" 
-                          value={formData.city} 
-                          onChange={handleChange} 
-                          required 
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="zipCode">Zip Code *</Label>
-                        <Input 
-                          id="zipCode" 
-                          name="zipCode" 
-                          value={formData.zipCode} 
-                          onChange={handleChange} 
-                          required 
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Payment Information */}
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="cardNumber">Card Number *</Label>
-                        <Input 
-                          id="cardNumber" 
-                          name="cardNumber"
-                          value={formData.cardNumber} 
-                          onChange={handleChange} 
-                          required 
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="cardExpiry">Expiry Date *</Label>
-                          <Input 
-                            id="cardExpiry" 
-                            name="cardExpiry" 
-                            value={formData.cardExpiry} 
-                            onChange={handleChange} 
-                            placeholder="MM/YY" 
-                            required 
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="cardCvv">CVV *</Label>
-                          <Input 
-                            id="cardCvv" 
-                            name="cardCvv" 
-                            value={formData.cardCvv} 
-                            onChange={handleChange} 
-                            placeholder="123" 
-                            required 
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Order Summary */}
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-                    <div className="border-t border-b py-4 space-y-3 mb-4">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Subtotal ({cart.length} items)</span>
-                        <span>{formatPrice(getCartTotal().toString())}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Shipping</span>
-                        <span>Free</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between font-semibold">
-                      <span>Total</span>
+                </div>
+                
+                {/* Order Summary */}
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+                  <div className="border-t border-b py-4 space-y-3 mb-4">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Subtotal ({cart.length} items)</span>
                       <span>{formatPrice(getCartTotal().toString())}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Shipping</span>
+                      <span>Free</span>
+                    </div>
                   </div>
-                  
-                  <Button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className="w-full mt-4"
-                  >
-                    {isSubmitting ? "Processing..." : "Complete Purchase"}
-                  </Button>
+                  <div className="flex justify-between font-semibold">
+                    <span>Total</span>
+                    <span>{formatPrice(getCartTotal().toString())}</span>
+                  </div>
                 </div>
-              </form>
-            </div>
+                
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full mt-4"
+                >
+                  {isSubmitting ? "Processing..." : "Complete Purchase"}
+                </Button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
-    </Layout>
+        </div>
+      )}
+    </div>
   );
 }
