@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
