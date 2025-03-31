@@ -34,7 +34,7 @@ export default function CategoryPage() {
     setLoading(true);
     setError(null);
     try {
-      // Type error fixed: API expects a string category and filter object
+      // Pass filters as a separate parameter to the API function
       const productsData = await getProductsByCategory(category || "all-products", filters);
       setProducts(productsData);
     } catch (err) {
@@ -91,9 +91,10 @@ export default function CategoryPage() {
 
   // Custom ErrorState component with correct props
   const ErrorState = ({ title, description, onRetry }: { 
-    title: string;
+    title?: string;
     description?: string;
     onRetry?: () => void;
+    error?: string;
   }) => (
     <div className="flex flex-col items-center justify-center text-center py-16 px-4">
       <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6">
@@ -114,8 +115,9 @@ export default function CategoryPage() {
           <path d="M12 17h.01" />
         </svg>
       </div>
-      <h3 className="text-xl font-medium mb-2">{title}</h3>
+      <h3 className="text-xl font-medium mb-2">{title || "Something went wrong"}</h3>
       {description && <p className="text-muted mb-6 max-w-md">{description}</p>}
+      {error && <p className="text-muted mb-6 max-w-md">{error}</p>}
       {onRetry && (
         <button
           onClick={onRetry}

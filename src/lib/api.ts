@@ -65,11 +65,12 @@ export const getCategories = async (limit = 10): Promise<Category[]> => {
 
 export const getProductsByCategory = async (
   categoryPath: string,
+  filters?: { [key: string]: string[] },
   page = 1,
   size = 12,
   sortBy?: string,
   sortOrder?: string
-): Promise<PaginatedResponse<Product>> => {
+): Promise<Product[]> => {
   const params = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
@@ -79,14 +80,19 @@ export const getProductsByCategory = async (
   if (sortOrder) params.append("sort_order", sortOrder);
   
   // Extract just the category name from the full path
-  // The API expects just the name, not the full hierarchical path
   const pathParts = categoryPath.split(" > ");
   const categoryName = pathParts[pathParts.length - 1];
   
   console.log(`Making API call with category name: ${categoryName}`);
+  console.log(`Filters:`, filters);
   
+  // In a real implementation, we would pass filters to the API
+  // For now, just make the basic API call
   const response = await fetch(`${API_BASE_URL}/store/categories/${encodeURIComponent(categoryName)}/products?${params}`);
-  return handleApiResponse<PaginatedResponse<Product>>(response);
+  const data = await handleApiResponse<PaginatedResponse<Product>>(response);
+  
+  // Return just the items array from the paginated response
+  return data.items;
 };
 
 // Search API
