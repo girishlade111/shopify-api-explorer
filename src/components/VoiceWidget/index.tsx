@@ -58,7 +58,7 @@ const VoiceWidget = () => {
                       setActiveChatType('atelier');
                     }}
                   >
-                    Talk to Atelier here
+                    Text Chat
                   </div>
                 </div>
               </div>
