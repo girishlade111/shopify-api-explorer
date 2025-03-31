@@ -1,11 +1,6 @@
 
-import { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export function Layout({ children }: LayoutProps) {
-  // This is now just a pass-through component for backward compatibility
-  return <>{children}</>;
+export function Layout() {
+  return <Outlet />;
 }

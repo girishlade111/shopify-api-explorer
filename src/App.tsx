@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
@@ -33,15 +33,15 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <UserActivityProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <FittingRoomProvider>
-              <BrowserRouter>
+      <BrowserRouter>
+        <UserActivityProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <FittingRoomProvider>
                 <ScrollToTop />
                 <Toaster position="top-right" richColors />
                 <Routes>
-                  <Route path="/" element={<Layout />}>
+                  <Route element={<Layout />}>
                     <Route index element={<Index />} />
                     <Route path="product/:id" element={<ProductDetail />} />
                     <Route path="search" element={<SearchResults />} />
@@ -57,11 +57,11 @@ function App() {
                   </Route>
                 </Routes>
                 <CopilotDemoApp />
-              </BrowserRouter>
-            </FittingRoomProvider>
-          </WishlistProvider>
-        </CartProvider>
-      </UserActivityProvider>
+              </FittingRoomProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </UserActivityProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
