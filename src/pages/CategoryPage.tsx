@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -9,6 +8,7 @@ import { Category, Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { CategoryPageEnhancement } from "@/components/CategoryPageEnhancement";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type SortOption = {
   label: string;
@@ -223,11 +223,11 @@ export default function CategoryPage() {
       <div className="category-content">
         <CategoryPageEnhancement />
         
-        <Section>
+        <Section className="pt-0 pb-8">
           <div className="flex flex-col h-full">
             {/* Sticky header with filters - fixed positioning below subcategory nav */}
-            <div className="sticky top-[104px] bg-white z-20 mb-8 py-0 shadow-sm">
-              <div className="flex items-center justify-between py-[20px]">
+            <div className="sticky top-[72px] bg-white z-20 mb-4 py-2 shadow-sm">
+              <div className="flex items-center justify-between py-2">
                 <h1 className="text-3xl md:text-4xl font-semibold">
                   {pageTitle}
                 </h1>
@@ -270,7 +270,7 @@ export default function CategoryPage() {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               <div className={cn(
                 "md:col-span-3", 
                 showFilterSidebar 
@@ -278,7 +278,7 @@ export default function CategoryPage() {
                   : "hidden md:block"
               )}>
                 {showFilterSidebar && (
-                  <div className="flex items-center justify-between mb-6 md:hidden">
+                  <div className="flex items-center justify-between mb-4 md:hidden">
                     <h2 className="text-xl font-semibold">Filters</h2>
                     <button onClick={() => setShowFilterSidebar(false)} className="p-2">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -289,26 +289,30 @@ export default function CategoryPage() {
                   </div>
                 )}
                 
-                {/* Make category nav sticky too, but positioned below the filter header */}
-                <div className="space-y-8 sticky top-[172px]">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Categories</h3>
-                    <CategoryNav activeCategory={fullPathFromUrl} onCategoryClick={handleCategoryClick} />
-                  </div>
-                  
-                  {showFilterSidebar && (
-                    <div className="md:hidden mt-6">
-                      <button onClick={() => setShowFilterSidebar(false)} className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors">
-                        Apply Filters
-                      </button>
+                {/* Use ScrollArea to keep sidebar content scrollable but contained */}
+                <div className="sticky top-[120px]">
+                  <ScrollArea className="h-[calc(100vh-160px)] pr-4">
+                    <div className="space-y-6 pb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">Categories</h3>
+                        <CategoryNav activeCategory={fullPathFromUrl} onCategoryClick={handleCategoryClick} />
+                      </div>
+                      
+                      {showFilterSidebar && (
+                        <div className="md:hidden mt-6">
+                          <button onClick={() => setShowFilterSidebar(false)} className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors">
+                            Apply Filters
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </ScrollArea>
                 </div>
               </div>
               
               <div className="md:col-span-9">
                 {!loading && !error && products.length > 0 && (
-                  <div className="text-sm text-muted mb-6">
+                  <div className="text-sm text-muted mb-4">
                     Showing {products.length} of {totalProducts} products
                   </div>
                 )}
@@ -325,7 +329,7 @@ export default function CategoryPage() {
                 />
                 
                 {!loading && !error && products.length > 0 && currentPage < totalPages && (
-                  <div className="mt-12 text-center">
+                  <div className="mt-10 text-center">
                     <button onClick={loadMore} className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors">
                       Load More Products
                     </button>
