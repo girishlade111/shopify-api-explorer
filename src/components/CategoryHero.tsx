@@ -5,7 +5,8 @@ import { ArrowRight } from "lucide-react";
 interface CategoryHeroProps {
   title: string;
   description: string;
-  image: string;
+  image?: string;
+  videoSrc?: string;
   ctaText?: string;
   ctaLink?: string;
   className?: string;
@@ -15,17 +16,29 @@ export function CategoryHero({
   title,
   description,
   image,
+  videoSrc,
   ctaText = "Shop Now",
   ctaLink = "#",
   className
 }: CategoryHeroProps) {
   return (
     <div className={`relative w-full h-[650px] md:h-[700px] overflow-hidden ${className}`}>
-      <img 
-        src={image} 
-        alt={title} 
-        className="w-full h-full object-cover"
-      />
+      {videoSrc ? (
+        <video 
+          autoPlay
+          muted
+          loop
+          className="w-full h-full object-cover"
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      ) : (
+        <img 
+          src={image} 
+          alt={title} 
+          className="w-full h-full object-cover"
+        />
+      )}
       
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent flex items-center justify-center">
         <div className="container-wide text-center">

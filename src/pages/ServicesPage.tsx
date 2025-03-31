@@ -103,13 +103,37 @@ const ServicesPage = () => {
 
   return (
     <div>
-      <CategoryHero 
-        title="Atelier Lifestyle Services"
-        description="Beyond fashion, experience the complete luxury lifestyle with our exclusive offerings"
-        image="https://www-armanihotels-com.azureedge.net/wp-content/uploads/2022/04/w768.webp"
-        ctaText="Explore Services"
-        ctaLink="#restaurants"
-      />
+      <div className="relative w-full h-[650px] md:h-[700px] overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          className="w-full h-full object-cover"
+        >
+          <source
+            src="https://sitecore-cd.shangri-la.com/MediaFiles/6/1/B/{61BCB4CD-38C4-48F8-B868-CE84CE1F3A58}202401_SLLN_Hero-Video_1920x1080.mp4"
+            type="video/mp4"
+          />
+        </video>
+        
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent flex items-center justify-center">
+          <div className="container-wide text-center">
+            <div className="max-w-2xl mx-auto">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4 text-center">Atelier Lifestyle Services</h1>
+              <p className="text-white/80 text-lg mb-8 text-center">Beyond fashion, experience the complete luxury lifestyle with our exclusive offerings</p>
+              
+              <div className="flex justify-center">
+                <a 
+                  href="#restaurants" 
+                  className="inline-flex items-center px-8 py-3 bg-white text-primary hover:bg-white/90 transition-colors text-sm uppercase tracking-wider font-medium"
+                >
+                  Explore Services
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <CategorySubNav 
         categories={serviceCategories} 

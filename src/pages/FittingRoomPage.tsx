@@ -168,11 +168,11 @@ export default function FittingRoomPage() {
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <FittingRoomIcon className="h-16 w-16 text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-semibold mb-2">Your fitting room is empty</h2>
-          <p className="text-muted-foreground max-w-md mb-6">
+          <h2 className="text-2xl font-serif mb-2">Your fitting room is empty</h2>
+          <p className="text-muted-foreground max-w-md mb-6 font-sans">
             Try asking the assistant to find clothing items for you to try on virtually.
           </p>
-          <Button asChild>
+          <Button asChild className="bg-primary text-white hover:bg-primary/90">
             <Link to="/">Start Shopping</Link>
           </Button>
         </div>
