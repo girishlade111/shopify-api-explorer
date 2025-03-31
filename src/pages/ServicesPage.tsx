@@ -106,7 +106,7 @@ const ServicesPage = () => {
       <CategoryHero 
         title="Atelier Lifestyle Services"
         description="Beyond fashion, experience the complete luxury lifestyle with our exclusive offerings"
-        image="https://assets.armani.com/image/upload/f_auto,q_auto,ar_16:9,w_1920,c_lfill/Armani-Hotel-Dubai-Exterior"
+        image="https://www-armanihotels-com.azureedge.net/wp-content/uploads/2022/04/w768.webp"
         ctaText="Explore Services"
         ctaLink="#restaurants"
       />

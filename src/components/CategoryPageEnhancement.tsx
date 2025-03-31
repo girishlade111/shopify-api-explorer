@@ -14,7 +14,7 @@ export function CategoryPageEnhancement() {
         hero: {
           title: "Men's Collection",
           description: "Sophisticated designs crafted with precision and style",
-          image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_16:9,w_1920,c_lfill/v1720778498/2025_SS_GALLERY_MENS_01",
+          image: "https://images.selfridges.com/is/image/selfridges/250314_CLP_MW_BANNER_1_D?wid=1232&hei=528&fmt=webp&qlt=80,1&dpr=on,2&fit=crop",
           ctaText: "Shop Men's Collection",
           ctaLink: "/all-products/men"
         },
@@ -34,7 +34,7 @@ export function CategoryPageEnhancement() {
         hero: {
           title: "Women's Collection",
           description: "Elegant silhouettes that celebrate feminine grace",
-          image: "https://assets.armani.com/image/upload/v1737391559/SS25_AX_ADV_FASHION_GLOBAL_MW_03_1080x1350.jpg",
+          image: "https://images.selfridges.com/is/image/selfridges/250301_WW_CLP_UPDATE_BANNER_1_D?wid=1232&hei=528&fmt=webp&qlt=80,1&dpr=on,2&fit=crop",
           ctaText: "Shop Women's Collection",
           ctaLink: "/all-products/women"
         },
@@ -57,7 +57,7 @@ export function CategoryPageEnhancement() {
         hero: {
           title: "Beauty",
           description: "Experience luxury skincare, makeup and fragrances",
-          image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/GA_2025_EA-SWY-Parfum_Pack-with-Ingredients_1x1_RVB-4000",
+          image: "https://cdn.media.amplience.net/i/liberty/250331-Beauty-R1-Hero-The-Best-New-Beauty-min_1?fmt=auto&qlt=default&metadata=true$poieg$&w=3840&sm=c&poi={$this.metadata.pointOfInterest.x},{$this.metadata.pointOfInterest.y},{$this.metadata.pointOfInterest.w},{$this.metadata.pointOfInterest.h}&scaleFit=poi",
           ctaText: "Shop Beauty Collection",
           ctaLink: "/all-products/beauty"
         },
@@ -76,7 +76,7 @@ export function CategoryPageEnhancement() {
         hero: {
           title: "Food & Dining",
           description: "Exquisite culinary experiences for the discerning palate",
-          image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/Armani-Dolci-Ramadan-01",
+          image: "https://images.selfridges.com/is/image/selfridges/250217_CLP_FOOD_BANNER_1_D?wid=1232&hei=528&fmt=webp&qlt=80,1&dpr=on,2&fit=crop",
           ctaText: "Explore Culinary Collection",
           ctaLink: "/all-products/food"
         },
