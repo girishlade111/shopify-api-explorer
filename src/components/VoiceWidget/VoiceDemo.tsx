@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -33,7 +32,7 @@ export default function VoiceDemo() {
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load persisted settings on component mount
+  // Load persisted settings on component mount, but don't auto-connect
   useEffect(() => {
     const storedSettings = localStorage.getItem('voiceWidgetSettings');
     if (storedSettings) {
@@ -42,15 +41,7 @@ export default function VoiceDemo() {
         setIsTranscriptionEnabled(settings.isTranscriptionEnabled ?? false);
         setIsAudioEnabled(settings.isAudioEnabled ?? false);
         setIsWidgetOpen(settings.isWidgetOpen ?? false);
-        
-        // Auto-connect if it was previously connected
-        if (settings.wasConnected && isInitialConnectionRef.current) {
-          isInitialConnectionRef.current = false;
-          // Use setTimeout to ensure component is fully mounted
-          setTimeout(() => {
-            handleToggleConnection();
-          }, 1000);
-        }
+        // Don't auto-connect even if it was previously connected
       } catch (e) {
         console.error('Error parsing stored voice widget settings:', e);
       }
