@@ -5,7 +5,7 @@ import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
-import { Mic, MicOff, Volume2, VolumeX, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -20,8 +20,6 @@ const MAX_CONNECTION_RETRIES = 3;
 
 export default function AtelierChat() {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
-  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [instructions, setInstructions] = useState<string>("");
   const [tools, setTools] = useState<any[]>([]);
@@ -38,9 +36,7 @@ export default function AtelierChat() {
     if (storedSettings) {
       try {
         const settings = JSON.parse(storedSettings);
-        // Don't auto-enable mic and speaker to avoid unexpected behavior
-        setIsTranscriptionEnabled(false);
-        setIsAudioEnabled(false);
+        // Removed microphone and speaker settings since they're not needed for text chat
       } catch (e) {
         console.error('Error parsing stored atelier chat settings:', e);
       }
@@ -50,29 +46,9 @@ export default function AtelierChat() {
   // Save settings whenever they change
   useEffect(() => {
     localStorage.setItem('atelierChatSettings', JSON.stringify({
-      isTranscriptionEnabled,
-      isAudioEnabled,
       wasConnected: sessionStatus === 'CONNECTED'
     }));
-  }, [isTranscriptionEnabled, isAudioEnabled, sessionStatus]);
-
-  useEffect(() => {
-    if (!audioElementRef.current) {
-      const audio = new Audio();
-      audio.autoplay = true;
-      audioElementRef.current = audio;
-    }
-
-    if (audioElementRef.current) {
-      audioElementRef.current.muted = !isAudioEnabled;
-      
-      if (isAudioEnabled && audioElementRef.current.srcObject) {
-        audioElementRef.current.play().catch((err) => {
-          console.warn("Autoplay prevented:", err);
-        });
-      }
-    }
-  }, [isAudioEnabled]);
+  }, [sessionStatus]);
 
   // Clean up resources when component unmounts
   useEffect(() => {
@@ -154,7 +130,7 @@ export default function AtelierChat() {
           const { pc, dc } = await createRealtimeConnection(
             clientSecret,
             audioElementRef,
-            isAudioEnabled
+            false // Audio is always disabled for text chat
           );
 
           pcRef.current = pc;
@@ -163,14 +139,6 @@ export default function AtelierChat() {
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
           setConnectionRetries(0); // Reset retries on successful connection
-
-          if (audioElementRef.current && isAudioEnabled) {
-            try {
-              await audioElementRef.current.play();
-            } catch (err) {
-              console.warn('Autoplay prevented:', err);
-            }
-          }
           
           resolve();
         } catch (error) {
@@ -235,59 +203,12 @@ export default function AtelierChat() {
     return `bg-[#5856d6] hover:bg-[#4745ac] ${cursorClass} ${baseClasses}`;
   }
 
-  const IconButton = ({
-    checked,
-    onChange,
-    icon: Icon,
-    iconOff: IconOff,
-    disabled = false,
-  }: {
-    checked: boolean;
-    onChange: (val: boolean) => void;
-    icon: React.ComponentType<any>;
-    iconOff: React.ComponentType<any>;
-    disabled?: boolean;
-  }) => (
-    <button
-      role="switch"
-      aria-checked={checked}
-      onClick={() => !disabled && onChange(!checked)}
-      className={`
-        p-3 rounded-full transition-all duration-200
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        ${
-          checked
-            ? 'bg-[#5856d6] text-white hover:bg-[#4745ac] cursor-pointer'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
-        }
-      `}
-      disabled={disabled}
-    >
-      {checked ? <Icon className="w-6 h-6" /> : <IconOff className="w-6 h-6" />}
-    </button>
-  );
-
   return (
     <div className="fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Atelier Chat</h2>
-          <div className="flex gap-2">
-            <IconButton
-              checked={isTranscriptionEnabled}
-              onChange={setIsTranscriptionEnabled}
-              icon={Mic}
-              iconOff={MicOff}
-              disabled={sessionStatus !== 'CONNECTED'}
-            />
-            <IconButton
-              checked={isAudioEnabled}
-              onChange={setIsAudioEnabled}
-              icon={Volume2}
-              iconOff={VolumeX}
-              disabled={sessionStatus !== 'CONNECTED'}
-            />
-          </div>
+          {/* Removed microphone and speaker buttons */}
         </div>
 
         <button
@@ -313,8 +234,8 @@ export default function AtelierChat() {
             onSessionStatusChange={setSessionStatus}
             peerConnection={pcRef.current}
             dataChannel={dcRef.current}
-            isTranscriptionEnabled={isTranscriptionEnabled}
-            isAudioEnabled={isAudioEnabled}
+            isTranscriptionEnabled={false} // Always false for text chat
+            isAudioEnabled={false} // Always false for text chat
             instructions={instructions}
             tools={tools}
           />
