@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { CategorySubNav } from "../components/CategorySubNav";
@@ -237,7 +236,7 @@ const ServicesPage = () => {
               </p>
               <Link 
                 to="/contact" 
-                className="inline-block bg-primary text-white px-10 py-4 uppercase text-sm tracking-wider hover:bg-primary/90 transition-colors"
+                className="inline-block bg-primary text-white px-10 py-4 uppercase text-sm tracking-wider hover:bg-primary hover:text-white transition-colors"
               >
                 Contact Concierge
               </Link>

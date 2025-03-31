@@ -329,7 +329,7 @@ export default function ProductDetail() {
         <SectionHeader
           title="You might also like"
           subtitle="Products similar to this one"
-          align="center" /* Changed "center" prop to "align" prop */
+          align="center"
         />
         <NewArrivals />
       </Section>
