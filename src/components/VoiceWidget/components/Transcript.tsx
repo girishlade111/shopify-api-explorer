@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Mic } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
 
 interface TranscriptProps {
@@ -8,8 +8,9 @@ interface TranscriptProps {
   setUserText: (text: string) => void;
   onSendMessage: () => void;
   canSend: boolean;
-  showTextInput?: boolean; // Controls visibility of the text input
-  isVoiceMode?: boolean; // Controls if we're in voice-only mode
+  showTextInput?: boolean;
+  isVoiceMode?: boolean;
+  onSwitchToVoice?: () => void; // New prop for handling switch to voice mode
 }
 
 function Transcript({ 
@@ -18,7 +19,8 @@ function Transcript({
   onSendMessage, 
   canSend, 
   showTextInput = true,
-  isVoiceMode = false 
+  isVoiceMode = false,
+  onSwitchToVoice
 }: TranscriptProps) {
   const { transcriptItems } = useTranscript();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -62,7 +64,7 @@ function Transcript({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex-1 overflow-y-auto p-4 pb-0 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {transcriptItems.map((item) => (
           <div
             key={item.itemId}
@@ -70,11 +72,14 @@ function Transcript({
               item.role === 'user' ? 'justify-end' : 'justify-start'
             }`}
           >
+            {item.role === 'assistant' && (
+              <div className="w-10 h-10 rounded-full bg-[#5BC0DE] mr-2 flex-shrink-0"></div>
+            )}
             <div
               className={`max-w-[80%] p-3 rounded-lg ${
                 item.role === 'user'
-                  ? 'bg-[#5856d6] text-white rounded-br-none'
-                  : 'bg-gray-200 text-gray-800 rounded-bl-none'
+                  ? 'bg-[#f0f0f0] text-gray-800 rounded-br-none'
+                  : 'bg-[#f5f5f5] text-gray-800 rounded-bl-none'
               }`}
             >
               <p className="whitespace-pre-wrap">{item.title}</p>
@@ -85,8 +90,9 @@ function Transcript({
           <div className="h-full flex items-center justify-center opacity-60">
             <p className="text-center text-gray-500">
               {showTextInput 
-                ? "Send a message to start chatting with Atelier"
-                : "Use the microphone to start talking with Atelier"}
+                ? "Send a message to start chatting"
+                : "Use the microphone to start talking"
+              }
             </p>
           </div>
         )}
@@ -95,35 +101,42 @@ function Transcript({
 
       {showTextInput && (
         <div className="px-4 py-3 border-t">
-          <div className="relative">
-            <textarea
-              ref={textareaRef}
+          <div className="relative flex items-center">
+            <input
+              type="text"
               value={userText}
               onChange={(e) => setUserText(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
-              className="w-full p-3 pr-12 border rounded-full resize-none focus:outline-none focus:ring-2 focus:ring-[#5856d6] focus:border-transparent"
-              rows={1}
+              placeholder="Type your message here..."
+              className="w-full p-3 pl-4 pr-20 border rounded-full resize-none focus:outline-none focus:ring-2 focus:ring-[#5BC0DE] focus:border-transparent bg-[#f5f5f5]"
               disabled={!canSend}
             />
-            <button
-              onClick={onSendMessage}
-              disabled={!canSend || !userText.trim()}
-              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${
-                canSend && userText.trim()
-                  ? 'text-[#5856d6] hover:bg-gray-100'
-                  : 'text-gray-300 cursor-not-allowed'
-              }`}
-            >
-              <Send size={20} />
-            </button>
+            <div className="absolute right-2 flex gap-2">
+              <button
+                onClick={onSendMessage}
+                disabled={!canSend || !userText.trim()}
+                className={`p-2 rounded-full ${
+                  canSend && userText.trim()
+                    ? 'text-white bg-[#5BC0DE] hover:bg-[#46b8da]'
+                    : 'text-gray-300 bg-gray-100 cursor-not-allowed'
+                }`}
+              >
+                <Send size={18} />
+              </button>
+              <button
+                onClick={onSwitchToVoice}
+                className="p-2 rounded-full text-white bg-[#5BC0DE] hover:bg-[#46b8da]"
+              >
+                <Mic size={18} />
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {!showTextInput && !isVoiceMode && (
         <div className="p-4 border-t bg-gray-50 text-center">
-          <p className="text-gray-500">Talk to Atelier here</p>
+          <p className="text-gray-500">Talk here</p>
         </div>
       )}
     </div>

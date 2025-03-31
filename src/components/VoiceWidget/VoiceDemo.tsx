@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX, AlertCircle } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
+import { AlertCircle, Menu, X, MessageSquare } from 'lucide-react';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -15,14 +15,14 @@ const DEFAULT_STORE_URL = "appella-test.myshopify.com";
 const NGROK_URL = import.meta.env.VITE_NGROK_URL || DEFAULT_NGROK_URL;
 const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 
-// Maximum number of connection retries
-const MAX_CONNECTION_RETRIES = 3;
+interface VoiceDemoProps {
+  onSwitchToText?: () => void;
+}
 
-export default function VoiceDemo() {
+const VoiceDemo = ({ onSwitchToText }: VoiceDemoProps) => {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
-  // Set microphone and speaker to true by default for voice mode
-  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState<boolean>(true);
+  const [isAudioEnabled, setIsAudioEnabled] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [instructions, setInstructions] = useState<string>("");
   const [tools, setTools] = useState<any[]>([]);
@@ -32,31 +32,11 @@ export default function VoiceDemo() {
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Load persisted settings on component mount, but don't override default settings
-  useEffect(() => {
-    const storedSettings = localStorage.getItem('voiceWidgetSettings');
-    if (storedSettings) {
-      try {
-        const settings = JSON.parse(storedSettings);
-        // Only apply stored settings if they exist, otherwise use our defaults
-        if (settings.isTranscriptionEnabled !== undefined) {
-          setIsTranscriptionEnabled(settings.isTranscriptionEnabled);
-        }
-        if (settings.isAudioEnabled !== undefined) {
-          setIsAudioEnabled(settings.isAudioEnabled);
-        }
-      } catch (e) {
-        console.error('Error parsing stored voice widget settings:', e);
-      }
-    }
-  }, []);
+  const MAX_CONNECTION_RETRIES = 3;
 
   // Auto-connect when component mounts
   useEffect(() => {
     connectToService();
-    
-    // Disconnect when component unmounts
     return () => {
       cleanupResources();
       if (connectionTimeoutRef.current) {
@@ -65,42 +45,10 @@ export default function VoiceDemo() {
     };
   }, []);
 
-  // Save settings whenever they change
-  useEffect(() => {
-    localStorage.setItem('voiceWidgetSettings', JSON.stringify({
-      isTranscriptionEnabled,
-      isAudioEnabled,
-      wasConnected: sessionStatus === 'CONNECTED'
-    }));
-  }, [isTranscriptionEnabled, isAudioEnabled, sessionStatus]);
-
-  useEffect(() => {
-    if (!audioElementRef.current) {
-      const audio = new Audio();
-      audio.autoplay = true;
-      audioElementRef.current = audio;
-    }
-
-    if (audioElementRef.current) {
-      audioElementRef.current.muted = !isAudioEnabled;
-      
-      if (isAudioEnabled && audioElementRef.current.srcObject) {
-        audioElementRef.current.play().catch((err) => {
-          console.warn("Autoplay prevented:", err);
-        });
-      }
-    }
-  }, [isAudioEnabled]);
-
   const cleanupResources = () => {
-    // Clean up RTCPeerConnection
     cleanupConnection(pcRef.current);
     pcRef.current = null;
-    
-    // Clear data channel reference
     dcRef.current = null;
-    
-    // Clear audio element
     if (audioElementRef.current) {
       audioElementRef.current.srcObject = null;
     }
@@ -158,14 +106,6 @@ export default function VoiceDemo() {
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
           setConnectionRetries(0); // Reset retries on successful connection
-
-          if (audioElementRef.current && isAudioEnabled) {
-            try {
-              await audioElementRef.current.play();
-            } catch (err) {
-              console.warn('Autoplay prevented:', err);
-            }
-          }
           
           resolve();
         } catch (error) {
@@ -212,84 +152,62 @@ export default function VoiceDemo() {
     }
   };
 
-  const IconButton = ({
-    checked,
-    onChange,
-    icon: Icon,
-    iconOff: IconOff,
-    disabled = false,
-  }: {
-    checked: boolean;
-    onChange: (val: boolean) => void;
-    icon: React.ComponentType<any>;
-    iconOff: React.ComponentType<any>;
-    disabled?: boolean;
-  }) => (
-    <button
-      role="switch"
-      aria-checked={checked}
-      onClick={() => !disabled && onChange(!checked)}
-      className={`
-        p-3 rounded-full transition-all duration-200
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        ${
-          checked
-            ? 'bg-[#5856d6] text-white hover:bg-[#4745ac] cursor-pointer'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
-        }
-      `}
-      disabled={disabled}
-    >
-      {checked ? <Icon className="w-6 h-6" /> : <IconOff className="w-6 h-6" />}
-    </button>
-  );
+  const toggleTranscription = () => {
+    setIsTranscriptionEnabled((prev) => !prev);
+  };
+
+  const toggleAudio = () => {
+    setIsAudioEnabled((prev) => !prev);
+  };
 
   return (
-    <div className="fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Atelier Assistant</h2>
-          <div className="flex gap-2">
-            <IconButton
-              checked={isTranscriptionEnabled}
-              onChange={setIsTranscriptionEnabled}
-              icon={Mic}
-              iconOff={MicOff}
-              disabled={sessionStatus !== 'CONNECTED'}
-            />
-            <IconButton
-              checked={isAudioEnabled}
-              onChange={setIsAudioEnabled}
-              icon={Volume2}
-              iconOff={VolumeX}
-              disabled={sessionStatus !== 'CONNECTED'}
-            />
-          </div>
+    <div className="fixed bottom-24 right-6 z-40 w-[320px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
+      <div className="p-4 border-b flex items-center justify-between">
+        <button className="p-1">
+          <Menu size={20} />
+        </button>
+        <h2 className="text-xl font-semibold">Enzo AI Voice</h2>
+        <div className="flex items-center">
+          <button 
+            onClick={onSwitchToText}
+            className="p-1 mr-2"
+            title="Switch to text mode"
+          >
+            <MessageSquare size={20} />
+          </button>
+          <button className="p-1">
+            <X size={20} />
+          </button>
         </div>
-
-        {error && (
-          <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
       </div>
 
-      <TranscriptProvider>
-        <EventProvider>
-          <CopilotDemoApp
-            initialSessionStatus={sessionStatus}
-            onSessionStatusChange={setSessionStatus}
-            peerConnection={pcRef.current}
-            dataChannel={dcRef.current}
-            isTranscriptionEnabled={isTranscriptionEnabled}
-            isAudioEnabled={isAudioEnabled}
-            instructions={instructions}
-            tools={tools}
-            isVoiceMode={true} // This is a voice-only mode
-          />
-        </EventProvider>
-      </TranscriptProvider>
+      {error && (
+        <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <span className="text-sm">{error}</span>
+        </div>
+      )}
+
+      <div>
+        <audio ref={audioElementRef} autoPlay />
+        <TranscriptProvider>
+          <EventProvider>
+            <CopilotDemoApp
+              initialSessionStatus={sessionStatus}
+              onSessionStatusChange={setSessionStatus}
+              peerConnection={pcRef.current}
+              dataChannel={dcRef.current}
+              isTranscriptionEnabled={isTranscriptionEnabled}
+              isAudioEnabled={isAudioEnabled}
+              instructions={instructions}
+              tools={tools}
+              isVoiceMode={true}
+            />
+          </EventProvider>
+        </TranscriptProvider>
+      </div>
     </div>
   );
-}
+};
+
+export default VoiceDemo;

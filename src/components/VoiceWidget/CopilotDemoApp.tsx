@@ -22,8 +22,8 @@ interface AppProps {
   isAudioEnabled: boolean;
   instructions: string;
   tools: any[];
-  // Add new prop to indicate if this is voice or text mode
   isVoiceMode?: boolean;
+  onSwitchToVoice?: () => void; // New prop for handling switch to voice mode
 }
 
 function CopilotDemoApp(props: AppProps) {
@@ -251,8 +251,9 @@ function CopilotDemoApp(props: AppProps) {
             sessionStatus === "CONNECTED" &&
             props.dataChannel?.readyState === "open"
           }
-          showTextInput={!props.isVoiceMode} // Hide the text input in voice mode
-          isVoiceMode={props.isVoiceMode} // Pass the voice mode flag to the Transcript component
+          showTextInput={!props.isVoiceMode}
+          isVoiceMode={props.isVoiceMode}
+          onSwitchToVoice={props.onSwitchToVoice}
         />
       </div>
     </div>
