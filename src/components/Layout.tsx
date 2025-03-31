@@ -1,235 +1,21 @@
-import { useState, useEffect, ReactNode } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { SearchBar } from "./SearchBar";
-import { cn } from "@/lib/utils";
-import { ShoppingBag, Heart, User, Menu, X, Sparkles, Search } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useWishlist } from "@/contexts/WishlistContext";
-import { useCart } from "@/contexts/CartContext";
+
+import { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
+import Header from "./Header";
 import { Separator } from "./ui/separator";
-import FittingRoom from "./icons/FittingRoom";
-import { Dialog, DialogContent } from "./ui/dialog";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchDialogOpen, setSearchDialogOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { wishlist } = useWishlist();
-  const { getCartCount } = useCart();
   
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location]);
-
-  const handleWishlistClick = () => {
-    navigate("/wishlist");
-  };
-
-  const handleCartClick = () => {
-    navigate("/cart");
-  };
-
-  const handleAccountClick = () => {
-    navigate("/account");
-  };
-
-  const handleFittingRoomClick = () => {
-    navigate("/fitting-room");
-  };
-  
-  const handleSearchClick = () => {
-    setSearchDialogOpen(true);
-  };
-
-  const cartCount = getCartCount();
-  const wishlistCount = wishlist.length;
-
   return (
     <div className="flex min-h-screen flex-col">
-      <header 
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
-          scrolled 
-            ? "bg-white border-b border-gray-200 text-dark py-2" 
-            : "bg-transparent text-white py-4"
-        }`}
-      >
-        <div className="container-wide flex items-center justify-between">
-          {/* Left Section - Logo */}
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <span className={`font-serif text-3xl sm:text-4xl tracking-tight ${!scrolled ? "text-white" : ""}`}>ATELIER</span>
-            </Link>
-          </div>
-          
-          {/* Center Section - Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            <NavLink to="/all-products/men">MENS</NavLink>
-            <NavLink to="/all-products/women">WOMENS</NavLink>
-            <NavLink to="/all-products/beauty">BEAUTY</NavLink>
-            <NavLink to="/all-products/food">FOOD</NavLink>
-            <NavLink to="/services">SERVICES</NavLink>
-          </nav>
-          
-          {/* Right Section - Icons */}
-          <div className="hidden md:flex items-center gap-6">
-            <button 
-              onClick={handleSearchClick}
-              className={`p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
-              }`}
-              aria-label="Search"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-            
-            <button 
-              onClick={handleFittingRoomClick}
-              className={`p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
-              }`}
-              aria-label="AI Fitting Room"
-            >
-              <Sparkles className="h-5 w-5" />
-            </button>
-            
-            <button 
-              onClick={handleWishlistClick}
-              className={`relative p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
-              }`}
-              aria-label="Wishlist"
-            >
-              <Heart className="h-5 w-5" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </button>
-            
-            <button 
-              onClick={handleAccountClick}
-              className={`p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
-              }`}
-              aria-label="Account"
-            >
-              <User className="h-5 w-5" />
-            </button>
-            
-            <button 
-              onClick={handleCartClick}
-              className={`relative p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
-              }`}
-              aria-label="Shopping Bag"
-            >
-              <ShoppingBag className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartCount > 99 ? '99+' : cartCount}
-                </span>
-              )}
-            </button>
-          </div>
-          
-          <button 
-            className={`lg:hidden ${!scrolled ? "text-white" : ""}`}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
-        </div>
-
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 bg-white pt-16 animate-fade-in">
-            <div className="container-wide py-6 flex flex-col space-y-6">
-              <div className="flex items-center justify-center pb-4">
-                <button 
-                  onClick={handleSearchClick}
-                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
-                >
-                  <Search className="h-5 w-5" />
-                  <span>Search</span>
-                </button>
-              </div>
-              
-              <nav className="flex flex-col space-y-4">
-                <MobileNavLink to="/all-products/men">MENS</MobileNavLink>
-                <MobileNavLink to="/all-products/women">WOMENS</MobileNavLink>
-                <MobileNavLink to="/all-products/beauty">BEAUTY</MobileNavLink>
-                <MobileNavLink to="/all-products/food">FOOD</MobileNavLink>
-                <MobileNavLink to="/services">SERVICES</MobileNavLink>
-                <MobileNavLink to="/new-arrivals">NEW ARRIVALS</MobileNavLink>
-                <MobileNavLink to="/all-products">ALL PRODUCTS</MobileNavLink>
-              </nav>
-              
-              <div className="flex flex-col space-y-4 pt-4 border-t border-gray-100">
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
-                  onClick={handleFittingRoomClick}
-                >
-                  <Sparkles className="h-5 w-5" />
-                  <span>AI Fitting Room</span>
-                </button>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
-                  onClick={handleWishlistClick}
-                >
-                  <Heart className="h-5 w-5" />
-                  <span>Wishlist {wishlistCount > 0 && `(${wishlistCount})`}</span>
-                </button>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
-                  onClick={handleAccountClick}
-                >
-                  <User className="h-5 w-5" />
-                  <span>Account</span>
-                </button>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
-                  onClick={handleCartClick}
-                >
-                  <ShoppingBag className="h-5 w-5" />
-                  <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      <Header />
       
       <main className="flex-1">{children}</main>
-      
-      {/* Search Dialog */}
-      <Dialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] p-0">
-          <div className="p-6">
-            <SearchBar autoFocus={true} placeholder="Search for products, brands, and more..." />
-          </div>
-        </DialogContent>
-      </Dialog>
       
       {/* Footer */}
       <footer className="bg-black text-white mt-24">
@@ -334,68 +120,18 @@ export function Layout({ children }: LayoutProps) {
   );
 }
 
-// Navigation link component with transparent/scrolled state awareness
-const NavLink = ({ to, children }: { to: string; children: ReactNode }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to || location.pathname.startsWith(`${to}/`);
-  const [scrolled, setScrolled] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-  
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "text-sm tracking-wider transition-colors relative px-1 py-1",
-        scrolled ? "font-normal" : "font-medium",
-        isActive 
-          ? scrolled ? "text-primary" : "text-white" 
-          : scrolled ? "text-dark hover:text-primary" : "text-white hover:text-white/80"
-      )}
-    >
-      {children}
-      {isActive && (
-        <span className={`absolute bottom-0 left-0 right-0 h-[1px] ${scrolled ? 'bg-primary' : 'bg-white'}`} />
-      )}
-    </Link>
-  );
-};
-
-const MobileNavLink = ({ to, children }: { to: string; children: ReactNode }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to || location.pathname.startsWith(`${to}/`);
-  
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "text-lg font-light p-3 tracking-wider transition-colors",
-        isActive ? "text-primary" : "text-dark hover:text-primary"
-      )}
-    >
-      {children}
-    </Link>
-  );
-};
-
-const FooterLink = ({ to, children }: { to: string; children: ReactNode }) => (
-  <Link
-    to={to}
+// Helper components for the footer
+const FooterLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
+  <a
+    href={to}
     className="text-sm text-gray-400 hover:text-white transition-colors"
   >
     {children}
-  </Link>
+  </a>
 );
 
 interface IconButtonProps {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
   onClick?: () => void;
   badgeCount?: number;
@@ -410,10 +146,7 @@ const IconButton = ({
   ...props
 }: IconButtonProps) => (
   <button
-    className={cn(
-      "flex items-center justify-center w-10 h-10 rounded-full border border-gray-800 text-gray-400 hover:text-white hover:border-gray-600 transition-colors",
-      className
-    )}
+    className={`flex items-center justify-center w-10 h-10 rounded-full border border-gray-800 text-gray-400 hover:text-white hover:border-gray-600 transition-colors ${className || ""}`}
     onClick={onClick}
     {...props}
   >
