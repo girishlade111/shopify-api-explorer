@@ -5,7 +5,19 @@ import { EventProvider } from './contexts/EventContext';
 import ModeSelection from './components/ModeSelection';
 import VoiceMode from './components/VoiceMode';
 import TextMode from './components/TextMode';
-import { ServerEvent } from './types';
+import { SessionStatus } from './types';
+import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
+
+// Default values for environment variables
+const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
+const DEFAULT_STORE_URL = "appella-test.myshopify.com";
+
+// Use environment variables or fallback to defaults
+const NGROK_URL = import.meta.env.VITE_NGROK_URL || DEFAULT_NGROK_URL;
+const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
+
+// Maximum number of connection retries
+const MAX_CONNECTION_RETRIES = 3;
 
 type Mode = 'selection' | 'voice' | 'text';
 
@@ -20,53 +32,230 @@ const VoiceWidgetController: React.FC = () => {
     timestamp?: string;
   }>>([]);
   
-  // Setup for handling server events
-  const [sessionStatus, setSessionStatus] = useState('DISCONNECTED');
+  // Connection states
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
+  const [error, setError] = useState<string | null>(null);
+  const [instructions, setInstructions] = useState<string>("");
+  const [tools, setTools] = useState<any[]>([]);
+  const [connectionRetries, setConnectionRetries] = useState(0);
   
+  // References
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const dcRef = useRef<RTCDataChannel | null>(null);
+  const isInitialConnectionRef = useRef<boolean>(true);
+  const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load persisted settings on component mount
   useEffect(() => {
-    // Disconnect when component unmounts
+    const storedSettings = localStorage.getItem('voiceWidgetSettings');
+    if (storedSettings) {
+      try {
+        const settings = JSON.parse(storedSettings);
+        setIsMicMuted(!settings.isTranscriptionEnabled);
+        setIsSpeakerMuted(!settings.isAudioEnabled);
+        
+        // Auto-connect if it was previously connected
+        if (settings.wasConnected && isInitialConnectionRef.current) {
+          isInitialConnectionRef.current = false;
+          // Use setTimeout to ensure component is fully mounted
+          setTimeout(() => {
+            handleToggleConnection();
+          }, 1000);
+        }
+      } catch (e) {
+        console.error('Error parsing stored voice widget settings:', e);
+      }
+    }
+  }, []);
+
+  // Save settings whenever they change
+  useEffect(() => {
+    localStorage.setItem('voiceWidgetSettings', JSON.stringify({
+      isTranscriptionEnabled: !isMicMuted,
+      isAudioEnabled: !isSpeakerMuted,
+      wasConnected: sessionStatus === 'CONNECTED'
+    }));
+  }, [isMicMuted, isSpeakerMuted, sessionStatus]);
+
+  useEffect(() => {
+    if (!audioElementRef.current) {
+      const audio = new Audio();
+      audio.autoplay = true;
+      audioElementRef.current = audio;
+    }
+
+    if (audioElementRef.current) {
+      audioElementRef.current.muted = isSpeakerMuted;
+      
+      if (!isSpeakerMuted && audioElementRef.current.srcObject) {
+        audioElementRef.current.play().catch((err) => {
+          console.warn("Autoplay prevented:", err);
+        });
+      }
+    }
+  }, [isSpeakerMuted]);
+
+  // Clean up resources when component unmounts
+  useEffect(() => {
     return () => {
-      if (isConnected) {
-        handleDisconnect();
+      cleanupResources();
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
       }
     };
   }, []);
 
-  const handleConnect = async () => {
-    try {
-      // Simulate connection
-      setIsConnected(true);
-      setSessionStatus('CONNECTED');
-      
-      // Add a welcome message
-      addMessage({
-        role: 'assistant',
-        content: 'Hello! I am your Atelier Assistant. How can I help you today?',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
-      
-      console.log('Connected to server');
-    } catch (error) {
-      console.error('Failed to connect:', error);
+  const cleanupResources = () => {
+    // Clean up RTCPeerConnection
+    cleanupConnection(pcRef.current);
+    pcRef.current = null;
+    
+    // Clear data channel reference
+    dcRef.current = null;
+    
+    // Clear audio element
+    if (audioElementRef.current) {
+      audioElementRef.current.srcObject = null;
     }
+  };
+
+  const handleConnect = async () => {
+    await connectToService();
   };
 
   const handleDisconnect = async () => {
-    try {
-      // Simulate disconnection
-      setIsConnected(false);
-      setSessionStatus('DISCONNECTED');
-      console.log('Disconnected from server');
-    } catch (error) {
-      console.error('Failed to disconnect:', error);
-    }
+    cleanupResources();
+    setSessionStatus('DISCONNECTED');
+    setIsConnected(false);
+    setError(null);
+    setInstructions("");
+    setTools([]);
+    setConnectionRetries(0);
+    console.log('Disconnected from server');
   };
 
   const handleToggleConnection = () => {
-    if (isConnected) {
+    if (sessionStatus === 'CONNECTED' || sessionStatus === 'CONNECTING') {
       handleDisconnect();
     } else {
       handleConnect();
+    }
+  };
+
+  const connectToService = async () => {
+    // Don't try to connect if we've exceeded the retry limit
+    if (connectionRetries >= MAX_CONNECTION_RETRIES) {
+      setError(`Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`);
+      setSessionStatus('DISCONNECTED');
+      return;
+    }
+
+    setSessionStatus('CONNECTING');
+    setError(null);
+
+    try {
+      // Set a connection timeout
+      const connectionPromise = new Promise<void>(async (resolve, reject) => {
+        try {
+          const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          const clientSecret = data.result?.client_secret?.value;
+          const sessionInstructions = data.result?.instructions;
+          const sessionTools = data.result?.tools || [];
+
+          if (!clientSecret) {
+            throw new Error('No client secret found in response');
+          }
+
+          // Clean up any existing connections before creating a new one
+          cleanupResources();
+
+          const { pc, dc } = await createRealtimeConnection(
+            clientSecret,
+            audioElementRef,
+            !isSpeakerMuted
+          );
+
+          pcRef.current = pc;
+          dcRef.current = dc;
+          setInstructions(sessionInstructions || "");
+          setTools(sessionTools);
+          setSessionStatus('CONNECTED');
+          setIsConnected(true);
+          setConnectionRetries(0); // Reset retries on successful connection
+
+          if (audioElementRef.current && !isSpeakerMuted) {
+            try {
+              await audioElementRef.current.play();
+            } catch (err) {
+              console.warn('Autoplay prevented:', err);
+            }
+          }
+          
+          // Add a welcome message
+          addMessage({
+            role: 'assistant',
+            content: 'Hello! I am your Atelier Assistant. How can I help you today?',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          });
+          
+          console.log('Connected to server');
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      // Set a connection timeout
+      const timeoutPromise = new Promise<void>((_, reject) => {
+        connectionTimeoutRef.current = setTimeout(() => {
+          reject(new Error('Connection timed out. Please try again.'));
+        }, 10000); // 10 second timeout
+      });
+
+      // Race the connection promise against the timeout
+      await Promise.race([connectionPromise, timeoutPromise]);
+      
+      // Clear the timeout if successful
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+        connectionTimeoutRef.current = null;
+      }
+    } catch (error) {
+      console.error('Error connecting:', error);
+      cleanupResources();
+      
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to connect. Please try again.'
+      );
+      setSessionStatus('DISCONNECTED');
+      setIsConnected(false);
+      
+      // Increment retry counter
+      setConnectionRetries(prev => prev + 1);
+      
+      // If we haven't exceeded the retry limit, try again after a delay
+      if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
+        console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
+        setTimeout(() => {
+          connectToService();
+        }, 2000); // Wait 2 seconds before retrying
+      }
     }
   };
 
@@ -99,13 +288,25 @@ const VoiceWidgetController: React.FC = () => {
         content: message,
       });
       
-      // Simulate a response after a short delay
-      setTimeout(() => {
-        addMessage({
-          role: 'assistant',
-          content: `I received your message: "${message}"`,
-        });
-      }, 1000);
+      // If we have a data channel, send the message through it
+      if (dcRef.current && dcRef.current.readyState === 'open') {
+        try {
+          dcRef.current.send(JSON.stringify({
+            type: 'text',
+            text: message,
+          }));
+        } catch (error) {
+          console.error('Error sending message:', error);
+        }
+      } else {
+        // Fallback if data channel isn't available
+        setTimeout(() => {
+          addMessage({
+            role: 'assistant',
+            content: `I received your message: "${message}", but the connection isn't fully established.`,
+          });
+        }, 1000);
+      }
     }
   };
 
@@ -116,8 +317,10 @@ const VoiceWidgetController: React.FC = () => {
     }
     
     setMode(selectedMode);
+    // Reset UI states
     setIsMicMuted(false);
     setIsSpeakerMuted(false);
+    setMessages([]);
   };
 
   const handleChangeMode = () => {
@@ -134,6 +337,9 @@ const VoiceWidgetController: React.FC = () => {
     } else {
       setMode('selection');
     }
+    
+    // Reset messages when changing modes
+    setMessages([]);
   };
 
   // Render appropriate mode
