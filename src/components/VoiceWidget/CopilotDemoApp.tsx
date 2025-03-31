@@ -113,19 +113,7 @@ function CopilotDemoApp(props: AppProps) {
       props.instructions &&
       props.dataChannel?.readyState === "open"
     ) {
-      // Only add instructions to transcript if not in voice-only mode
-      if (!props.isVoiceMode) {
-        addTranscriptBreadcrumb(
-          `Instructions`,
-          { content: props.instructions }
-        );
-        if (props.tools && props.tools.length > 0) {
-          addTranscriptBreadcrumb(
-            `Available Tools`,
-            { tools: props.tools }
-          );
-        }
-      }
+      // No longer adding instructions or tools to the transcript
       updateSession();
     }
   }, [props.instructions, props.tools, sessionStatus, props.dataChannel?.readyState]);
