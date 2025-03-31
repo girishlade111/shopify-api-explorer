@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -21,6 +22,8 @@ interface AppProps {
   isAudioEnabled: boolean;
   instructions: string;
   tools: any[];
+  // Add new prop to indicate if this is voice or text mode
+  isVoiceMode?: boolean;
 }
 
 function CopilotDemoApp(props: AppProps) {
@@ -257,6 +260,7 @@ function CopilotDemoApp(props: AppProps) {
             sessionStatus === "CONNECTED" &&
             props.dataChannel?.readyState === "open"
           }
+          showTextInput={!props.isVoiceMode} // Hide the text input in voice mode
         />
       </div>
     </div>

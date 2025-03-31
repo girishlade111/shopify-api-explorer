@@ -1,157 +1,123 @@
 
-import { useEffect, useRef } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { ArrowRight } from "lucide-react";
-import { useTranscript } from "../contexts/TranscriptContext";
+import React, { useRef, useEffect } from 'react';
+import { Send } from 'lucide-react';
+import { useTranscript } from '../contexts/TranscriptContext';
 
-export interface TranscriptProps {
+interface TranscriptProps {
   userText: string;
-  setUserText: (val: string) => void;
+  setUserText: (text: string) => void;
   onSendMessage: () => void;
   canSend: boolean;
+  showTextInput?: boolean; // Add this prop to control visibility of the text input
 }
 
-function Transcript({
-  userText,
-  setUserText,
-  onSendMessage,
-  canSend,
-}: TranscriptProps) {
-  const { transcriptItems, toggleTranscriptItemExpand } = useTranscript();
-  const transcriptRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+function Transcript({ userText, setUserText, onSendMessage, canSend, showTextInput = true }: TranscriptProps) {
+  const { transcriptItems } = useTranscript();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  function scrollToBottom() {
-    if (transcriptRef.current) {
-      transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Resize textarea based on content
+  const resizeTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(
+        textareaRef.current.scrollHeight,
+        200
+      )}px`;
     }
-  }
+  };
 
+  // Scroll to bottom when new messages arrive
   useEffect(() => {
     scrollToBottom();
   }, [transcriptItems]);
 
+  // Auto-resize textarea when text changes
   useEffect(() => {
-    if (canSend && inputRef.current) {
-      inputRef.current.focus();
+    resizeTextarea();
+  }, [userText]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (canSend && userText.trim()) {
+        onSendMessage();
+      }
     }
-  }, [canSend]);
+  };
 
   return (
-    <div className="flex flex-col flex-1 bg-white min-h-0 rounded-xl">
-      <div className="relative flex-1 min-h-0">
-        <div
-          ref={transcriptRef}
-          className="overflow-auto p-4 flex flex-col gap-y-4 h-full"
-        >
-          {transcriptItems.map((item) => {
-            const { itemId, type, role, data, expanded, timestamp, title = "", isHidden } = item;
-
-            if (isHidden) {
-              return null;
-            }
-
-            if (type === "MESSAGE") {
-              const isUser = role === "user";
-              const baseContainer = "flex justify-end flex-col";
-              const containerClasses = `${baseContainer} ${isUser ? "items-end" : "items-start"}`;
-              const bubbleBase = `max-w-lg p-3 rounded-xl ${isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"}`;
-              const isBracketedMessage = title.startsWith("[") && title.endsWith("]");
-              const messageStyle = isBracketedMessage ? "italic text-gray-400" : "";
-              const displayTitle = isBracketedMessage ? title.slice(1, -1) : title;
-
-              return (
-                <div key={itemId} className={containerClasses}>
-                  <div className={bubbleBase}>
-                    <div className={`text-xs ${isUser ? "text-gray-400" : "text-gray-500"} font-mono`}>
-                      {timestamp}
-                    </div>
-                    <div className={`whitespace-pre-wrap ${messageStyle}`}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayTitle}</ReactMarkdown>
-                    </div>
-                  </div>
-                </div>
-              );
-            } else if (type === "BREADCRUMB") {
-              return (
-                <div
-                  key={itemId}
-                  className="flex flex-col justify-start items-start text-gray-500 text-sm"
-                >
-                  <span className="text-xs font-mono">{timestamp}</span>
-                  <div
-                    className={`whitespace-pre-wrap flex items-center font-mono text-sm text-gray-800 ${
-                      data ? "cursor-pointer" : ""
-                    }`}
-                    onClick={() => data && toggleTranscriptItemExpand(itemId)}
-                  >
-                    {data && (
-                      <span
-                        className={`text-gray-400 mr-1 transform transition-transform duration-200 select-none font-mono ${
-                          expanded ? "rotate-90" : "rotate-0"
-                        }`}
-                      >
-                        ▶
-                      </span>
-                    )}
-                    {title}
-                  </div>
-                  {expanded && data && (
-                    <div className="text-gray-800 text-left">
-                      <pre className="border-l-2 ml-1 border-gray-200 whitespace-pre-wrap break-words font-mono text-xs mb-2 mt-2 pl-2">
-                        {JSON.stringify(data, null, 2)}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              );
-            } else {
-              return (
-                <div
-                  key={itemId}
-                  className="flex justify-center text-gray-500 text-sm italic font-mono"
-                >
-                  Unknown item type: {type}{" "}
-                  <span className="ml-2 text-xs">{timestamp}</span>
-                </div>
-              );
-            }
-          })}
-        </div>
-      </div>
-
-      <div className="p-4 flex items-center gap-x-4">
-        <div className="flex-1 flex items-center bg-[#f3f3ee] rounded-full px-6 py-4">
-          <input
-            ref={inputRef}
-            type="text"
-            value={userText}
-            onChange={(e) => setUserText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && canSend && userText.trim()) {
-                onSendMessage();
-              }
-            }}
-            disabled={!canSend}
-            className="flex-1 bg-transparent text-[#16161D] placeholder-[#4B4B4B] focus:outline-none text-lg"
-            placeholder="Talk to Atelier here"
-          />
-          {canSend && (
-            <div className="flex items-center gap-x-4">
-              <button
-                onClick={onSendMessage}
-                disabled={!userText.trim()}
-                className={`p-1 transition-colors ${
-                  userText.trim() ? "text-[#16161D]" : "text-[#4B4B4B]"
-                }`}
-              >
-                <ArrowRight className="w-6 h-6" />
-              </button>
+    <div className="flex flex-col w-full h-full">
+      <div className="flex-1 overflow-y-auto p-4 pb-0 space-y-4">
+        {transcriptItems.map((item) => (
+          <div
+            key={item.itemId}
+            className={`flex ${
+              item.role === 'user' ? 'justify-end' : 'justify-start'
+            }`}
+          >
+            <div
+              className={`max-w-[80%] p-3 rounded-lg ${
+                item.role === 'user'
+                  ? 'bg-[#5856d6] text-white rounded-br-none'
+                  : 'bg-gray-200 text-gray-800 rounded-bl-none'
+              }`}
+            >
+              <p className="whitespace-pre-wrap">{item.text}</p>
             </div>
-          )}
-        </div>
+          </div>
+        ))}
+        {transcriptItems.length === 0 && (
+          <div className="h-full flex items-center justify-center opacity-60">
+            <p className="text-center text-gray-500">
+              {showTextInput 
+                ? "Send a message to start chatting with Atelier"
+                : "Use the microphone to start talking with Atelier"}
+            </p>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
+
+      {/* Only show the text input area if showTextInput is true */}
+      {showTextInput && (
+        <div className="px-4 py-3 border-t">
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              value={userText}
+              onChange={(e) => setUserText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type your message..."
+              className="w-full p-3 pr-12 border rounded-full resize-none focus:outline-none focus:ring-2 focus:ring-[#5856d6] focus:border-transparent"
+              rows={1}
+              disabled={!canSend}
+            />
+            <button
+              onClick={onSendMessage}
+              disabled={!canSend || !userText.trim()}
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${
+                canSend && userText.trim()
+                  ? 'text-[#5856d6] hover:bg-gray-100'
+                  : 'text-gray-300 cursor-not-allowed'
+              }`}
+            >
+              <Send size={20} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* When in voice mode, show an assistance message at the bottom */}
+      {!showTextInput && (
+        <div className="p-4 border-t bg-gray-50 text-center">
+          <p className="text-gray-500">Talk to Atelier here</p>
+        </div>
+      )}
     </div>
   );
 }
