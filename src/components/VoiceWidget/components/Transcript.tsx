@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -28,7 +27,6 @@ function Transcript({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Resize textarea based on content
   const resizeTextarea = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -39,12 +37,10 @@ function Transcript({
     }
   };
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     scrollToBottom();
   }, [transcriptItems]);
 
-  // Auto-resize textarea when text changes
   useEffect(() => {
     resizeTextarea();
   }, [userText]);
@@ -58,18 +54,12 @@ function Transcript({
     }
   };
 
-  // In voice-only mode, we show a simplified interface
   if (isVoiceMode) {
     return (
-      <div className="flex flex-col w-full h-full">
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-center text-gray-500">
-            Use the microphone to start talking with Atelier
-          </p>
-        </div>
-        <div className="p-4 border-t bg-gray-50 text-center">
-          <p className="text-gray-500">Talk to Atelier here</p>
-        </div>
+      <div className="text-center p-4">
+        <p className="text-gray-500">
+          Use the microphone to start talking with Atelier
+        </p>
       </div>
     );
   }
@@ -107,7 +97,6 @@ function Transcript({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Only show the text input area if showTextInput is true */}
       {showTextInput && (
         <div className="px-4 py-3 border-t">
           <div className="relative">
@@ -136,7 +125,6 @@ function Transcript({
         </div>
       )}
 
-      {/* When in voice mode but not voice-only mode, show an assistance message at the bottom */}
       {!showTextInput && !isVoiceMode && (
         <div className="p-4 border-t bg-gray-50 text-center">
           <p className="text-gray-500">Talk to Atelier here</p>
