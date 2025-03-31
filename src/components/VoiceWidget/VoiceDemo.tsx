@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
-import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
 import { useUserActivity } from '@/contexts/UserActivityContext';
@@ -19,21 +17,48 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 // Maximum number of connection retries
 const MAX_CONNECTION_RETRIES = 3;
 
-export default function VoiceDemo() {
+interface VoiceDemoProps {
+  initialSessionStatus?: SessionStatus;
+  onSessionStatusChange?: React.Dispatch<React.SetStateAction<SessionStatus>>;
+  peerConnection?: RTCPeerConnection | null;
+  dataChannel?: RTCDataChannel | null;
+  isTranscriptionEnabled?: boolean;
+  isAudioEnabled?: boolean;
+  instructions?: string;
+  tools?: any[];
+}
+
+const VoiceDemo: React.FC<VoiceDemoProps> = ({
+  initialSessionStatus,
+  onSessionStatusChange,
+  peerConnection,
+  dataChannel,
+  isTranscriptionEnabled: initialTranscriptionEnabled,
+  isAudioEnabled: initialAudioEnabled,
+  instructions: externalInstructions,
+  tools: externalTools
+}) => {
   const { userActivity } = useUserActivity();
-  const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
-  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>(initialSessionStatus || 'DISCONNECTED');
+  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(initialTranscriptionEnabled ?? false);
+  const [isAudioEnabled, setIsAudioEnabled] = useState(initialAudioEnabled ?? false);
   const [error, setError] = useState<string | null>(null);
-  const [baseInstructions, setBaseInstructions] = useState<string>("");
-  const [tools, setTools] = useState<any[]>([]);
+  const [baseInstructions, setBaseInstructions] = useState<string>(externalInstructions || "");
+  const [tools, setTools] = useState<any[]>(externalTools || []);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [connectionRetries, setConnectionRetries] = useState(0);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  const pcRef = useRef<RTCPeerConnection | null>(null);
-  const dcRef = useRef<RTCDataChannel | null>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(peerConnection || null);
+  const dcRef = useRef<RTCDataChannel | null>(dataChannel || null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Effect to sync local state with parent component if provided
+  useEffect(() => {
+    if (onSessionStatusChange) {
+      onSessionStatusChange(sessionStatus);
+    }
+  }, [sessionStatus, onSessionStatusChange]);
 
   // Function to get combined instructions with user activity
   const getCombinedInstructions = () => {
@@ -418,4 +443,6 @@ export default function VoiceDemo() {
       </div>
     </>
   );
-}
+};
+
+export default VoiceDemo;
