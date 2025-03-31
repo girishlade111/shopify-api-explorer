@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
-import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryNav } from "@/components/CategoryNav";
 import { Section } from "@/components/ui-components";
@@ -235,7 +234,7 @@ export default function CategoryPage() {
   }, [location.pathname, navigate]);
 
   return (
-    <Layout>
+    <>
       <div className="container-wide py-4">
         <Breadcrumb>
           <BreadcrumbList>
@@ -401,6 +400,6 @@ export default function CategoryPage() {
           </div>
         </Section>
       </div>
-    </Layout>
+    </>
   );
 }

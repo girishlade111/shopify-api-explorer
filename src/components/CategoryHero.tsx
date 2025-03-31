@@ -30,15 +30,17 @@ export function CategoryHero({
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent flex items-center justify-center">
         <div className="container-wide text-center">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4">{title}</h1>
-            <p className="text-white/80 text-lg mb-8">{description}</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4 text-center">{title}</h1>
+            <p className="text-white/80 text-lg mb-8 text-center">{description}</p>
             
-            <Link 
-              to={ctaLink} 
-              className="inline-flex items-center px-8 py-3 bg-white text-primary hover:bg-white/90 transition-colors text-sm uppercase tracking-wider font-medium"
-            >
-              {ctaText} <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+            <div className="flex justify-center">
+              <Link 
+                to={ctaLink} 
+                className="inline-flex items-center px-8 py-3 bg-white text-primary hover:bg-white/90 transition-colors text-sm uppercase tracking-wider font-medium"
+              >
+                {ctaText} <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>
