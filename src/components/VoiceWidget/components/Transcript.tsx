@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -48,9 +47,9 @@ function Transcript({
     if (messages && messages.length > 0) {
       return messages.map((message, index) => {
         const isUser = message.role === "user";
-        const baseContainer = "flex justify-end flex-col";
+        const baseContainer = "flex justify-end flex-col my-2";
         const containerClasses = `${baseContainer} ${isUser ? "items-end" : "items-start"}`;
-        const bubbleBase = `max-w-lg p-3 rounded-xl ${isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"}`;
+        const bubbleBase = `max-w-[85%] p-3 rounded-xl ${isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"}`;
         const timestamp = message.timestamp || new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -59,7 +58,7 @@ function Transcript({
         return (
           <div key={index} className={containerClasses}>
             <div className={bubbleBase}>
-              <div className={`text-xs ${isUser ? "text-gray-400" : "text-gray-500"} font-mono`}>
+              <div className={`text-xs ${isUser ? "text-gray-400" : "text-gray-500"} font-mono mb-1`}>
                 {timestamp}
               </div>
               <div className="whitespace-pre-wrap">
@@ -80,9 +79,9 @@ function Transcript({
 
       if (type === "MESSAGE") {
         const isUser = role === "user";
-        const baseContainer = "flex justify-end flex-col";
+        const baseContainer = "flex justify-end flex-col my-2";
         const containerClasses = `${baseContainer} ${isUser ? "items-end" : "items-start"}`;
-        const bubbleBase = `max-w-lg p-3 rounded-xl ${isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"}`;
+        const bubbleBase = `max-w-[85%] p-3 rounded-xl ${isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"}`;
         const isBracketedMessage = title.startsWith("[") && title.endsWith("]");
         const messageStyle = isBracketedMessage ? "italic text-gray-400" : "";
         const displayTitle = isBracketedMessage ? title.slice(1, -1) : title;
@@ -90,7 +89,7 @@ function Transcript({
         return (
           <div key={itemId} className={containerClasses}>
             <div className={bubbleBase}>
-              <div className={`text-xs ${isUser ? "text-gray-400" : "text-gray-500"} font-mono`}>
+              <div className={`text-xs ${isUser ? "text-gray-400" : "text-gray-500"} font-mono mb-1`}>
                 {timestamp}
               </div>
               <div className={`whitespace-pre-wrap ${messageStyle}`}>
@@ -151,7 +150,7 @@ function Transcript({
       <div className="relative flex-1 min-h-0">
         <div
           ref={transcriptRef}
-          className="overflow-auto p-4 flex flex-col gap-y-4 h-full"
+          className="overflow-auto p-4 flex flex-col gap-y-2 h-full"
         >
           {renderContent()}
         </div>
