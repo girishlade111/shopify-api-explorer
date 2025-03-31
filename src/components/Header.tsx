@@ -28,6 +28,10 @@ const Header = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
+    
+    // Initial check to set correct state
+    handleScroll();
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
