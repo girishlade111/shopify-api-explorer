@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Section, SectionHeader } from "@/components/ui-components";
 import { getNewArrivals } from "@/lib/api";
@@ -54,42 +53,40 @@ export default function NewArrivalsPage() {
   };
 
   return (
-    <Layout>
-      <Section className="w-full">
-        <div className="container-wide">
-          <SectionHeader
-            title="New Arrivals"
-            subtitle="Discover our latest additions to the collection"
-            align="center"
-            className="mb-8"
-          />
-          
-          <ProductGrid
-            products={products}
-            loading={loading}
-            error={error}
-            onRetry={() => fetchNewArrivals()}
-            cols={4}
-          />
-          
-          {!loading && !error && products.length > 0 && currentPage < totalPages && (
-            <div className="mt-12 text-center">
-              <button
-                onClick={loadMore}
-                className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors"
-              >
-                Load More Products
-              </button>
-            </div>
-          )}
-          
-          {!loading && !error && products.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-lg text-muted mb-4">No products found.</p>
-            </div>
-          )}
-        </div>
-      </Section>
-    </Layout>
+    <Section className="w-full">
+      <div className="container-wide">
+        <SectionHeader
+          title="New Arrivals"
+          subtitle="Discover our latest additions to the collection"
+          align="center"
+          className="mb-8"
+        />
+        
+        <ProductGrid
+          products={products}
+          loading={loading}
+          error={error}
+          onRetry={() => fetchNewArrivals()}
+          cols={4}
+        />
+        
+        {!loading && !error && products.length > 0 && currentPage < totalPages && (
+          <div className="mt-12 text-center">
+            <button
+              onClick={loadMore}
+              className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors"
+            >
+              Load More Products
+            </button>
+          </div>
+        )}
+        
+        {!loading && !error && products.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted mb-4">No products found.</p>
+          </div>
+        )}
+      </div>
+    </Section>
   );
 }

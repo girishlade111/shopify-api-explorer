@@ -9,11 +9,10 @@ import { PersonalizedRecommendations } from "@/components/PersonalizedRecommenda
 import { BeautySection } from "@/components/BeautySection";
 import { MensSection } from "@/components/MensSection";
 import { WomensSection } from "@/components/WomensSection";
-import { Layout } from "@/components/Layout";
 
 const Index = () => {
   return (
-    <Layout>
+    <>
       <Hero />
       <PersonalizedRecommendations />
       <Separator className="max-w-screen-lg mx-auto" />
@@ -30,7 +29,7 @@ const Index = () => {
       <BeautySection />
       <Separator className="max-w-screen-lg mx-auto" />
       <ServicesSection />
-    </Layout>
+    </>
   );
 };
 
