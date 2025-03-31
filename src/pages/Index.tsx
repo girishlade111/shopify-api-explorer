@@ -14,7 +14,7 @@ const Index = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Hero />
-      <NewArrivals />
+      <PersonalizedRecommendations />
       <Separator className="max-w-screen-lg mx-auto" />
       <CategorySection />
       <Separator className="max-w-screen-lg mx-auto" />
@@ -24,7 +24,7 @@ const Index = () => {
       <Separator className="max-w-screen-lg mx-auto" />
       <BestSellers />
       <Separator className="max-w-screen-lg mx-auto" />
-      <PersonalizedRecommendations />
+      <NewArrivals />
       <Separator className="max-w-screen-lg mx-auto" />
       <BeautySection />
       <Separator className="max-w-screen-lg mx-auto" />
