@@ -1,5 +1,3 @@
-
-import { Layout } from "@/components/Layout";
 import { useFittingRoom, FittingRoomProduct } from "@/contexts/FittingRoomContext";
 import { formatPrice } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -138,89 +136,87 @@ export default function FittingRoomPage() {
   );
 
   return (
-    <Layout>
-      <div className="container py-12">
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <FittingRoomIcon className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold tracking-tight">Virtual Fitting Room</h1>
-          </div>
-          <div className="flex gap-2">
-            {products.length > 0 && (
-              <>
-                <Button variant="outline" size="sm" onClick={handleReset}>
-                  <RefreshCcw className="mr-2 h-4 w-4" />
-                  Reset
-                </Button>
-                <Button variant="outline" size="sm" onClick={clearProducts}>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Clear All
-                </Button>
-              </>
-            )}
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Shopping
-              </Link>
-            </Button>
-          </div>
+    <div className="container py-12">
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <FittingRoomIcon className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold tracking-tight">Virtual Fitting Room</h1>
         </div>
-
-        {products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <FittingRoomIcon className="h-16 w-16 text-muted-foreground mb-4" />
-            <h2 className="text-2xl font-semibold mb-2">Your fitting room is empty</h2>
-            <p className="text-muted-foreground max-w-md mb-6">
-              Try asking the assistant to find clothing items for you to try on virtually.
-            </p>
-            <Button asChild>
-              <Link to="/">Start Shopping</Link>
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* View Type Selector */}
-            <div className="flex justify-end">
-              <Tabs value={viewType} onValueChange={(value) => setViewType(value as "grid" | "compare")}>
-                <TabsList>
-                  <TabsTrigger value="grid">Grid View</TabsTrigger>
-                  <TabsTrigger value="compare">Compare</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            
-            {/* Product Set Tabs */}
-            {tabs.length > 0 && (
-              <Tabs 
-                value={activeTabId} 
-                onValueChange={setActiveTabId}
-                className="w-full"
-              >
-                <TabsList className="mb-6 flex flex-wrap">
-                  {tabs.map((tab) => (
-                    <TabsTrigger key={tab.id} value={tab.id} className="flex-grow">
-                      {tab.name} ({tab.products.length})
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-                
-                {tabs.map((tab) => (
-                  <TabsContent key={tab.id} value={tab.id} className="mt-0">
-                    <div className="mb-4">
-                      <p className="text-muted-foreground">
-                        {tab.products.length} item{tab.products.length !== 1 ? "s" : ""} added {new Date(tab.timestamp).toLocaleString()}
-                      </p>
-                    </div>
-                    
-                    {viewType === "grid" ? renderProductGrid(tab.products) : renderCompareTable(tab.products)}
-                  </TabsContent>
-                ))}
-              </Tabs>
-            )}
-          </div>
-        )}
+        <div className="flex gap-2">
+          {products.length > 0 && (
+            <>
+              <Button variant="outline" size="sm" onClick={handleReset}>
+                <RefreshCcw className="mr-2 h-4 w-4" />
+                Reset
+              </Button>
+              <Button variant="outline" size="sm" onClick={clearProducts}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Clear All
+              </Button>
+            </>
+          )}
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Shopping
+            </Link>
+          </Button>
+        </div>
       </div>
-    </Layout>
+
+      {products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <FittingRoomIcon className="h-16 w-16 text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-semibold mb-2">Your fitting room is empty</h2>
+          <p className="text-muted-foreground max-w-md mb-6">
+            Try asking the assistant to find clothing items for you to try on virtually.
+          </p>
+          <Button asChild>
+            <Link to="/">Start Shopping</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* View Type Selector */}
+          <div className="flex justify-end">
+            <Tabs value={viewType} onValueChange={(value) => setViewType(value as "grid" | "compare")}>
+              <TabsList>
+                <TabsTrigger value="grid">Grid View</TabsTrigger>
+                <TabsTrigger value="compare">Compare</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+          
+          {/* Product Set Tabs */}
+          {tabs.length > 0 && (
+            <Tabs 
+              value={activeTabId} 
+              onValueChange={setActiveTabId}
+              className="w-full"
+            >
+              <TabsList className="mb-6 flex flex-wrap">
+                {tabs.map((tab) => (
+                  <TabsTrigger key={tab.id} value={tab.id} className="flex-grow">
+                    {tab.name} ({tab.products.length})
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              
+              {tabs.map((tab) => (
+                <TabsContent key={tab.id} value={tab.id} className="mt-0">
+                  <div className="mb-4">
+                    <p className="text-muted-foreground">
+                      {tab.products.length} item{tab.products.length !== 1 ? "s" : ""} added {new Date(tab.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                  
+                  {viewType === "grid" ? renderProductGrid(tab.products) : renderCompareTable(tab.products)}
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
