@@ -83,7 +83,7 @@ export function Hero() {
   };
 
   return (
-    <div className="relative w-full h-[100vh] overflow-hidden bg-black">
+    <div className="relative w-full h-[100vh] overflow-hidden bg-black mt-[104px]">
       {heroSlides.map((slide, index) => (
         <div 
           key={index}
