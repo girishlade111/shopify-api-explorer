@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -252,7 +253,7 @@ function CopilotDemoApp(props: AppProps) {
   }, [isPTTActive]);
 
   return (
-    <div className={`flex flex-col bg-white ${props.isVoiceMode ? 'h-[40px]' : 'h-[500px]'}`}>
+    <div className={`flex flex-col bg-white ${props.isVoiceMode ? 'h-0' : 'h-[500px]'}`}>
       <div className={`flex flex-1 overflow-hidden relative ${props.isVoiceMode ? 'min-h-0' : ''}`}>
         <Transcript
           userText={userText}

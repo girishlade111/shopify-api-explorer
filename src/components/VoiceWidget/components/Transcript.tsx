@@ -55,9 +55,9 @@ function Transcript({
     }
   };
 
-  // For voice mode, return minimal empty container with no content
+  // For voice mode, return empty div without any padding
   if (isVoiceMode) {
-    return <div className="py-2"></div>;
+    return <div></div>;
   }
 
   return (
