@@ -3,12 +3,13 @@ import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Heart, User, Menu, X, Sparkles } from "lucide-react";
+import { ShoppingBag, Heart, User, Menu, X, Sparkles, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
 import { Separator } from "./ui/separator";
 import FittingRoom from "./icons/FittingRoom";
+import { Dialog, DialogContent } from "./ui/dialog";
 
 interface LayoutProps {
   children: ReactNode;
@@ -17,6 +18,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchDialogOpen, setSearchDialogOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -51,6 +53,10 @@ export function Layout({ children }: LayoutProps) {
   const handleFittingRoomClick = () => {
     navigate("/fitting-room");
   };
+  
+  const handleSearchClick = () => {
+    setSearchDialogOpen(true);
+  };
 
   const cartCount = getCartCount();
   const wishlistCount = wishlist.length;
@@ -68,7 +74,7 @@ export function Layout({ children }: LayoutProps) {
           {/* Left Section - Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <span className="font-serif text-2xl sm:text-3xl tracking-tight">ATELIER</span>
+              <span className={`font-serif text-2xl sm:text-3xl tracking-tight ${!scrolled ? "text-white" : ""}`}>ATELIER</span>
             </Link>
           </div>
           
@@ -83,14 +89,20 @@ export function Layout({ children }: LayoutProps) {
           
           {/* Right Section - Icons */}
           <div className="hidden md:flex items-center gap-6">
-            <div className="w-48">
-              <SearchBar />
-            </div>
+            <button 
+              onClick={handleSearchClick}
+              className={`p-2 transition-colors rounded-full ${
+                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
+              }`}
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
             
             <button 
               onClick={handleFittingRoomClick}
               className={`p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "hover:text-white/80"
+                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
               }`}
               aria-label="AI Fitting Room"
             >
@@ -100,7 +112,7 @@ export function Layout({ children }: LayoutProps) {
             <button 
               onClick={handleWishlistClick}
               className={`relative p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "hover:text-white/80"
+                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
               }`}
               aria-label="Wishlist"
             >
@@ -115,7 +127,7 @@ export function Layout({ children }: LayoutProps) {
             <button 
               onClick={handleAccountClick}
               className={`p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "hover:text-white/80"
+                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
               }`}
               aria-label="Account"
             >
@@ -125,7 +137,7 @@ export function Layout({ children }: LayoutProps) {
             <button 
               onClick={handleCartClick}
               className={`relative p-2 transition-colors rounded-full ${
-                scrolled ? "hover:text-primary" : "hover:text-white/80"
+                scrolled ? "hover:text-primary" : "text-white hover:text-white/80"
               }`}
               aria-label="Shopping Bag"
             >
@@ -139,7 +151,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
           
           <button 
-            className="lg:hidden"
+            className={`lg:hidden ${!scrolled ? "text-white" : ""}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -154,7 +166,15 @@ export function Layout({ children }: LayoutProps) {
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 bg-white pt-16 animate-fade-in">
             <div className="container-wide py-6 flex flex-col space-y-6">
-              <SearchBar />
+              <div className="flex items-center justify-center pb-4">
+                <button 
+                  onClick={handleSearchClick}
+                  className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
+                >
+                  <Search className="h-5 w-5" />
+                  <span>Search</span>
+                </button>
+              </div>
               
               <nav className="flex flex-col space-y-4">
                 <MobileNavLink to="/all-products/men">MENS</MobileNavLink>
@@ -203,6 +223,16 @@ export function Layout({ children }: LayoutProps) {
       
       <main className="flex-1">{children}</main>
       
+      {/* Search Dialog */}
+      <Dialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] p-0">
+          <div className="p-6">
+            <SearchBar autoFocus={true} placeholder="Search for products, brands, and more..." />
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Footer */}
       <footer className="bg-black text-white mt-24">
         <div className="container-wide py-16 md:py-24">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -327,7 +357,7 @@ const NavLink = ({ to, children }: { to: string; children: ReactNode }) => {
         "text-sm tracking-wider transition-colors relative px-1 py-1 font-light",
         isActive 
           ? scrolled ? "text-primary" : "text-white" 
-          : scrolled ? "text-dark hover:text-primary" : "text-white/90 hover:text-white"
+          : scrolled ? "text-dark hover:text-primary" : "text-white hover:text-white"
       )}
     >
       {children}
