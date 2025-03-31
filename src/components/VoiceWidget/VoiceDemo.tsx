@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -38,10 +39,9 @@ export default function VoiceDemo() {
     if (storedSettings) {
       try {
         const settings = JSON.parse(storedSettings);
-        setIsTranscriptionEnabled(settings.isTranscriptionEnabled ?? false);
-        setIsAudioEnabled(settings.isAudioEnabled ?? false);
+        // Don't auto-enable mic and speaker
+        // Only persist open/closed state
         setIsWidgetOpen(settings.isWidgetOpen ?? false);
-        // Don't auto-connect even if it was previously connected
       } catch (e) {
         console.error('Error parsing stored voice widget settings:', e);
       }
@@ -243,24 +243,28 @@ export default function VoiceDemo() {
     onChange,
     icon: Icon,
     iconOff: IconOff,
+    disabled = false,
   }: {
     checked: boolean;
     onChange: (val: boolean) => void;
     icon: React.ComponentType<any>;
     iconOff: React.ComponentType<any>;
+    disabled?: boolean;
   }) => (
     <button
       role="switch"
       aria-checked={checked}
-      onClick={() => onChange(!checked)}
+      onClick={() => !disabled && onChange(!checked)}
       className={`
         p-3 rounded-full transition-all duration-200
+        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         ${
           checked
             ? 'bg-[#5856d6] text-white hover:bg-[#4745ac] cursor-pointer'
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
         }
       `}
+      disabled={disabled}
     >
       {checked ? <Icon className="w-6 h-6" /> : <IconOff className="w-6 h-6" />}
     </button>
@@ -295,12 +299,14 @@ export default function VoiceDemo() {
                 onChange={setIsTranscriptionEnabled}
                 icon={Mic}
                 iconOff={MicOff}
+                disabled={sessionStatus !== 'CONNECTED'}
               />
               <IconButton
                 checked={isAudioEnabled}
                 onChange={setIsAudioEnabled}
                 icon={Volume2}
                 iconOff={VolumeX}
+                disabled={sessionStatus !== 'CONNECTED'}
               />
             </div>
           </div>

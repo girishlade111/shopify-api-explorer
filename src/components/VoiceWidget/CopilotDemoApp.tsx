@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -33,7 +32,8 @@ function CopilotDemoApp(props: AppProps) {
 
   const [userText, setUserText] = useState<string>("");
   const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
-  const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] = useState<boolean>(false);
+  
+  const isAudioPlaybackEnabled = props.isAudioEnabled;
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (props.dataChannel && props.dataChannel.readyState === "open") {
@@ -127,11 +127,25 @@ function CopilotDemoApp(props: AppProps) {
   useEffect(() => {
     if (sessionStatus === "CONNECTED") {
       console.log(
-        `updatingSession, isPTTACtive=${isPTTActive} sessionStatus=${sessionStatus}`
+        `updatingSession, isPTTACtive=${isPTTActive} sessionStatus=${sessionStatus}, isTranscriptionEnabled=${props.isTranscriptionEnabled}`
       );
       updateSession();
     }
-  }, [isPTTActive, props.isTranscriptionEnabled]);
+  }, [isPTTActive, props.isTranscriptionEnabled, sessionStatus]);
+
+  useEffect(() => {
+    if (audioElementRef.current) {
+      audioElementRef.current.muted = !props.isAudioEnabled;
+      
+      if (props.isAudioEnabled && audioElementRef.current.srcObject) {
+        audioElementRef.current.play().catch((err) => {
+          console.warn("Autoplay prevented:", err);
+        });
+      } else if (!props.isAudioEnabled) {
+        audioElementRef.current.pause();
+      }
+    }
+  }, [props.isAudioEnabled]);
 
   const updateSession = () => {
     if (!props.dataChannel || props.dataChannel.readyState !== "open") {
@@ -226,36 +240,11 @@ function CopilotDemoApp(props: AppProps) {
     if (storedPushToTalkUI) {
       setIsPTTActive(storedPushToTalkUI === "true");
     }
-    const storedAudioPlaybackEnabled = localStorage.getItem(
-      "audioPlaybackEnabled"
-    );
-    if (storedAudioPlaybackEnabled) {
-      setIsAudioPlaybackEnabled(storedAudioPlaybackEnabled === "true");
-    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("pushToTalkUI", isPTTActive.toString());
   }, [isPTTActive]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "audioPlaybackEnabled",
-      isAudioPlaybackEnabled.toString()
-    );
-  }, [isAudioPlaybackEnabled]);
-
-  useEffect(() => {
-    if (audioElementRef.current) {
-      if (isAudioPlaybackEnabled) {
-        audioElementRef.current.play().catch((err) => {
-          console.warn("Autoplay may be blocked by browser:", err);
-        });
-      } else {
-        audioElementRef.current.pause();
-      }
-    }
-  }, [isAudioPlaybackEnabled]);
 
   return (
     <div className="flex flex-col h-[500px] bg-white">

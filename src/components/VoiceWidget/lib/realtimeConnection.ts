@@ -80,6 +80,7 @@ export async function createRealtimeConnection(
   pc.ontrack = (e) => {
     if (audioElement.current) {
       audioElement.current.srcObject = e.streams[0];
+      // Make sure audio is muted unless the user has explicitly enabled it
       audioElement.current.muted = !isAudioEnabled;
       
       if (isAudioEnabled) {
