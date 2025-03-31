@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -54,14 +55,9 @@ function Transcript({
     }
   };
 
+  // For voice mode, return minimal empty container with no content
   if (isVoiceMode) {
-    return (
-      <div className="text-center p-4">
-        <p className="text-gray-500">
-          Use the microphone to start talking with Atelier
-        </p>
-      </div>
-    );
+    return <div className="py-2"></div>;
   }
 
   return (
