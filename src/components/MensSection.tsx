@@ -11,7 +11,7 @@ export function MensSection() {
           <div className="w-full md:w-1/2">
             <div className="relative overflow-hidden">
               <img 
-                src="https://images.prismic.io/end-features/Z-UxJndAxsiBv-DI_19-03-25_MW-Curates__BrandPage_2400x1350.jpg" 
+                src="https://cdn.media.amplience.net/i/liberty/250313-Mens-SC2-Coats-and-Jackets-min?fmt=auto&qlt=default&w=360&h=450" 
                 alt="Men's Collection" 
                 className="w-full aspect-[4/5] object-cover"
               />

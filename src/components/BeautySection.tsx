@@ -20,7 +20,7 @@ export function BeautySection() {
           <div className="md:w-1/2 relative z-10">
             <div className="relative overflow-hidden rounded-lg">
               <img 
-                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/GA_2025_EA-SWY-Parfum_Pack-with-Ingredients_1x1_RVB-4000" 
+                src="https://images.selfridges.com/is/image/selfridges/250305_CLP_BEAUTY_BANNER_1_D?wid=1232&hei=528&fmt=webp&qlt=80,1&dpr=on,2&fit=crop" 
                 alt="Beauty Collection" 
                 className="w-full h-auto transform transition-transform duration-700 hover:scale-105"
               />
@@ -35,7 +35,7 @@ export function BeautySection() {
           <div className="border border-gray-200 p-8 text-center hover:border-primary transition-colors group">
             <div className="h-64 mb-6 overflow-hidden">
               <img 
-                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720778517/hp_story_beauty_06_double" 
+                src="https://cdn.media.amplience.net/i/liberty/241224-Beauty-R2E3-Makeup-min?fmt=auto&qlt=default&w=800&h=1000" 
                 alt="Makeup" 
                 className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
               />
@@ -50,7 +50,7 @@ export function BeautySection() {
           <div className="border border-gray-200 p-8 text-center hover:border-primary transition-colors group">
             <div className="h-64 mb-6 overflow-hidden">
               <img 
-                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/GA_2025_EA-SWY-Parfum_Pack-with-Ingredients_1x1_RVB-4000" 
+                src="https://cdn.media.amplience.net/i/liberty/250327-Beauty-R2E2-Skincare-min?fmt=auto&qlt=default&w=800&h=1000" 
                 alt="Skincare" 
                 className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
               />
@@ -65,7 +65,7 @@ export function BeautySection() {
           <div className="border border-gray-200 p-8 text-center hover:border-primary transition-colors group">
             <div className="h-64 mb-6 overflow-hidden">
               <img 
-                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720537033/GA_2025_PA-MLG-Fragrance-PDP-EDP-New-Visuel-Flacon.jpg" 
+                src="https://cdn.media.amplience.net/i/liberty/241224-Beauty-R2E1-Fragrance-min?fmt=auto&qlt=default&w=800&h=1000" 
                 alt="Fragrance" 
                 className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
               />

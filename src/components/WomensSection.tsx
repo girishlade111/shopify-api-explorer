@@ -15,16 +15,16 @@ export function WomensSection() {
           <div className="group relative overflow-hidden">
             <div className="aspect-[3/4] overflow-hidden">
               <img 
-                src="https://assets.armani.com/image/upload/v1737391559/SS25_AX_ADV_FASHION_GLOBAL_MW_03_1080x1350.jpg" 
-                alt="Ready-to-Wear" 
+                src="https://cdn.media.amplience.net/i/liberty/250206-Womens-R2E2-Dresses-min?fmt=auto&qlt=default&w=800&h=1000" 
+                alt="Dresses" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6">
-              <h3 className="text-white text-2xl font-serif mb-2">Ready-to-Wear</h3>
-              <p className="text-white/80 mb-4 max-w-xs">Sophisticated silhouettes that seamlessly transition from day to evening</p>
+              <h3 className="text-white text-2xl font-serif mb-2">Dresses</h3>
+              <p className="text-white/80 mb-4 max-w-xs">Elegant dresses for every occasion from casual to formal</p>
               <Link 
-                to="/all-products/women/ready-to-wear" 
+                to="/all-products/women/dresses" 
                 className="inline-flex items-center text-white bg-primary/20 backdrop-blur-sm px-4 py-2 border border-white/30 hover:bg-primary/40 transition-colors"
               >
                 Explore Collection <ArrowRight className="ml-2 h-4 w-4" />
@@ -35,16 +35,16 @@ export function WomensSection() {
           <div className="group relative overflow-hidden">
             <div className="aspect-[3/4] overflow-hidden">
               <img 
-                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1728403167/HP_STORY_WOMENS_SPRING_SUMMER_2025_06.jpg" 
-                alt="Evening" 
+                src="https://cdn.media.amplience.net/i/liberty/250320-Womens-R2E4-Coats-And-Jackets-min?fmt=auto&qlt=default&w=800&h=1000" 
+                alt="Coats & Jackets" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6">
-              <h3 className="text-white text-2xl font-serif mb-2">Evening</h3>
-              <p className="text-white/80 mb-4 max-w-xs">Exquisite evening wear designed to make a statement at every special occasion</p>
+              <h3 className="text-white text-2xl font-serif mb-2">Coats & Jackets</h3>
+              <p className="text-white/80 mb-4 max-w-xs">Premium outerwear to keep you stylish in any weather</p>
               <Link 
-                to="/all-products/women/evening" 
+                to="/all-products/women/coats-jackets" 
                 className="inline-flex items-center text-white bg-primary/20 backdrop-blur-sm px-4 py-2 border border-white/30 hover:bg-primary/40 transition-colors"
               >
                 Explore Collection <ArrowRight className="ml-2 h-4 w-4" />
@@ -55,16 +55,16 @@ export function WomensSection() {
           <div className="group relative overflow-hidden">
             <div className="aspect-[3/4] overflow-hidden">
               <img 
-                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1736688632/2025_SS_GALLERY_WOMENS_21.jpg" 
-                alt="Accessories" 
+                src="https://cdn.media.amplience.net/i/liberty/241211-Womens-R2E6-Tops?fmt=auto&qlt=default&w=800&h=1000" 
+                alt="Tops" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6">
-              <h3 className="text-white text-2xl font-serif mb-2">Accessories</h3>
-              <p className="text-white/80 mb-4 max-w-xs">Refined accessories that add the perfect finishing touch to every ensemble</p>
+              <h3 className="text-white text-2xl font-serif mb-2">Tops</h3>
+              <p className="text-white/80 mb-4 max-w-xs">Versatile tops to complete any outfit with style</p>
               <Link 
-                to="/all-products/women/accessories" 
+                to="/all-products/women/tops" 
                 className="inline-flex items-center text-white bg-primary/20 backdrop-blur-sm px-4 py-2 border border-white/30 hover:bg-primary/40 transition-colors"
               >
                 Explore Collection <ArrowRight className="ml-2 h-4 w-4" />
