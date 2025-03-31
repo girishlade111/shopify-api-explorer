@@ -48,7 +48,7 @@ const VoiceWidget = () => {
                   }} 
                   className="w-full bg-[#5856d6] hover:bg-[#4745ac] text-white text-base py-6 rounded-full"
                 >
-                  Chat to AI
+                  Voice Chat
                 </Button>
                 <div className="w-full mt-8 pt-4 border-t">
                   <div 
