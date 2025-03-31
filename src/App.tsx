@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,11 +23,8 @@ import FittingRoomPage from "./pages/FittingRoomPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import ServicesPage from "./pages/ServicesPage";
 import VoiceWidget from "./components/VoiceWidget";
-
 const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+const App = () => <QueryClientProvider client={queryClient}>
     <WishlistProvider>
       <CartProvider>
         <FittingRoomProvider>
@@ -40,7 +36,7 @@ const App = () => (
                 <Sonner />
                 <div className="flex min-h-screen flex-col">
                   <Header />
-                  <main className="flex-1 pt-[104px]">
+                  <main className="flex-1 pt-[104px] py-0">
                     <AppEnhancement />
                     <Routes>
                       <Route path="/" element={<Index />} />
@@ -114,16 +110,16 @@ const App = () => (
                             <h4 className="text-sm font-medium mb-6 uppercase tracking-wider">Connect With Us</h4>
                             <div className="flex space-x-4">
                               <IconButton aria-label="Instagram">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
                               </IconButton>
                               <IconButton aria-label="Twitter">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" /></svg>
                               </IconButton>
                               <IconButton aria-label="Facebook">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
                               </IconButton>
                               <IconButton aria-label="YouTube">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" /><path d="m10 15 5-3-5-3z" /></svg>
                               </IconButton>
                             </div>
                           </div>
@@ -132,11 +128,7 @@ const App = () => (
                             <h4 className="text-sm font-medium mb-4 uppercase tracking-wider">Newsletter</h4>
                             <p className="text-gray-400 text-sm mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
                             <div className="flex">
-                              <input
-                                type="email"
-                                placeholder="Your email address"
-                                className="bg-gray-900 border border-gray-800 text-white px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/30"
-                              />
+                              <input type="email" placeholder="Your email address" className="bg-gray-900 border border-gray-800 text-white px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/30" />
                               <button className="bg-white text-black px-4 py-2 uppercase text-sm tracking-wider font-medium hover:bg-gray-200 transition-colors">
                                 Subscribe
                               </button>
@@ -168,19 +160,18 @@ const App = () => (
         </FittingRoomProvider>
       </CartProvider>
     </WishlistProvider>
-  </QueryClientProvider>
-);
+  </QueryClientProvider>;
 
 // Helper components for the footer
-const FooterLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
-  <a
-    href={to}
-    className="text-sm text-gray-400 hover:text-white transition-colors"
-  >
+const FooterLink = ({
+  to,
+  children
+}: {
+  to: string;
+  children: React.ReactNode;
+}) => <a href={to} className="text-sm text-gray-400 hover:text-white transition-colors">
     {children}
-  </a>
-);
-
+  </a>;
 interface IconButtonProps {
   children: React.ReactNode;
   className?: string;
@@ -188,26 +179,16 @@ interface IconButtonProps {
   badgeCount?: number;
   [key: string]: any;
 }
-
 const IconButton = ({
   children,
   className,
   onClick,
   badgeCount,
   ...props
-}: IconButtonProps) => (
-  <button
-    className={`flex items-center justify-center w-10 h-10 rounded-full border border-gray-800 text-gray-400 hover:text-white hover:border-gray-600 transition-colors ${className || ""}`}
-    onClick={onClick}
-    {...props}
-  >
+}: IconButtonProps) => <button className={`flex items-center justify-center w-10 h-10 rounded-full border border-gray-800 text-gray-400 hover:text-white hover:border-gray-600 transition-colors ${className || ""}`} onClick={onClick} {...props}>
     {children}
-    {badgeCount && badgeCount > 0 && (
-      <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+    {badgeCount && badgeCount > 0 && <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
         {badgeCount > 99 ? '99+' : badgeCount}
-      </span>
-    )}
-  </button>
-);
-
+      </span>}
+  </button>;
 export default App;
