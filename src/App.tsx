@@ -9,6 +9,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { FittingRoomProvider } from "@/contexts/FittingRoomContext";
 import { UserActivityProvider } from "@/contexts/UserActivityContext";
 import { Layout } from "@/components/Layout";
+import { AppEnhancement } from "@/components/AppEnhancement";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
@@ -36,6 +37,7 @@ const App = () => (
                 <Toaster />
                 <Sonner />
                 <Layout>
+                  <AppEnhancement />
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/products/:handle" element={<ProductDetail />} />
