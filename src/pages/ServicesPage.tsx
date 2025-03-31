@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { CategorySubNav } from "../components/CategorySubNav";
@@ -147,7 +148,7 @@ const ServicesPage = () => {
           className="w-full h-full object-cover"
         >
           <source
-            src="https://sitecore-cd.shangri-la.com/MediaFiles/6/1/B/{61BCB4CD-38F8-B868-CE84CE1F3A58}202401_SLLN_Hero-Video_1920x1080.mp4"
+            src="https://sitecore-cd.shangri-la.com/MediaFiles/6/1/B/{61BCB4CD-38C4-48F8-B868-CE84CE1F3A58}202401_SLLN_Hero-Video_1920x1080.mp4"
             type="video/mp4"
           />
         </video>

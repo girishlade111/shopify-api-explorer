@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Mic, X } from 'lucide-react';
-import VoiceWidgetController from './VoiceWidgetController';
+import VoiceDemo from './VoiceDemo';
 
 const VoiceWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +18,7 @@ const VoiceWidget = () => {
       </button>
 
       {/* Voice Widget Container */}
-      {isOpen && <VoiceWidgetController />}
+      {isOpen && <VoiceDemo />}
     </>
   );
 };

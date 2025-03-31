@@ -1,32 +1,6 @@
 
 import { RefObject } from "react";
 
-// Add proper function signatures for the missing exports
-export async function connectToServer(handleServerEvent: (event: any) => void): Promise<void> {
-  console.log("Connecting to server...");
-  // Simulating successful connection
-  setTimeout(() => {
-    handleServerEvent({
-      type: "session.created",
-      session: { id: `session-${Date.now()}` }
-    });
-  }, 500);
-}
-
-export async function disconnectFromServer(): Promise<void> {
-  console.log("Disconnecting from server...");
-  // Simulating successful disconnection
-  return Promise.resolve();
-}
-
-export function toggleMic(): void {
-  console.log("Toggling microphone...");
-}
-
-export function toggleSpeaker(): void {
-  console.log("Toggling speaker...");
-}
-
 async function checkMicrophoneSupport() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     throw new Error("Your browser doesn't support microphone access. Please use a modern browser like Chrome, Firefox, or Safari.");
