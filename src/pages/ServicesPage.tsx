@@ -1,12 +1,24 @@
 
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { CategoryHero } from "../components/CategoryHero";
+import { CategorySubNav } from "../components/CategorySubNav";
 
 const ServicesPage = () => {
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const serviceCategories = [
+    { name: "All Services", path: "/services" },
+    { name: "Restaurants", path: "/services#restaurants" },
+    { name: "Hotels", path: "/services#hotels" },
+    { name: "Fiori", path: "/services#fiori" },
+    { name: "Private Shopping", path: "/services#private-shopping" },
+    { name: "Dolci", path: "/services#dolci" },
+    { name: "Clubs", path: "/services#clubs" }
+  ];
 
   const services = [
     {
@@ -90,68 +102,84 @@ const ServicesPage = () => {
   ];
 
   return (
-    <div className="py-20">
-      <div className="container-wide">
-        <div className="max-w-4xl mx-auto mb-16 text-center">
-          <h1 className="text-5xl md:text-6xl font-serif mb-6">Armani Lifestyle Services</h1>
-          <p className="text-lg text-muted">
-            Beyond fashion, Armani extends its philosophy of elegance and sophistication to a complete lifestyle experience.
-            Discover our exclusive services that embody the Armani vision of luxury living.
-          </p>
-        </div>
+    <div>
+      <CategoryHero 
+        title="Armani Lifestyle Services"
+        description="Beyond fashion, experience the complete Armani lifestyle with our exclusive offerings"
+        image="https://assets.armani.com/image/upload/f_auto,q_auto,ar_16:9,w_1920,c_lfill/Armani-Hotel-Dubai-Exterior"
+        ctaText="Explore Services"
+        ctaLink="#restaurants"
+      />
+      
+      <CategorySubNav 
+        categories={serviceCategories} 
+        currentCategory="All Services"
+        className="mb-10"
+      />
+      
+      <div className="py-10">
+        <div className="container-wide">
+          <div className="max-w-4xl mx-auto mb-16 text-center">
+            <h2 className="text-4xl md:text-5xl font-serif mb-6">Exclusive Lifestyle Experiences</h2>
+            <p className="text-lg text-muted">
+              Beyond fashion, Armani extends its philosophy of elegance and sophistication to a complete lifestyle experience.
+              Discover our exclusive services that embody the Armani vision of luxury living.
+            </p>
+          </div>
 
-        <div className="space-y-24">
-          {services.map((service, index) => (
-            <div key={service.id} id={service.id} className="scroll-mt-24">
-              <div className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${index % 2 !== 0 ? 'lg:grid-flow-dense' : ''}`}>
-                <div className={index % 2 !== 0 ? 'lg:col-start-2' : ''}>
-                  <img 
-                    src={service.image} 
-                    alt={service.title} 
-                    className="w-full h-auto object-cover"
-                  />
+          <div className="space-y-24">
+            {services.map((service, index) => (
+              <div key={service.id} id={service.id} className="scroll-mt-24">
+                <div className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${index % 2 !== 0 ? 'lg:grid-flow-dense' : ''}`}>
+                  <div className={index % 2 !== 0 ? 'lg:col-start-2' : ''}>
+                    <img 
+                      src={service.image} 
+                      alt={service.title} 
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+                  
+                  <div className={`${index % 2 !== 0 ? 'lg:col-start-1' : ''} lg:p-12`}>
+                    <h2 className="text-4xl font-serif mb-4">{service.title}</h2>
+                    <p className="text-muted text-lg mb-8">{service.description}</p>
+                    
+                    <ul className="space-y-3 mb-10">
+                      {service.features.map((feature, i) => (
+                        <li key={i} className="flex items-start">
+                          <span className="text-primary mr-2">•</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <Link 
+                      to={`/services/${service.id}`} 
+                      className="inline-block border border-primary text-primary px-8 py-3 uppercase text-sm tracking-wider hover:bg-primary hover:text-white transition-colors"
+                    >
+                      Learn More
+                    </Link>
+                  </div>
                 </div>
                 
-                <div className={`${index % 2 !== 0 ? 'lg:col-start-1' : ''} lg:p-12`}>
-                  <h2 className="text-4xl font-serif mb-4">{service.title}</h2>
-                  <p className="text-muted text-lg mb-8">{service.description}</p>
-                  
-                  <ul className="space-y-3 mb-10">
-                    {service.features.map((feature, i) => (
-                      <li key={i} className="flex items-start">
-                        <span className="text-primary mr-2">•</span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Link 
-                    to={`/services/${service.id}`} 
-                    className="inline-block border border-primary text-primary px-8 py-3 uppercase text-sm tracking-wider hover:bg-primary hover:text-white transition-colors"
-                  >
-                    Learn More
-                  </Link>
-                </div>
+                {index < services.length - 1 && (
+                  <div className="my-20 border-b border-gray-200"></div>
+                )}
               </div>
-              
-              {index < services.length - 1 && (
-                <div className="my-20 border-b border-gray-200"></div>
-              )}
-            </div>
-          ))}
-        </div>
-        
-        <div className="mt-20 py-16 bg-light text-center">
-          <h2 className="text-3xl font-serif mb-6">Experience Armani Excellence</h2>
-          <p className="text-lg text-muted max-w-3xl mx-auto mb-10">
-            To book any of our exclusive services or for more information, please contact our dedicated concierge team.
-          </p>
-          <Link 
-            to="/contact" 
-            className="inline-block bg-primary text-white px-10 py-4 uppercase text-sm tracking-wider hover:bg-primary/90 transition-colors"
-          >
-            Contact Concierge
-          </Link>
+            ))}
+          </div>
+          
+          <div className="mt-20 py-16 bg-light text-center">
+            <h2 className="text-3xl font-serif mb-6">Experience Armani Excellence</h2>
+            <p className="text-lg text-muted max-w-3xl mx-auto mb-10">
+              To book any of our exclusive services or for more information, please contact our dedicated concierge team.
+            </p>
+            <Link 
+              to="/contact" 
+              className="inline-block bg-primary text-white px-10 py-4 uppercase text-sm tracking-wider hover:bg-primary/90 transition-colors"
+            >
+              Contact Concierge
+            </Link>
+          </div>
         </div>
       </div>
     </div>

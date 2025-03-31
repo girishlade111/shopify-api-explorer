@@ -20,16 +20,16 @@ export function CategoryHero({
   className
 }: CategoryHeroProps) {
   return (
-    <div className={`relative w-full h-[500px] md:h-[600px] overflow-hidden ${className}`}>
+    <div className={`relative w-full h-[600px] md:h-[650px] overflow-hidden ${className}`}>
       <img 
         src={image} 
         alt={title} 
         className="w-full h-full object-cover"
       />
       
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent flex items-center">
-        <div className="container-wide">
-          <div className="max-w-lg">
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent flex items-center justify-center">
+        <div className="container-wide text-center">
+          <div className="max-w-2xl mx-auto">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4">{title}</h1>
             <p className="text-white/80 text-lg mb-8">{description}</p>
             
