@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { CategoryHero } from "../components/CategoryHero";
+
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { CategorySubNav } from "../components/CategorySubNav";
 import { Layout } from "@/components/Layout";
 
@@ -9,6 +9,32 @@ const ServicesPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
+  const location = useLocation();
+  const [activeCategory, setActiveCategory] = useState("All Services");
+
+  // Get the hash from the URL (e.g., #restaurants)
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+      const matchingCategory = serviceCategories.find(
+        cat => cat.path.includes(hash)
+      );
+      if (matchingCategory) {
+        setActiveCategory(matchingCategory.name);
+        
+        // Scroll to the section after a short delay to ensure the DOM is updated
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    } else {
+      setActiveCategory("All Services");
+    }
+  }, [location.hash]);
 
   const serviceCategories = [
     { name: "All Services", path: "/services" },
@@ -101,6 +127,17 @@ const ServicesPage = () => {
     }
   ];
 
+  // Filter services based on active category
+  const filteredServices = activeCategory === "All Services" 
+    ? services 
+    : services.filter(service => {
+        const categoryName = serviceCategories.find(cat => cat.name === activeCategory);
+        if (!categoryName) return false;
+        
+        const categoryId = categoryName.path.split('#')[1];
+        return service.id === categoryId;
+      });
+
   return (
     <Layout>
       <div className="relative w-full h-[650px] md:h-[700px] overflow-hidden">
@@ -137,7 +174,7 @@ const ServicesPage = () => {
       
       <CategorySubNav 
         categories={serviceCategories} 
-        currentCategory="All Services"
+        currentCategory={activeCategory}
         className="mb-10"
       />
       
@@ -152,7 +189,7 @@ const ServicesPage = () => {
           </div>
 
           <div className="space-y-24">
-            {services.map((service, index) => (
+            {filteredServices.map((service, index) => (
               <div key={service.id} id={service.id} className="scroll-mt-24">
                 <div className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${index % 2 !== 0 ? 'lg:grid-flow-dense' : ''}`}>
                   <div className={index % 2 !== 0 ? 'lg:col-start-2' : ''}>
@@ -185,25 +222,40 @@ const ServicesPage = () => {
                   </div>
                 </div>
                 
-                {index < services.length - 1 && (
+                {index < filteredServices.length - 1 && (
                   <div className="my-20 border-b border-gray-200"></div>
                 )}
               </div>
             ))}
           </div>
           
-          <div className="mt-20 py-16 bg-light text-center">
-            <h2 className="text-3xl font-serif mb-6">Experience Atelier Excellence</h2>
-            <p className="text-lg text-muted max-w-3xl mx-auto mb-10">
-              To book any of our exclusive services or for more information, please contact our dedicated concierge team.
-            </p>
-            <Link 
-              to="/contact" 
-              className="inline-block bg-primary text-white px-10 py-4 uppercase text-sm tracking-wider hover:bg-primary/90 transition-colors"
-            >
-              Contact Concierge
-            </Link>
-          </div>
+          {filteredServices.length > 0 && (
+            <div className="mt-20 py-16 bg-light text-center">
+              <h2 className="text-3xl font-serif mb-6">Experience Atelier Excellence</h2>
+              <p className="text-lg text-muted max-w-3xl mx-auto mb-10">
+                To book any of our exclusive services or for more information, please contact our dedicated concierge team.
+              </p>
+              <Link 
+                to="/contact" 
+                className="inline-block bg-primary text-white px-10 py-4 uppercase text-sm tracking-wider hover:bg-primary/90 transition-colors"
+              >
+                Contact Concierge
+              </Link>
+            </div>
+          )}
+          
+          {filteredServices.length === 0 && (
+            <div className="text-center py-16">
+              <h3 className="text-2xl font-serif mb-4">No services found</h3>
+              <p className="text-muted">Please select another category or view all services.</p>
+              <Link 
+                to="/services" 
+                className="inline-block mt-6 border border-primary text-primary px-8 py-3 uppercase text-sm tracking-wider hover:bg-primary hover:text-white transition-colors"
+              >
+                View All Services
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
