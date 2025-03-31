@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
@@ -184,6 +185,7 @@ const VoiceWidgetController: React.FC = () => {
 
     setSessionStatus('CONNECTING');
     setError(null);
+    setMessages([]); // Clear previous messages when connecting
 
     try {
       // Set a connection timeout
@@ -223,6 +225,17 @@ const VoiceWidgetController: React.FC = () => {
           pcRef.current = pc;
           dcRef.current = dc;
           
+          // Monitor connection state changes
+          pc.onconnectionstatechange = () => {
+            console.log(`RTCPeerConnection state: ${pc.connectionState}`);
+            if (pc.connectionState === 'disconnected' || 
+                pc.connectionState === 'failed' ||
+                pc.connectionState === 'closed') {
+              setIsConnected(false);
+              setSessionStatus('DISCONNECTED');
+            }
+          };
+          
           // Set up data channel message handler
           if (dc && dc.readyState === 'open') {
             dc.onmessage = (event) => {
@@ -237,6 +250,32 @@ const VoiceWidgetController: React.FC = () => {
                 }
               } catch (error) {
                 console.error('Error parsing data channel message:', error);
+              }
+            };
+            
+            // Set up data channel close handler
+            dc.onclose = () => {
+              console.log('Data channel closed');
+              if (sessionStatus === 'CONNECTED') {
+                addMessage({
+                  role: 'assistant',
+                  content: 'The connection was closed. Please try reconnecting.',
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+                setIsConnected(false);
+                setSessionStatus('DISCONNECTED');
+              }
+            };
+            
+            // Set up data channel error handler
+            dc.onerror = (error) => {
+              console.error('Data channel error:', error);
+              if (sessionStatus === 'CONNECTED') {
+                addMessage({
+                  role: 'assistant',
+                  content: 'There was an error with the connection. Please try reconnecting.',
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
               }
             };
           }

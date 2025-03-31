@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -47,7 +48,7 @@ function Transcript({
     if (messages && messages.length > 0) {
       return messages.map((message, index) => {
         const isUser = message.role === "user";
-        const baseContainer = "flex justify-end flex-col my-2";
+        const baseContainer = "flex flex-col my-2";
         const containerClasses = `${baseContainer} ${isUser ? "items-end" : "items-start"}`;
         const bubbleBase = `max-w-[85%] p-3 rounded-xl ${isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"}`;
         const timestamp = message.timestamp || new Date().toLocaleTimeString([], {
@@ -79,7 +80,7 @@ function Transcript({
 
       if (type === "MESSAGE") {
         const isUser = role === "user";
-        const baseContainer = "flex justify-end flex-col my-2";
+        const baseContainer = "flex flex-col my-2";
         const containerClasses = `${baseContainer} ${isUser ? "items-end" : "items-start"}`;
         const bubbleBase = `max-w-[85%] p-3 rounded-xl ${isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"}`;
         const isBracketedMessage = title.startsWith("[") && title.endsWith("]");
