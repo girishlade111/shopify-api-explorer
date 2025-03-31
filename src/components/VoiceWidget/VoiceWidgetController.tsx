@@ -1,12 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { connectToServer, disconnectFromServer, toggleMic, toggleSpeaker } from './lib/realtimeConnection';
-import { useTranscript } from './contexts/TranscriptContext';
-import { useHandleServerEvent } from './hooks/useHandleServerEvent';
-import { ServerEvent } from './types';
+import { TranscriptProvider } from './contexts/TranscriptContext';
+import { EventProvider } from './contexts/EventContext';
 import ModeSelection from './components/ModeSelection';
 import VoiceMode from './components/VoiceMode';
 import TextMode from './components/TextMode';
+import { ServerEvent } from './types';
 
 type Mode = 'selection' | 'voice' | 'text';
 
@@ -15,22 +14,17 @@ const VoiceWidgetController: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
-  
-  const { messages, addMessage } = useTranscript();
+  const [messages, setMessages] = useState<Array<{
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp?: string;
+  }>>([]);
   
   // Setup for handling server events
   const [sessionStatus, setSessionStatus] = useState('DISCONNECTED');
-  const sendClientEvent = (eventObj: any, eventNameSuffix?: string) => {
-    console.log("Sending client event:", eventObj, eventNameSuffix);
-  };
-  
-  const handleServerEventRef = useHandleServerEvent({
-    setSessionStatus: setSessionStatus,
-    sendClientEvent: sendClientEvent
-  });
   
   useEffect(() => {
-    // Disconnect when component unmounts or mode changes
+    // Disconnect when component unmounts
     return () => {
       if (isConnected) {
         handleDisconnect();
@@ -40,10 +34,17 @@ const VoiceWidgetController: React.FC = () => {
 
   const handleConnect = async () => {
     try {
-      await connectToServer((event: ServerEvent) => {
-        handleServerEventRef.current(event);
-      });
+      // Simulate connection
       setIsConnected(true);
+      setSessionStatus('CONNECTED');
+      
+      // Add a welcome message
+      addMessage({
+        role: 'assistant',
+        content: 'Hello! I am your Atelier Assistant. How can I help you today?',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      
       console.log('Connected to server');
     } catch (error) {
       console.error('Failed to connect:', error);
@@ -52,8 +53,9 @@ const VoiceWidgetController: React.FC = () => {
 
   const handleDisconnect = async () => {
     try {
-      await disconnectFromServer();
+      // Simulate disconnection
       setIsConnected(false);
+      setSessionStatus('DISCONNECTED');
       console.log('Disconnected from server');
     } catch (error) {
       console.error('Failed to disconnect:', error);
@@ -69,23 +71,32 @@ const VoiceWidgetController: React.FC = () => {
   };
 
   const handleToggleMic = () => {
-    toggleMic();
+    // Toggle microphone state
     setIsMicMuted(!isMicMuted);
   };
 
   const handleToggleSpeaker = () => {
-    toggleSpeaker();
+    // Toggle speaker state
     setIsSpeakerMuted(!isSpeakerMuted);
+  };
+
+  const addMessage = (message: {
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp?: string;
+  }) => {
+    setMessages(prev => [...prev, {
+      ...message,
+      timestamp: message.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }]);
   };
 
   const handleSendMessage = (message: string) => {
     if (isConnected) {
-      // Send message to server (this would need to be implemented in realtimeConnection.ts)
-      // For now, just add it to the transcript
+      // Add user message to transcript
       addMessage({
         role: 'user',
         content: message,
-        timestamp: new Date().toLocaleTimeString(),
       });
       
       // Simulate a response after a short delay
@@ -93,7 +104,6 @@ const VoiceWidgetController: React.FC = () => {
         addMessage({
           role: 'assistant',
           content: `I received your message: "${message}"`,
-          timestamp: new Date().toLocaleTimeString(),
         });
       }, 1000);
     }
@@ -129,33 +139,38 @@ const VoiceWidgetController: React.FC = () => {
   // Render appropriate mode
   if (mode === 'selection') {
     return (
-      <div className="fixed bottom-4 right-4 z-50 max-w-md w-full">
+      <div className="fixed bottom-24 right-6 z-50 max-w-md w-full">
         <ModeSelection onSelectMode={handleSelectMode} />
       </div>
     );
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-md w-full bg-white rounded-lg shadow-lg overflow-hidden">
-      {mode === 'voice' ? (
-        <VoiceMode
-          isConnected={isConnected}
-          onToggleConnection={handleToggleConnection}
-          onToggleMic={handleToggleMic}
-          onToggleSpeaker={handleToggleSpeaker}
-          isMicMuted={isMicMuted}
-          isSpeakerMuted={isSpeakerMuted}
-          onChangeMode={handleChangeMode}
-        />
-      ) : (
-        <TextMode
-          isConnected={isConnected}
-          onToggleConnection={handleToggleConnection}
-          onSendMessage={handleSendMessage}
-          messages={messages}
-          onChangeMode={handleChangeMode}
-        />
-      )}
+    <div className="fixed bottom-24 right-6 z-50 max-w-md w-full bg-white rounded-lg shadow-lg overflow-hidden">
+      <TranscriptProvider>
+        <EventProvider>
+          {mode === 'voice' ? (
+            <VoiceMode
+              isConnected={isConnected}
+              onToggleConnection={handleToggleConnection}
+              onToggleMic={handleToggleMic}
+              onToggleSpeaker={handleToggleSpeaker}
+              isMicMuted={isMicMuted}
+              isSpeakerMuted={isSpeakerMuted}
+              onChangeMode={handleChangeMode}
+              messages={messages}
+            />
+          ) : (
+            <TextMode
+              isConnected={isConnected}
+              onToggleConnection={handleToggleConnection}
+              onSendMessage={handleSendMessage}
+              messages={messages}
+              onChangeMode={handleChangeMode}
+            />
+          )}
+        </EventProvider>
+      </TranscriptProvider>
     </div>
   );
 };

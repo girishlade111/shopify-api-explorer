@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -156,37 +157,39 @@ function Transcript({
         </div>
       </div>
 
-      <div className="p-4 flex items-center gap-x-4">
-        <div className="flex-1 flex items-center bg-[#f3f3ee] rounded-full px-6 py-4">
-          <input
-            ref={inputRef}
-            type="text"
-            value={userText}
-            onChange={(e) => setUserText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && canSend && userText.trim()) {
-                onSendMessage();
-              }
-            }}
-            disabled={!canSend}
-            className="flex-1 bg-transparent text-[#16161D] placeholder-[#4B4B4B] focus:outline-none text-lg"
-            placeholder="Talk to Atelier here"
-          />
-          {canSend && (
-            <div className="flex items-center gap-x-4">
-              <button
-                onClick={onSendMessage}
-                disabled={!userText.trim()}
-                className={`p-1 transition-colors ${
-                  userText.trim() ? "text-[#16161D]" : "text-[#4B4B4B]"
-                }`}
-              >
-                <ArrowRight className="w-6 h-6" />
-              </button>
-            </div>
-          )}
+      {userText !== undefined && (
+        <div className="p-4 flex items-center gap-x-4">
+          <div className="flex-1 flex items-center bg-[#f3f3ee] rounded-full px-6 py-4">
+            <input
+              ref={inputRef}
+              type="text"
+              value={userText}
+              onChange={(e) => setUserText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canSend && userText.trim()) {
+                  onSendMessage();
+                }
+              }}
+              disabled={!canSend}
+              className="flex-1 bg-transparent text-[#16161D] placeholder-[#4B4B4B] focus:outline-none text-lg"
+              placeholder="Talk to Atelier here"
+            />
+            {canSend && (
+              <div className="flex items-center gap-x-4">
+                <button
+                  onClick={onSendMessage}
+                  disabled={!userText.trim()}
+                  className={`p-1 transition-colors ${
+                    userText.trim() ? "text-[#16161D]" : "text-[#4B4B4B]"
+                  }`}
+                >
+                  <ArrowRight className="w-6 h-6" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

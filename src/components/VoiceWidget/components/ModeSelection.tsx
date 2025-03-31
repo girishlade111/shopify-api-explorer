@@ -13,14 +13,14 @@ const ModeSelection: React.FC<ModeSelectionProps> = ({ onSelectMode }) => {
       <div className="flex gap-4">
         <button 
           onClick={() => onSelectMode('voice')}
-          className="flex flex-col items-center justify-center gap-2 p-6 bg-sky-600 hover:bg-sky-700 rounded-lg transition-colors w-36 h-36"
+          className="flex flex-col items-center justify-center gap-2 p-6 bg-[#5856d6] hover:bg-[#4745ac] rounded-lg transition-colors w-36 h-36"
         >
           <Mic className="w-10 h-10 text-white" />
           <span className="text-white font-medium">Voice</span>
         </button>
         <button 
           onClick={() => onSelectMode('text')}
-          className="flex flex-col items-center justify-center gap-2 p-6 bg-sky-600 hover:bg-sky-700 rounded-lg transition-colors w-36 h-36"
+          className="flex flex-col items-center justify-center gap-2 p-6 bg-[#5856d6] hover:bg-[#4745ac] rounded-lg transition-colors w-36 h-36"
         >
           <MessageSquare className="w-10 h-10 text-white" />
           <span className="text-white font-medium">Text</span>
