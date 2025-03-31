@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -232,51 +231,53 @@ export default function CategoryPage() {
         <CategoryPageEnhancement />
         
         <Section>
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl md:text-4xl font-semibold">
-              {pageTitle}
-            </h1>
-            
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <button
-                  onClick={() => setShowSortDropdown(!showSortDropdown)}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  Sort by: <span className="font-medium">{selectedSort.label}</span>
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-                
-                {showSortDropdown && (
-                  <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium border border-gray-100 py-2 z-10 min-w-[200px]">
-                    {sortOptions.map(option => (
-                      <button
-                        key={option.label}
-                        onClick={() => {
-                          setSelectedSort(option);
-                          setShowSortDropdown(false);
-                        }}
-                        className={cn(
-                          "w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors",
-                          option.value === selectedSort.value && option.order === selectedSort.order
-                            ? "text-primary font-medium"
-                            : "text-dark"
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+          <div className="sticky top-16 bg-white z-10 py-4 border-b border-gray-100 mb-8">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl md:text-4xl font-semibold">
+                {pageTitle}
+              </h1>
               
-              <button
-                onClick={() => setShowFilterSidebar(!showFilterSidebar)}
-                className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md"
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-              </button>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <button
+                    onClick={() => setShowSortDropdown(!showSortDropdown)}
+                    className="flex items-center gap-2 text-sm"
+                  >
+                    Sort by: <span className="font-medium">{selectedSort.label}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  
+                  {showSortDropdown && (
+                    <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium border border-gray-100 py-2 z-10 min-w-[200px]">
+                      {sortOptions.map(option => (
+                        <button
+                          key={option.label}
+                          onClick={() => {
+                            setSelectedSort(option);
+                            setShowSortDropdown(false);
+                          }}
+                          className={cn(
+                            "w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors",
+                            option.value === selectedSort.value && option.order === selectedSort.order
+                              ? "text-primary font-medium"
+                              : "text-dark"
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <button
+                  onClick={() => setShowFilterSidebar(!showFilterSidebar)}
+                  className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                </button>
+              </div>
             </div>
           </div>
           
@@ -302,7 +303,10 @@ export default function CategoryPage() {
               )}
               
               <div className="space-y-8">
-                <div>
+                <div className={cn(
+                  "md:sticky",
+                  { "md:top-44": !showFilterSidebar }
+                )}>
                   <h3 className="text-lg font-semibold mb-4">Categories</h3>
                   <CategoryNav 
                     activeCategory={fullPathFromUrl}
@@ -358,4 +362,3 @@ export default function CategoryPage() {
     </>
   );
 }
-
