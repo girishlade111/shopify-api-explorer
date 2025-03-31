@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
 import AtelierChat from './AtelierChat';
@@ -9,6 +9,16 @@ const VoiceWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showChatView, setShowChatView] = useState(false);
   const [activeChatType, setActiveChatType] = useState<'ai' | 'atelier' | null>(null);
+
+  // This effect is triggered when the widget is closed
+  // to ensure proper cleanup
+  useEffect(() => {
+    if (!isOpen) {
+      // Reset chat state when closing the widget
+      setShowChatView(false);
+      setActiveChatType(null);
+    }
+  }, [isOpen]);
 
   return (
     <>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -51,6 +52,19 @@ export default function VoiceDemo() {
     }
   }, []);
 
+  // Auto-connect when component mounts
+  useEffect(() => {
+    connectToService();
+    
+    // Disconnect when component unmounts
+    return () => {
+      cleanupResources();
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Save settings whenever they change
   useEffect(() => {
     localStorage.setItem('voiceWidgetSettings', JSON.stringify({
@@ -78,16 +92,6 @@ export default function VoiceDemo() {
     }
   }, [isAudioEnabled]);
 
-  // Clean up resources when component unmounts
-  useEffect(() => {
-    return () => {
-      cleanupResources();
-      if (connectionTimeoutRef.current) {
-        clearTimeout(connectionTimeoutRef.current);
-      }
-    };
-  }, []);
-
   const cleanupResources = () => {
     // Clean up RTCPeerConnection
     cleanupConnection(pcRef.current);
@@ -99,19 +103,6 @@ export default function VoiceDemo() {
     // Clear audio element
     if (audioElementRef.current) {
       audioElementRef.current.srcObject = null;
-    }
-  };
-
-  const handleToggleConnection = async () => {
-    if (sessionStatus === 'CONNECTED' || sessionStatus === 'CONNECTING') {
-      cleanupResources();
-      setSessionStatus('DISCONNECTED');
-      setError(null);
-      setInstructions("");
-      setTools([]);
-      setConnectionRetries(0);
-    } else {
-      await connectToService();
     }
   };
 
@@ -221,24 +212,6 @@ export default function VoiceDemo() {
     }
   };
 
-  function getConnectionButtonLabel() {
-    if (sessionStatus === 'CONNECTED') return 'Disconnect';
-    if (sessionStatus === 'CONNECTING') return 'Connecting...';
-    return 'Connect';
-  }
-
-  function getConnectionButtonClasses() {
-    const baseClasses =
-      'text-white text-base px-8 py-3 rounded-full transition-all duration-200';
-    const cursorClass =
-      sessionStatus === 'CONNECTING' ? 'cursor-not-allowed' : 'cursor-pointer';
-
-    if (sessionStatus === 'CONNECTED') {
-      return `bg-red-600 hover:bg-red-700 ${cursorClass} ${baseClasses}`;
-    }
-    return `bg-[#5856d6] hover:bg-[#4745ac] ${cursorClass} ${baseClasses}`;
-  }
-
   const IconButton = ({
     checked,
     onChange,
@@ -274,7 +247,7 @@ export default function VoiceDemo() {
   return (
     <div className="fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
       <div className="p-4 border-b">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Atelier Assistant</h2>
           <div className="flex gap-2">
             <IconButton
@@ -293,14 +266,6 @@ export default function VoiceDemo() {
             />
           </div>
         </div>
-
-        <button
-          onClick={handleToggleConnection}
-          className={`w-full ${getConnectionButtonClasses()}`}
-          disabled={sessionStatus === 'CONNECTING'}
-        >
-          {getConnectionButtonLabel()}
-        </button>
 
         {error && (
           <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
