@@ -12,7 +12,7 @@ export function Hero() {
       subtitle: "The new collection has arrived",
       buttonText: "Shop the Collection",
       buttonLink: "/new-arrivals",
-      alignment: "center" // Changed from left to center
+      alignment: "center"
     },
     {
       image: "https://assets.armani.com/image/upload/v1738145290/SS25_EA_ADV_GLOBAL_FASHION_M_01_1080_x_1350.jpg",
@@ -28,7 +28,7 @@ export function Hero() {
       subtitle: "Discover the art of Italian craftsmanship",
       buttonText: "Shop Now",
       buttonLink: "/all-products/women",
-      alignment: "center" // Changed from right to center
+      alignment: "center"
     }
   ];
 
@@ -96,8 +96,8 @@ export function Hero() {
         </div>
       ))}
 
-      <div className="relative h-full container-wide flex flex-col justify-center">
-        <div className={`max-w-xl flex flex-col ${getTextAlignmentClass(heroSlides[currentSlide].alignment)} mx-4 sm:mx-12 transition-all duration-700 ${isTransitioning ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'}`}>
+      <div className="relative h-full container-wide flex flex-col justify-center items-center">
+        <div className={`max-w-xl flex flex-col ${getTextAlignmentClass(heroSlides[currentSlide].alignment)} mx-auto transition-all duration-700 ${isTransitioning ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'}`}>
           <h1 className="text-white text-5xl md:text-6xl lg:text-7xl font-serif tracking-tight mb-4">
             {heroSlides[currentSlide].title}
           </h1>
