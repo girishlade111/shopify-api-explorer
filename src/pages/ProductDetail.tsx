@@ -167,7 +167,7 @@ export default function ProductDetail() {
         </nav>
       </div>
       
-      <Section>
+      <Section className="pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-6">
             <div className="aspect-square bg-accent/30 rounded-lg overflow-hidden">
@@ -325,11 +325,11 @@ export default function ProductDetail() {
         </div>
       </Section>
       
-      <Section>
+      <Section className="pb-16">
         <SectionHeader
           title="You might also like"
           subtitle="Products similar to this one"
-          align="center" /* Changed "center" prop to "align" prop */
+          align="center"
         />
         <NewArrivals />
       </Section>
