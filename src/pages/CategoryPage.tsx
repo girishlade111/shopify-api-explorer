@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, Fragment } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryFilters } from "@/components/CategoryFilters";
 import { SectionHeader } from "@/components/ui-components";
 import { Product } from "@/types";
 import { getProductsByCategory } from "@/lib/api";
-import { LoadingState, ErrorState } from "@/components/ui-components";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -14,6 +14,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Loader2 } from "lucide-react";
 
 interface BreadcrumbItemType {
   label: string;
@@ -33,6 +34,7 @@ export default function CategoryPage() {
     setLoading(true);
     setError(null);
     try {
+      // Type error fixed: API expects a string category and filter object
       const productsData = await getProductsByCategory(category || "all-products", filters);
       setProducts(productsData);
     } catch (err) {
@@ -79,11 +81,63 @@ export default function CategoryPage() {
     setFilters(newFilters);
   };
 
+  // Custom LoadingState component since it wasn't available
+  const LoadingState = () => (
+    <div className="flex flex-col items-center justify-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+      <p className="text-muted">Loading products...</p>
+    </div>
+  );
+
+  // Custom ErrorState component with correct props
+  const ErrorState = ({ title, description, onRetry }: { 
+    title: string;
+    description?: string;
+    onRetry?: () => void;
+  }) => (
+    <div className="flex flex-col items-center justify-center text-center py-16 px-4">
+      <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-8 w-8 text-red-500"
+        >
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <path d="M12 9v4" />
+          <path d="M12 17h.01" />
+        </svg>
+      </div>
+      <h3 className="text-xl font-medium mb-2">{title}</h3>
+      {description && <p className="text-muted mb-6 max-w-md">{description}</p>}
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+        >
+          Try Again
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <section className="category-content py-6">
       {loading && <LoadingState />}
       
-      {!loading && error && <ErrorState error={error} onRetry={fetchProducts} />}
+      {!loading && error && (
+        <ErrorState 
+          title="Something went wrong"
+          description={error}
+          onRetry={fetchProducts} 
+        />
+      )}
       
       {!loading && !error && (
         <>
@@ -98,7 +152,7 @@ export default function CategoryPage() {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   {breadcrumbs.map((breadcrumb, index) => (
-                    <React.Fragment key={index}>
+                    <Fragment key={index}>
                       {index === breadcrumbs.length - 1 ? (
                         <BreadcrumbItem>
                           <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
@@ -111,7 +165,7 @@ export default function CategoryPage() {
                         </BreadcrumbItem>
                       )}
                       {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-                    </React.Fragment>
+                    </Fragment>
                   ))}
                 </BreadcrumbList>
               </Breadcrumb>
