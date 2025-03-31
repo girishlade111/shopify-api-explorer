@@ -67,7 +67,7 @@ export function Layout({ children }: LayoutProps) {
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           scrolled 
             ? "bg-white border-b border-gray-200 text-dark py-2" 
-            : "bg-transparent text-white py-4"
+            : "bg-black/50 backdrop-blur-sm text-white py-4"
         }`}
       >
         <div className="container-wide flex items-center justify-between">
@@ -357,7 +357,7 @@ const NavLink = ({ to, children }: { to: string; children: ReactNode }) => {
         "text-sm tracking-wider transition-colors relative px-1 py-1 font-light",
         isActive 
           ? scrolled ? "text-primary" : "text-white" 
-          : scrolled ? "text-dark hover:text-primary" : "text-white hover:text-white"
+          : scrolled ? "text-dark hover:text-primary" : "text-white hover:text-white/80"
       )}
     >
       {children}
