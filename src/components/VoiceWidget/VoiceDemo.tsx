@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -426,20 +427,10 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
           )}
         </div>
 
-        <TranscriptProvider>
-          <EventProvider>
-            <CopilotDemoApp
-              initialSessionStatus={sessionStatus}
-              onSessionStatusChange={setSessionStatus}
-              peerConnection={pcRef.current}
-              dataChannel={dcRef.current}
-              isTranscriptionEnabled={isTranscriptionEnabled}
-              isAudioEnabled={isAudioEnabled}
-              instructions={getCombinedInstructions()}
-              tools={tools}
-            />
-          </EventProvider>
-        </TranscriptProvider>
+        {/* This is where the transcript and interaction happens */}
+        <div className="p-4 h-[400px] overflow-y-auto">
+          {/* Transcript content would be rendered here */}
+        </div>
       </div>
     </>
   );
