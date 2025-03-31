@@ -16,6 +16,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { CategoryPageEnhancement } from "@/components/CategoryPageEnhancement";
 
 type SortOption = {
   label: string;
@@ -273,129 +274,133 @@ export default function CategoryPage() {
         </Breadcrumb>
       </div>
       
-      <Section>
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl md:text-4xl font-semibold">
-            {pageTitle}
-          </h1>
-          
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <button
-                onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center gap-2 text-sm"
-              >
-                Sort by: <span className="font-medium">{selectedSort.label}</span>
-                <ChevronDown className="h-4 w-4" />
-              </button>
+      <div className="category-content">
+        <CategoryPageEnhancement />
+        
+        <Section>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl md:text-4xl font-semibold">
+              {pageTitle}
+            </h1>
+            
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <button
+                  onClick={() => setShowSortDropdown(!showSortDropdown)}
+                  className="flex items-center gap-2 text-sm"
+                >
+                  Sort by: <span className="font-medium">{selectedSort.label}</span>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                
+                {showSortDropdown && (
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium border border-gray-100 py-2 z-10 min-w-[200px]">
+                    {sortOptions.map(option => (
+                      <button
+                        key={option.label}
+                        onClick={() => {
+                          setSelectedSort(option);
+                          setShowSortDropdown(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors",
+                          option.value === selectedSort.value && option.order === selectedSort.order
+                            ? "text-primary font-medium"
+                            : "text-dark"
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               
-              {showSortDropdown && (
-                <div className="absolute right-0 top-full mt-2 bg-white rounded-md shadow-medium border border-gray-100 py-2 z-10 min-w-[200px]">
-                  {sortOptions.map(option => (
-                    <button
-                      key={option.label}
-                      onClick={() => {
-                        setSelectedSort(option);
-                        setShowSortDropdown(false);
-                      }}
-                      className={cn(
-                        "w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors",
-                        option.value === selectedSort.value && option.order === selectedSort.order
-                          ? "text-primary font-medium"
-                          : "text-dark"
-                      )}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+              <button
+                onClick={() => setShowFilterSidebar(!showFilterSidebar)}
+                className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters
+              </button>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div 
+              className={cn(
+                "md:col-span-3",
+                showFilterSidebar 
+                  ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" 
+                  : "hidden md:block"
+              )}
+            >
+              {showFilterSidebar && (
+                <div className="flex items-center justify-between mb-6 md:hidden">
+                  <h2 className="text-xl font-semibold">Filters</h2>
+                  <button 
+                    onClick={() => setShowFilterSidebar(false)}
+                    className="p-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
                 </div>
               )}
+              
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Categories</h3>
+                  <CategoryNav 
+                    activeCategory={fullPathFromUrl}
+                    onCategoryClick={handleCategoryClick}
+                  />
+                </div>
+                
+                {showFilterSidebar && (
+                  <div className="md:hidden mt-6">
+                    <button
+                      onClick={() => setShowFilterSidebar(false)}
+                      className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             
-            <button
-              onClick={() => setShowFilterSidebar(!showFilterSidebar)}
-              className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-            </button>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div 
-            className={cn(
-              "md:col-span-3",
-              showFilterSidebar 
-                ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" 
-                : "hidden md:block"
-            )}
-          >
-            {showFilterSidebar && (
-              <div className="flex items-center justify-between mb-6 md:hidden">
-                <h2 className="text-xl font-semibold">Filters</h2>
-                <button 
-                  onClick={() => setShowFilterSidebar(false)}
-                  className="p-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-              </div>
-            )}
-            
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Categories</h3>
-                <CategoryNav 
-                  activeCategory={fullPathFromUrl}
-                  onCategoryClick={handleCategoryClick}
-                />
-              </div>
+            <div className="md:col-span-9">
+              {!loading && !error && products.length > 0 && (
+                <div className="text-sm text-muted mb-6">
+                  Showing {products.length} of {totalProducts} products
+                </div>
+              )}
               
-              {showFilterSidebar && (
-                <div className="md:hidden mt-6">
+              <ProductGrid
+                products={products}
+                loading={loading}
+                error={error}
+                onRetry={() => {
+                  setCurrentPage(1);
+                  setCategoryFullName(categoryFullName);
+                }}
+                cols={3}
+              />
+              
+              {!loading && !error && products.length > 0 && currentPage < totalPages && (
+                <div className="mt-12 text-center">
                   <button
-                    onClick={() => setShowFilterSidebar(false)}
-                    className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors"
+                    onClick={loadMore}
+                    className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors"
                   >
-                    Apply Filters
+                    Load More Products
                   </button>
                 </div>
               )}
             </div>
           </div>
-          
-          <div className="md:col-span-9">
-            {!loading && !error && products.length > 0 && (
-              <div className="text-sm text-muted mb-6">
-                Showing {products.length} of {totalProducts} products
-              </div>
-            )}
-            
-            <ProductGrid
-              products={products}
-              loading={loading}
-              error={error}
-              onRetry={() => {
-                setCurrentPage(1);
-                setCategoryFullName(categoryFullName);
-              }}
-              cols={3}
-            />
-            
-            {!loading && !error && products.length > 0 && currentPage < totalPages && (
-              <div className="mt-12 text-center">
-                <button
-                  onClick={loadMore}
-                  className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors"
-                >
-                  Load More Products
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </Section>
+        </Section>
+      </div>
     </Layout>
   );
 }
