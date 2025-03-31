@@ -50,9 +50,10 @@ const Header = () => {
   return (
     <>
       <header 
-        className="fixed w-full z-50 transition-all duration-300"
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          isScrolled ? "bg-white shadow-soft" : isHomePage ? "bg-transparent" : "bg-white"
+        }`}
         style={{ 
-          backgroundColor: isScrolled ? "white" : isHomePage ? "transparent" : "white",
           padding: isScrolled ? "0.5rem 0" : "1.25rem 0"
         }}
       >

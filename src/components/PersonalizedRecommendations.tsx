@@ -16,8 +16,8 @@ export function PersonalizedRecommendations() {
     const fetchRecommendations = async () => {
       try {
         // In a real app, you would have a personalized recommendations endpoint
-        // For now, we'll use the regular products endpoint
-        const response = await getProducts(1, 8);
+        // For now, we'll use the regular products endpoint with different filters to get different products
+        const response = await getProducts(3, 8, "date", "asc");
         setProducts(response.items);
       } catch (error) {
         console.error("Failed to fetch recommendations:", error);
@@ -44,7 +44,7 @@ export function PersonalizedRecommendations() {
   };
 
   return (
-    <section className="py-24 w-full bg-light">
+    <section className="py-24 w-full bg-gradient-to-b from-white to-light">
       <div className="container-wide">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-serif mb-2">Recommended For You</h2>

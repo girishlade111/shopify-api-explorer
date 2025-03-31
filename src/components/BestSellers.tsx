@@ -16,8 +16,8 @@ export function BestSellers() {
     const fetchBestSellers = async () => {
       try {
         // In a real app, you would have a dedicated endpoint for best sellers
-        // For now, we'll use the regular products endpoint and sort by popularity
-        const response = await getProducts(1, 8, "popularity", "desc");
+        // For now, we'll use the regular products endpoint with different filters to get different products
+        const response = await getProducts(2, 8, "price", "desc");
         setProducts(response.items);
       } catch (error) {
         console.error("Failed to fetch best sellers:", error);
@@ -44,7 +44,7 @@ export function BestSellers() {
   };
 
   return (
-    <section className="py-24 w-full">
+    <section className="py-24 w-full bg-neutral-50">
       <div className="container-wide">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-serif mb-2">Best Sellers</h2>

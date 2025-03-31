@@ -3,62 +3,79 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 export function BeautySection() {
-  const beautyCategories = [
-    {
-      name: "Skincare",
-      image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/GA_2025_EA-SWY-Parfum_Pack-with-Ingredients_1x1_RVB-4000",
-      link: "/all-products/beauty/skincare"
-    },
-    {
-      name: "Makeup",
-      image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720778517/hp_story_beauty_06_double",
-      link: "/all-products/beauty/makeup"
-    },
-    {
-      name: "Fragrance",
-      image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720537033/GA_2025_PA-MLG-Fragrance-PDP-EDP-New-Visuel-Flacon.jpg",
-      link: "/all-products/beauty/fragrance"
-    }
-  ];
-
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white overflow-hidden">
       <div className="container-wide">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-serif mb-3">Beauty</h2>
-            <p className="text-muted">Experience luxury skincare, makeup and fragrances</p>
+        <div className="flex flex-col md:flex-row items-center mb-16 relative">
+          <div className="md:w-1/2 mb-10 md:mb-0 md:pr-12">
+            <h2 className="text-4xl md:text-5xl font-serif mb-6">Beauty Collection</h2>
+            <p className="text-gray-600 mb-8 text-lg">Indulge in our luxurious beauty collection, meticulously formulated with the finest ingredients to enhance your natural radiance.</p>
+            <Link 
+              to="/all-products/beauty" 
+              className="inline-flex items-center bg-primary text-white px-8 py-3 uppercase text-sm tracking-wider hover:bg-transparent hover:text-primary transition-colors border border-primary"
+            >
+              Discover Beauty <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+          <div className="md:w-1/2 relative z-10">
+            <div className="relative overflow-hidden rounded-lg">
+              <img 
+                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/GA_2025_EA-SWY-Parfum_Pack-with-Ingredients_1x1_RVB-4000" 
+                alt="Beauty Collection" 
+                className="w-full h-auto transform transition-transform duration-700 hover:scale-105"
+              />
+            </div>
           </div>
           
-          <Link to="/all-products/beauty" className="mt-6 md:mt-0 flex items-center text-primary hover:underline font-medium">
-            View All Beauty <ArrowRight className="w-4 h-4 ml-2" />
-          </Link>
+          <div className="absolute -right-40 -bottom-40 w-96 h-96 bg-gradient-radial from-primary/10 to-transparent rounded-full z-0"></div>
+          <div className="absolute -left-40 -top-40 w-96 h-96 bg-gradient-radial from-primary/10 to-transparent rounded-full z-0"></div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {beautyCategories.map((category, index) => (
-            <Link 
-              key={index}
-              to={category.link}
-              className="group overflow-hidden block relative"
-            >
-              <div className="aspect-[3/4] overflow-hidden">
-                <img 
-                  src={category.image} 
-                  alt={category.name} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              </div>
-              
-              <div className="absolute bottom-0 left-0 p-6 w-full">
-                <h3 className="text-white text-2xl font-serif mb-2">{category.name}</h3>
-                <span className="inline-flex items-center text-white text-sm group-hover:underline">
-                  Explore Collection <ArrowRight className="w-4 h-4 ml-2" />
-                </span>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+          <div className="border border-gray-200 p-8 text-center hover:border-primary transition-colors group">
+            <div className="h-64 mb-6 overflow-hidden">
+              <img 
+                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720778517/hp_story_beauty_06_double" 
+                alt="Makeup" 
+                className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+            <h3 className="text-2xl font-serif mb-3">Makeup</h3>
+            <p className="text-gray-600 mb-6">Enhance your natural beauty with our premium makeup collection</p>
+            <Link to="/all-products/beauty/makeup" className="text-primary flex items-center justify-center font-medium group-hover:underline">
+              Shop Makeup <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-          ))}
+          </div>
+          
+          <div className="border border-gray-200 p-8 text-center hover:border-primary transition-colors group">
+            <div className="h-64 mb-6 overflow-hidden">
+              <img 
+                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/GA_2025_EA-SWY-Parfum_Pack-with-Ingredients_1x1_RVB-4000" 
+                alt="Skincare" 
+                className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+            <h3 className="text-2xl font-serif mb-3">Skincare</h3>
+            <p className="text-gray-600 mb-6">Luxurious skincare formulated with the finest ingredients</p>
+            <Link to="/all-products/beauty/skincare" className="text-primary flex items-center justify-center font-medium group-hover:underline">
+              Shop Skincare <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+          
+          <div className="border border-gray-200 p-8 text-center hover:border-primary transition-colors group">
+            <div className="h-64 mb-6 overflow-hidden">
+              <img 
+                src="https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720537033/GA_2025_PA-MLG-Fragrance-PDP-EDP-New-Visuel-Flacon.jpg" 
+                alt="Fragrance" 
+                className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+            <h3 className="text-2xl font-serif mb-3">Fragrance</h3>
+            <p className="text-gray-600 mb-6">Captivating scents that leave a lasting impression</p>
+            <Link to="/all-products/beauty/fragrance" className="text-primary flex items-center justify-center font-medium group-hover:underline">
+              Shop Fragrance <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
         </div>
       </div>
     </section>
