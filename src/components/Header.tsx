@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, User, Menu, X, Search, Sparkles, Heart } from "lucide-react";
@@ -15,9 +14,6 @@ const Header = () => {
   const { wishlist } = useWishlist();
   const { getCartCount } = useCart();
   
-  // Check if we're on the homepage
-  const isHomePage = location.pathname === "/";
-
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 60) {
@@ -29,7 +25,6 @@ const Header = () => {
 
     window.addEventListener("scroll", handleScroll);
     
-    // Initial check to set correct state
     handleScroll();
     
     return () => window.removeEventListener("scroll", handleScroll);
@@ -55,7 +50,7 @@ const Header = () => {
     <>
       <header 
         className={`fixed w-full z-50 transition-all duration-300 ${
-          isScrolled ? "bg-white shadow-soft" : isHomePage ? "bg-transparent" : "bg-white"
+          isScrolled ? "bg-white shadow-soft" : "bg-white"
         }`}
         style={{ 
           padding: isScrolled ? "0.5rem 0" : "1.25rem 0"
@@ -63,9 +58,8 @@ const Header = () => {
       >
         <div className="container-wide">
           <div className="flex items-center justify-between">
-            {/* Mobile Menu Button */}
             <button 
-              className={`lg:hidden ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
+              className="lg:hidden text-black"
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
@@ -76,33 +70,28 @@ const Header = () => {
               )}
             </button>
 
-            {/* Logo */}
             <div className="absolute left-1/2 transform -translate-x-1/2 lg:static lg:translate-x-0">
               <Link to="/" className="block">
-                <h1 className={`font-serif text-3xl md:text-4xl tracking-tight ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}>ATELIER</h1>
+                <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-black">ATELIER</h1>
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
             <nav className="hidden lg:flex space-x-8 items-center mx-auto">
               {mainCategories.map((category) => (
                 <Link 
                   key={category.name}
                   to={category.path}
-                  className={`nav-link text-sm uppercase tracking-wider font-medium ${
-                    isScrolled || !isHomePage ? "text-black" : "text-white"
-                  }`}
+                  className="nav-link text-sm uppercase tracking-wider font-medium text-black"
                 >
                   {category.name}
                 </Link>
               ))}
             </nav>
 
-            {/* Right side icons */}
             <div className="flex items-center space-x-4">
               <button 
                 aria-label="Search" 
-                className={isScrolled || !isHomePage ? "text-black" : "text-white"}
+                className="text-black"
                 onClick={() => setIsSearchOpen(true)}
               >
                 <Search className="w-5 h-5" />
@@ -111,14 +100,14 @@ const Header = () => {
               <Link 
                 to="/fitting-room" 
                 aria-label="AI Fitting Room" 
-                className={isScrolled || !isHomePage ? "text-black" : "text-white"}
+                className="text-black"
               >
                 <Sparkles className="w-5 h-5" />
               </Link>
 
               <Link 
                 to="/wishlist" 
-                className={`hidden md:block relative ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
+                className="hidden md:block relative text-black"
               >
                 <Heart className="w-5 h-5" />
                 {wishlistCount > 0 && (
@@ -130,14 +119,14 @@ const Header = () => {
 
               <Link 
                 to="/account" 
-                className={`hidden md:block ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
+                className="hidden md:block text-black"
               >
                 <User className="w-5 h-5" />
               </Link>
 
               <Link 
                 to="/cart" 
-                className={`relative ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
+                className="relative text-black"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -150,7 +139,6 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="lg:hidden bg-white absolute top-full left-0 w-full h-screen animate-fade-in">
             <div className="container-wide py-6">
@@ -185,7 +173,6 @@ const Header = () => {
         )}
       </header>
 
-      {/* Search Dialog */}
       <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <DialogContent className="sm:max-w-[600px] p-0">
           <div className="p-6">

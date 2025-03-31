@@ -16,15 +16,15 @@ const Index = () => {
       <Hero />
       <NewArrivals />
       <Separator className="max-w-screen-lg mx-auto" />
-      <BestSellers />
-      <Separator className="max-w-screen-lg mx-auto" />
-      <PersonalizedRecommendations />
-      <Separator className="max-w-screen-lg mx-auto" />
       <CategorySection />
       <Separator className="max-w-screen-lg mx-auto" />
       <MensSection />
       <Separator className="max-w-screen-lg mx-auto" />
       <WomensSection />
+      <Separator className="max-w-screen-lg mx-auto" />
+      <BestSellers />
+      <Separator className="max-w-screen-lg mx-auto" />
+      <PersonalizedRecommendations />
       <Separator className="max-w-screen-lg mx-auto" />
       <BeautySection />
       <Separator className="max-w-screen-lg mx-auto" />
