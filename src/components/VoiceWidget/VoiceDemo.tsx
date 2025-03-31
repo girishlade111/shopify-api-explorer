@@ -20,8 +20,9 @@ const MAX_CONNECTION_RETRIES = 3;
 
 export default function VoiceDemo() {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
-  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+  // Set microphone and speaker to true by default for voice mode
+  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
+  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [instructions, setInstructions] = useState<string>("");
   const [tools, setTools] = useState<any[]>([]);
@@ -32,15 +33,19 @@ export default function VoiceDemo() {
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load persisted settings on component mount, but don't auto-connect
+  // Load persisted settings on component mount, but don't override default settings
   useEffect(() => {
     const storedSettings = localStorage.getItem('voiceWidgetSettings');
     if (storedSettings) {
       try {
         const settings = JSON.parse(storedSettings);
-        // Don't auto-enable mic and speaker to avoid unexpected behavior
-        setIsTranscriptionEnabled(false);
-        setIsAudioEnabled(false);
+        // Only apply stored settings if they exist, otherwise use our defaults
+        if (settings.isTranscriptionEnabled !== undefined) {
+          setIsTranscriptionEnabled(settings.isTranscriptionEnabled);
+        }
+        if (settings.isAudioEnabled !== undefined) {
+          setIsAudioEnabled(settings.isAudioEnabled);
+        }
       } catch (e) {
         console.error('Error parsing stored voice widget settings:', e);
       }
