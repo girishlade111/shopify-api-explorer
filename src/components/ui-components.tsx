@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { AlertTriangle, Loader2 } from "lucide-react"; // Changed from ExclamationTriangleIcon to AlertTriangle
@@ -23,6 +24,7 @@ export function SectionHeader({
       {subtitle && <p className="text-muted text-lg">{subtitle}</p>}
     </div>;
 }
+
 interface SectionProps {
   children: ReactNode;
   className?: string;
@@ -39,6 +41,7 @@ export function Section({
       </div>
     </section>;
 }
+
 interface EmptyStateProps {
   title: string;
   description?: string;
@@ -62,6 +65,7 @@ export function EmptyState({
       {action}
     </div>;
 }
+
 interface ErrorStateProps {
   title: string;
   description?: string;
@@ -83,6 +87,7 @@ export function ErrorState({
       {action}
     </div>;
 }
+
 interface LoaderProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
@@ -103,6 +108,7 @@ export function Loader({
       {text && <p className="text-sm text-muted">{text}</p>}
     </div>;
 }
+
 interface DividerProps {
   className?: string;
   orientation?: 'horizontal' | 'vertical';
@@ -126,6 +132,7 @@ export function Divider({
         </span>}
     </div>;
 }
+
 interface BadgeProps {
   children: ReactNode;
   variant?: 'default' | 'primary' | 'outline' | 'secondary';

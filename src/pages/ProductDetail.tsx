@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -66,7 +65,6 @@ export default function ProductDetail() {
   const shareProduct = () => {
     if (!product) return;
     
-    // This is a placeholder for share functionality
     navigator.clipboard.writeText(window.location.href)
       .then(() => {
         alert("Link copied to clipboard");
