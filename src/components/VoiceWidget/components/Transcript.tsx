@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Mic } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
 
 interface TranscriptProps {
@@ -108,7 +108,7 @@ function Transcript({
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
-              <Mic size={20} />
+              <Send size={20} />
             </button>
           </div>
         </div>
