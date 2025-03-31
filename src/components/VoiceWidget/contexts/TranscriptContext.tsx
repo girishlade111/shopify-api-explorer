@@ -1,9 +1,16 @@
-
 import React, { createContext, useContext, useState, useRef } from "react";
 import { TranscriptItem } from "../types";
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+  timestamp?: string;
+}
+
 interface TranscriptContextType {
   transcriptItems: TranscriptItem[];
+  messages: Message[];
+  addMessage: (message: Message) => void;
   addTranscriptMessage: (
     itemId: string,
     role: "user" | "assistant",
@@ -26,6 +33,8 @@ interface TranscriptContextType {
 
 const TranscriptContext = createContext<TranscriptContextType>({
   transcriptItems: [],
+  messages: [],
+  addMessage: () => {},
   addTranscriptMessage: () => {},
   addTranscriptBreadcrumb: () => {},
   updateTranscriptMessage: () => {},
@@ -38,8 +47,12 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [transcriptItems, setTranscriptItems] = useState<TranscriptItem[]>([]);
-  // Add a counter for breadcrumbs to ensure unique IDs
+  const [messages, setMessages] = useState<Message[]>([]);
   const breadcrumbCounter = useRef<number>(0);
+
+  const addMessage = (message: Message) => {
+    setMessages(prevMessages => [...prevMessages, message]);
+  };
 
   const addTranscriptMessage = (
     itemId: string,
@@ -54,7 +67,6 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     setTranscriptItems((prevItems) => {
-      // Check if the item already exists to avoid duplicates
       if (prevItems.some((item) => item.itemId === itemId)) {
         return prevItems;
       }
@@ -79,7 +91,6 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     title: string,
     data?: Record<string, any>
   ) => {
-    // Use a combination of a counter, timestamp, and a random string to ensure uniqueness
     const uniqueCounter = breadcrumbCounter.current++;
     const randomSuffix = Math.random().toString(36).substring(2, 8);
     const itemId = `breadcrumb-${uniqueCounter}-${Date.now()}-${randomSuffix}`;
@@ -175,6 +186,8 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     <TranscriptContext.Provider
       value={{
         transcriptItems,
+        messages,
+        addMessage,
         addTranscriptMessage,
         addTranscriptBreadcrumb,
         updateTranscriptMessage,

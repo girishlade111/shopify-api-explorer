@@ -1,8 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { useHandleServerEvent } from './hooks/useHandleServerEvent';
-import { useTranscript } from './contexts/TranscriptContext';
+import React, { useState, useEffect, useRef } from 'react';
 import { connectToServer, disconnectFromServer, toggleMic, toggleSpeaker } from './lib/realtimeConnection';
+import { useTranscript } from './contexts/TranscriptContext';
+import { useHandleServerEvent } from './hooks/useHandleServerEvent';
+import { ServerEvent } from './types';
 import ModeSelection from './components/ModeSelection';
 import VoiceMode from './components/VoiceMode';
 import TextMode from './components/TextMode';
@@ -16,7 +17,17 @@ const VoiceWidgetController: React.FC = () => {
   const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
   
   const { messages, addMessage } = useTranscript();
-  const { handleServerEvent } = useHandleServerEvent();
+  
+  // Setup for handling server events
+  const [sessionStatus, setSessionStatus] = useState('DISCONNECTED');
+  const sendClientEvent = (eventObj: any, eventNameSuffix?: string) => {
+    console.log("Sending client event:", eventObj, eventNameSuffix);
+  };
+  
+  const handleServerEventRef = useHandleServerEvent({
+    setSessionStatus: setSessionStatus,
+    sendClientEvent: sendClientEvent
+  });
   
   useEffect(() => {
     // Disconnect when component unmounts or mode changes
@@ -29,7 +40,9 @@ const VoiceWidgetController: React.FC = () => {
 
   const handleConnect = async () => {
     try {
-      await connectToServer(handleServerEvent);
+      await connectToServer((event: ServerEvent) => {
+        handleServerEventRef.current(event);
+      });
       setIsConnected(true);
       console.log('Connected to server');
     } catch (error) {
@@ -74,6 +87,15 @@ const VoiceWidgetController: React.FC = () => {
         content: message,
         timestamp: new Date().toLocaleTimeString(),
       });
+      
+      // Simulate a response after a short delay
+      setTimeout(() => {
+        addMessage({
+          role: 'assistant',
+          content: `I received your message: "${message}"`,
+          timestamp: new Date().toLocaleTimeString(),
+        });
+      }, 1000);
     }
   };
 
