@@ -67,7 +67,7 @@ function Transcript({ userText, setUserText, onSendMessage, canSend, showTextInp
                   : 'bg-gray-200 text-gray-800 rounded-bl-none'
               }`}
             >
-              <p className="whitespace-pre-wrap">{item.text}</p>
+              <p className="whitespace-pre-wrap">{item.title}</p>
             </div>
           </div>
         ))}
