@@ -174,17 +174,15 @@ function Transcript({
               placeholder="Talk to Atelier here"
             />
             {canSend && (
-              <div className="flex items-center gap-x-4">
-                <button
-                  onClick={onSendMessage}
-                  disabled={!userText.trim()}
-                  className={`p-1 transition-colors ${
-                    userText.trim() ? "text-[#16161D]" : "text-[#4B4B4B]"
-                  }`}
-                >
-                  <ArrowRight className="w-6 h-6" />
-                </button>
-              </div>
+              <button
+                onClick={onSendMessage}
+                disabled={!userText.trim()}
+                className={`p-1 transition-colors ${
+                  userText.trim() ? "text-[#16161D]" : "text-[#4B4B4B]"
+                }`}
+              >
+                <ArrowRight className="w-6 h-6" />
+              </button>
             )}
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
@@ -106,6 +105,38 @@ const VoiceWidgetController: React.FC = () => {
     };
   }, []);
 
+  // Setup data channel event listeners
+  useEffect(() => {
+    if (dcRef.current && dcRef.current.readyState === 'open') {
+      // Setup message handler
+      const handleDataChannelMessage = (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          // Handle text messages from assistant
+          if (data.type === 'text') {
+            addMessage({
+              role: 'assistant',
+              content: data.text || '',
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing data channel message:', error);
+        }
+      };
+      
+      dcRef.current.onmessage = handleDataChannelMessage;
+      
+      // Clean up on unmount
+      return () => {
+        if (dcRef.current) {
+          dcRef.current.onmessage = null;
+        }
+      };
+    }
+  }, [dcRef.current]);
+
   const cleanupResources = () => {
     // Clean up RTCPeerConnection
     cleanupConnection(pcRef.current);
@@ -191,6 +222,25 @@ const VoiceWidgetController: React.FC = () => {
 
           pcRef.current = pc;
           dcRef.current = dc;
+          
+          // Set up data channel message handler
+          if (dc && dc.readyState === 'open') {
+            dc.onmessage = (event) => {
+              try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'text') {
+                  addMessage({
+                    role: 'assistant',
+                    content: data.text || '',
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  });
+                }
+              } catch (error) {
+                console.error('Error parsing data channel message:', error);
+              }
+            };
+          }
+
           setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
@@ -295,17 +345,26 @@ const VoiceWidgetController: React.FC = () => {
             type: 'text',
             text: message,
           }));
+          console.log('Message sent through data channel:', message);
         } catch (error) {
           console.error('Error sending message:', error);
+          // Fallback if sending fails
+          setTimeout(() => {
+            addMessage({
+              role: 'assistant',
+              content: "I'm sorry, there was an error sending your message. Please try disconnecting and connecting again.",
+            });
+          }, 500);
         }
       } else {
+        console.warn('Data channel not ready:', dcRef.current?.readyState);
         // Fallback if data channel isn't available
         setTimeout(() => {
           addMessage({
             role: 'assistant',
-            content: `I received your message: "${message}", but the connection isn't fully established.`,
+            content: "I'm sorry, the connection isn't fully established. Please try disconnecting and connecting again.",
           });
-        }, 1000);
+        }, 500);
       }
     }
   };
