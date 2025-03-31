@@ -51,7 +51,7 @@ const Header = () => {
       <header 
         className="fixed w-full z-50 transition-all duration-300"
         style={{ 
-          backgroundColor: isScrolled ? "white" : "transparent",
+          backgroundColor: isScrolled ? "white" : isHomePage ? "transparent" : "white",
           padding: isScrolled ? "0.5rem 0" : "1.25rem 0"
         }}
       >
@@ -59,7 +59,7 @@ const Header = () => {
           <div className="flex items-center justify-between">
             {/* Mobile Menu Button */}
             <button 
-              className={`lg:hidden ${isScrolled ? "text-black" : "text-white"}`}
+              className={`lg:hidden ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
@@ -73,7 +73,7 @@ const Header = () => {
             {/* Logo */}
             <div className="absolute left-1/2 transform -translate-x-1/2 lg:static lg:translate-x-0">
               <Link to="/" className="block">
-                <h1 className={`font-serif text-3xl md:text-4xl tracking-tight ${isScrolled ? "text-black" : "text-white"}`}>ATELIER</h1>
+                <h1 className={`font-serif text-3xl md:text-4xl tracking-tight ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}>ATELIER</h1>
               </Link>
             </div>
 
@@ -84,7 +84,7 @@ const Header = () => {
                   key={category.name}
                   to={category.path}
                   className={`nav-link text-sm uppercase tracking-wider font-medium ${
-                    isScrolled ? "text-black" : "text-white"
+                    isScrolled || !isHomePage ? "text-black" : "text-white"
                   }`}
                 >
                   {category.name}
@@ -96,7 +96,7 @@ const Header = () => {
             <div className="flex items-center space-x-4">
               <button 
                 aria-label="Search" 
-                className={isScrolled ? "text-black" : "text-white"}
+                className={isScrolled || !isHomePage ? "text-black" : "text-white"}
                 onClick={() => setIsSearchOpen(true)}
               >
                 <Search className="w-5 h-5" />
@@ -105,14 +105,14 @@ const Header = () => {
               <Link 
                 to="/fitting-room" 
                 aria-label="AI Fitting Room" 
-                className={isScrolled ? "text-black" : "text-white"}
+                className={isScrolled || !isHomePage ? "text-black" : "text-white"}
               >
                 <Sparkles className="w-5 h-5" />
               </Link>
 
               <Link 
                 to="/wishlist" 
-                className={`hidden md:block relative ${isScrolled ? "text-black" : "text-white"}`}
+                className={`hidden md:block relative ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
               >
                 <Heart className="w-5 h-5" />
                 {wishlistCount > 0 && (
@@ -124,14 +124,14 @@ const Header = () => {
 
               <Link 
                 to="/account" 
-                className={`hidden md:block ${isScrolled ? "text-black" : "text-white"}`}
+                className={`hidden md:block ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
               >
                 <User className="w-5 h-5" />
               </Link>
 
               <Link 
                 to="/cart" 
-                className={`relative ${isScrolled ? "text-black" : "text-white"}`}
+                className={`relative ${isScrolled || !isHomePage ? "text-black" : "text-white"}`}
               >
                 <ShoppingBag className="w-5 h-5" />
                 {cartCount > 0 && (
