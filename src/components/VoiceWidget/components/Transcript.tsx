@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Mic } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
 
 interface TranscriptProps {
@@ -8,17 +8,17 @@ interface TranscriptProps {
   setUserText: (text: string) => void;
   onSendMessage: () => void;
   canSend: boolean;
-  showTextInput?: boolean;
-  isVoiceMode?: boolean;
+  showTextInput?: boolean; // Controls visibility of the text input
+  isVoiceMode?: boolean; // Controls if we're in voice-only mode
 }
 
-function Transcript({
-  userText,
-  setUserText,
-  onSendMessage,
-  canSend,
+function Transcript({ 
+  userText, 
+  setUserText, 
+  onSendMessage, 
+  canSend, 
   showTextInput = true,
-  isVoiceMode = false
+  isVoiceMode = false 
 }: TranscriptProps) {
   const { transcriptItems } = useTranscript();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -28,9 +28,23 @@ function Transcript({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const resizeTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(
+        textareaRef.current.scrollHeight,
+        200
+      )}px`;
+    }
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [transcriptItems]);
+
+  useEffect(() => {
+    resizeTextarea();
+  }, [userText]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -48,69 +62,68 @@ function Transcript({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-        {transcriptItems.length === 0 ? (
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-full bg-[#5ac8fa]"></div>
-            </div>
-            <div className="bg-gray-100 rounded-2xl p-3 max-w-[80%]">
-              <p className="text-gray-800">
-                Hello! I am Enzo, your AI Agent to help you shop.
-              </p>
-            </div>
-          </div>
-        ) : (
-          transcriptItems.map((item) => (
+      <div className="flex-1 overflow-y-auto p-4 pb-0 space-y-4">
+        {transcriptItems.map((item) => (
+          <div
+            key={item.itemId}
+            className={`flex ${
+              item.role === 'user' ? 'justify-end' : 'justify-start'
+            }`}
+          >
             <div
-              key={item.itemId}
-              className={`flex ${
-                item.role === 'user' ? 'justify-end' : 'items-start space-x-3'
+              className={`max-w-[80%] p-3 rounded-lg ${
+                item.role === 'user'
+                  ? 'bg-[#5856d6] text-white rounded-br-none'
+                  : 'bg-gray-200 text-gray-800 rounded-bl-none'
               }`}
             >
-              {item.role === 'assistant' && (
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-[#5ac8fa]"></div>
-                </div>
-              )}
-              <div
-                className={`p-3 rounded-2xl ${
-                  item.role === 'user'
-                    ? 'bg-[#5ac8fa] text-white'
-                    : 'bg-gray-100 text-gray-800'
-                } max-w-[80%]`}
-              >
-                <p className="whitespace-pre-wrap">{item.title}</p>
-              </div>
+              <p className="whitespace-pre-wrap">{item.title}</p>
             </div>
-          ))
+          </div>
+        ))}
+        {transcriptItems.length === 0 && (
+          <div className="h-full flex items-center justify-center opacity-60">
+            <p className="text-center text-gray-500">
+              {showTextInput 
+                ? "Send a message to start chatting with Atelier"
+                : "Use the microphone to start talking with Atelier"}
+            </p>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {showTextInput && (
-        <div className="px-4 py-3 border-t bg-[#f8f8f8]">
-          <div className="relative flex items-center">
-            <input
+        <div className="px-4 py-3 border-t">
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
               value={userText}
               onChange={(e) => setUserText(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type your message here..."
-              className="w-full p-3 pr-12 border rounded-full bg-[#f1f1f1] focus:outline-none focus:ring-2 focus:ring-[#5ac8fa] focus:border-transparent"
+              placeholder="Type your message..."
+              className="w-full p-3 pr-12 border rounded-full resize-none focus:outline-none focus:ring-2 focus:ring-[#5856d6] focus:border-transparent"
+              rows={1}
               disabled={!canSend}
             />
             <button
               onClick={onSendMessage}
               disabled={!canSend || !userText.trim()}
-              className={`absolute right-2 p-2 rounded-full ${
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${
                 canSend && userText.trim()
-                  ? 'bg-[#5ac8fa] text-white'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'text-[#5856d6] hover:bg-gray-100'
+                  : 'text-gray-300 cursor-not-allowed'
               }`}
             >
-              <Mic size={20} />
+              <Send size={20} />
             </button>
           </div>
+        </div>
+      )}
+
+      {!showTextInput && !isVoiceMode && (
+        <div className="p-4 border-t bg-gray-50 text-center">
+          <p className="text-gray-500">Talk to Atelier here</p>
         </div>
       )}
     </div>
