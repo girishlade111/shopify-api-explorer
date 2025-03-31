@@ -2,6 +2,7 @@
 import { useLocation } from "react-router-dom";
 import { CategoryHero } from "./CategoryHero";
 import { CategoryFeatures } from "./CategoryFeatures";
+import { CategorySubNav } from "./CategorySubNav";
 
 export function CategoryPageEnhancement() {
   const location = useLocation();
@@ -37,6 +38,16 @@ export function CategoryPageEnhancement() {
             image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720778487/2025_SS_GALLERY_MENS_14",
             link: "/all-products/men/accessories"
           }
+        ],
+        subNav: [
+          { name: "All Categories", path: "/all-products/men" },
+          { name: "Tops and T-shirts", path: "/all-products/men/tops-tshirts" },
+          { name: "Coats and Jackets", path: "/all-products/men/coats-jackets" },
+          { name: "Trainers and Sweats", path: "/all-products/men/trainers-sweats" },
+          { name: "Jeans", path: "/all-products/men/jeans" },
+          { name: "Swimwear", path: "/all-products/men/swimwear" },
+          { name: "Technology", path: "/all-products/men/technology" },
+          { name: "Shoes", path: "/all-products/men/shoes" }
         ]
       };
     } else if (path.includes("/women")) {
@@ -67,6 +78,19 @@ export function CategoryPageEnhancement() {
             image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1736688632/2025_SS_GALLERY_WOMENS_21.jpg",
             link: "/all-products/women/accessories"
           }
+        ],
+        subNav: [
+          { name: "All", path: "/all-products/women" },
+          { name: "New In", path: "/all-products/women/new-in" },
+          { name: "Dresses", path: "/all-products/women/dresses" },
+          { name: "Coats & Jackets", path: "/all-products/women/coats-jackets" },
+          { name: "Denim", path: "/all-products/women/denim" },
+          { name: "Bags", path: "/all-products/women/bags" },
+          { name: "Sportswear", path: "/all-products/women/sportswear" },
+          { name: "Knitwear", path: "/all-products/women/knitwear" },
+          { name: "Jewelry", path: "/all-products/women/jewelry" },
+          { name: "Tops", path: "/all-products/women/tops" },
+          { name: "Shoes", path: "/all-products/women/shoes" }
         ]
       };
     } else if (path.includes("/beauty")) {
@@ -97,6 +121,15 @@ export function CategoryPageEnhancement() {
             image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/v1720537033/GA_2025_PA-MLG-Fragrance-PDP-EDP-New-Visuel-Flacon.jpg",
             link: "/all-products/beauty/fragrance"
           }
+        ],
+        subNav: [
+          { name: "All Categories", path: "/all-products/beauty" },
+          { name: "Skincare", path: "/all-products/beauty/skincare" },
+          { name: "Makeup", path: "/all-products/beauty/makeup" },
+          { name: "Fragrance", path: "/all-products/beauty/fragrance" },
+          { name: "Haircare", path: "/all-products/beauty/haircare" },
+          { name: "Body Care", path: "/all-products/beauty/body-care" },
+          { name: "Home Fragrances", path: "/all-products/beauty/home-fragrances" }
         ]
       };
     } else if (path.includes("/food")) {
@@ -127,6 +160,14 @@ export function CategoryPageEnhancement() {
             image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/Armani-Dolci-Ramadan-02",
             link: "/all-products/food/gifts"
           }
+        ],
+        subNav: [
+          { name: "All Products", path: "/all-products/food" },
+          { name: "Bakery", path: "/all-products/food/bakery" },
+          { name: "Cheese & Dairy", path: "/all-products/food/cheese-dairy" },
+          { name: "Pantry", path: "/all-products/food/pantry" },
+          { name: "Fruits & Vegetables", path: "/all-products/food/fruits-vegetables" },
+          { name: "Wines & Spirits", path: "/all-products/food/wines-spirits" }
         ]
       };
     }
@@ -141,6 +182,25 @@ export function CategoryPageEnhancement() {
     return null;
   }
   
+  // Extract the current subcategory from the path if any
+  const getCurrentSubcategory = () => {
+    if (!categoryContent.subNav) return undefined;
+    
+    const pathSegments = path.split('/');
+    if (pathSegments.length <= 3) {
+      // We're at the main category level, so highlight "All"
+      return categoryContent.subNav[0].name;
+    }
+    
+    const subCategorySlug = pathSegments[3];
+    const matchingSubNav = categoryContent.subNav.find(item => {
+      const itemSlug = item.path.split('/').pop();
+      return itemSlug === subCategorySlug;
+    });
+    
+    return matchingSubNav?.name;
+  };
+  
   return (
     <>
       <CategoryHero 
@@ -150,6 +210,13 @@ export function CategoryPageEnhancement() {
         ctaText={categoryContent.hero.ctaText}
         ctaLink={categoryContent.hero.ctaLink}
       />
+      {categoryContent.subNav && (
+        <CategorySubNav 
+          categories={categoryContent.subNav} 
+          currentCategory={getCurrentSubcategory()}
+          className="mb-6"
+        />
+      )}
       <CategoryFeatures features={categoryContent.features} className="mb-12" />
     </>
   );

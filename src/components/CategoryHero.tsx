@@ -20,7 +20,7 @@ export function CategoryHero({
   className
 }: CategoryHeroProps) {
   return (
-    <div className={`relative w-full h-[400px] md:h-[500px] overflow-hidden ${className}`}>
+    <div className={`relative w-full h-[500px] md:h-[600px] overflow-hidden ${className}`}>
       <img 
         src={image} 
         alt={title} 
