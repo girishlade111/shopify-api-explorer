@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from "react";
 import { LoggedEvent, ServerEvent } from "../types";
 
@@ -10,6 +9,7 @@ interface EventContextType {
   ) => void;
   logServerEvent: (eventData: ServerEvent) => void;
   toggleExpand: (id: number) => void;
+  resetEvents: () => void;
 }
 
 const EventContext = createContext<EventContextType>({
@@ -17,6 +17,7 @@ const EventContext = createContext<EventContextType>({
   logClientEvent: () => {},
   logServerEvent: () => {},
   toggleExpand: () => {},
+  resetEvents: () => {},
 });
 
 export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -81,6 +82,11 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
+  const resetEvents = () => {
+    setLoggedEvents([]);
+    setNextId(1);
+  };
+
   return (
     <EventContext.Provider
       value={{
@@ -88,6 +94,7 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
         logClientEvent,
         logServerEvent,
         toggleExpand,
+        resetEvents,
       }}
     >
       {children}

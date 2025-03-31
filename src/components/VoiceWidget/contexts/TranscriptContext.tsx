@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useRef } from "react";
 import { TranscriptItem } from "../types";
 
@@ -22,6 +21,7 @@ interface TranscriptContextType {
   ) => void;
   hideTranscriptItem: (itemId: string) => void;
   toggleTranscriptItemExpand: (itemId: string) => void;
+  resetTranscript: () => void;
 }
 
 const TranscriptContext = createContext<TranscriptContextType>({
@@ -32,13 +32,13 @@ const TranscriptContext = createContext<TranscriptContextType>({
   updateTranscriptItemStatus: () => {},
   hideTranscriptItem: () => {},
   toggleTranscriptItemExpand: () => {},
+  resetTranscript: () => {},
 });
 
 export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [transcriptItems, setTranscriptItems] = useState<TranscriptItem[]>([]);
-  // Add a counter for breadcrumbs to ensure unique IDs
   const breadcrumbCounter = useRef<number>(0);
 
   const addTranscriptMessage = (
@@ -54,7 +54,6 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     setTranscriptItems((prevItems) => {
-      // Check if the item already exists to avoid duplicates
       if (prevItems.some((item) => item.itemId === itemId)) {
         return prevItems;
       }
@@ -79,7 +78,6 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     title: string,
     data?: Record<string, any>
   ) => {
-    // Use a combination of a counter, timestamp, and a random string to ensure uniqueness
     const uniqueCounter = breadcrumbCounter.current++;
     const randomSuffix = Math.random().toString(36).substring(2, 8);
     const itemId = `breadcrumb-${uniqueCounter}-${Date.now()}-${randomSuffix}`;
@@ -171,6 +169,11 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
+  const resetTranscript = () => {
+    setTranscriptItems([]);
+    breadcrumbCounter.current = 0;
+  };
+
   return (
     <TranscriptContext.Provider
       value={{
@@ -181,6 +184,7 @@ export const TranscriptProvider: React.FC<{ children: React.ReactNode }> = ({
         updateTranscriptItemStatus,
         hideTranscriptItem,
         toggleTranscriptItemExpand,
+        resetTranscript,
       }}
     >
       {children}
