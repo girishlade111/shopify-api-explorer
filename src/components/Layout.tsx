@@ -1,5 +1,6 @@
 
-import { Outlet, ReactNode } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { ReactNode } from "react";
 
 interface LayoutProps {
   children?: ReactNode;
