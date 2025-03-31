@@ -23,7 +23,7 @@ const ServicesPage = () => {
   const services = [
     {
       id: "restaurants",
-      title: "Armani Restaurants",
+      title: "Atelier Restaurants",
       description: "Experience culinary excellence in an atmosphere of unparalleled elegance.",
       image: "https://assets.armani.com/image/upload/v1728401835/ARMANI_RESTAURANT_FALL_WINTER_2024.jpg",
       features: [
@@ -36,21 +36,21 @@ const ServicesPage = () => {
     },
     {
       id: "hotels",
-      title: "Armani Hotels",
-      description: "Immerse yourself in the world of Armani with our luxury accommodation.",
+      title: "Atelier Hotels",
+      description: "Immerse yourself in the world of luxury with our exclusive accommodation.",
       image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/Armani-Hotel-Balcony",
       features: [
-        "Rooms and suites designed by Giorgio Armani",
-        "Signature Armani amenities",
-        "Armani/SPA wellness experiences",
+        "Rooms and suites designed by master artisans",
+        "Signature amenities",
+        "Wellness experiences",
         "Distinguished locations in Dubai and Milan",
         "Personalized lifestyle manager service"
       ]
     },
     {
       id: "fiori",
-      title: "Armani Fiori",
-      description: "Elegant floral arrangements that embody the Armani aesthetic.",
+      title: "Atelier Fiori",
+      description: "Elegant floral arrangements that embody our aesthetic.",
       image: "https://assets.armani.com/image/upload/v1727108228/Armani_Fiori_Floral_Collections_038.jpg",
       features: [
         "Bespoke floral arrangements",
@@ -75,8 +75,8 @@ const ServicesPage = () => {
     },
     {
       id: "dolci",
-      title: "Armani Dolci",
-      description: "Indulge in sweet creations from the Armani universe.",
+      title: "Atelier Dolci",
+      description: "Indulge in sweet creations from our artisanal kitchens.",
       image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/Armani-Dolci-Ramadan-01",
       features: [
         "Handcrafted pralines and chocolates",
@@ -88,7 +88,7 @@ const ServicesPage = () => {
     },
     {
       id: "clubs",
-      title: "Armani Privé Clubs",
+      title: "Atelier Privé Clubs",
       description: "Experience exclusive nightlife in the world's most vibrant cities.",
       image: "https://assets.armani.com/image/upload/f_auto,q_auto,ar_4:5,w_768,c_lfill/Armani_Clubs_2555x1437",
       features: [
@@ -104,8 +104,8 @@ const ServicesPage = () => {
   return (
     <div>
       <CategoryHero 
-        title="Armani Lifestyle Services"
-        description="Beyond fashion, experience the complete Armani lifestyle with our exclusive offerings"
+        title="Atelier Lifestyle Services"
+        description="Beyond fashion, experience the complete luxury lifestyle with our exclusive offerings"
         image="https://assets.armani.com/image/upload/f_auto,q_auto,ar_16:9,w_1920,c_lfill/Armani-Hotel-Dubai-Exterior"
         ctaText="Explore Services"
         ctaLink="#restaurants"
@@ -122,8 +122,8 @@ const ServicesPage = () => {
           <div className="max-w-4xl mx-auto mb-16 text-center">
             <h2 className="text-4xl md:text-5xl font-serif mb-6">Exclusive Lifestyle Experiences</h2>
             <p className="text-lg text-muted">
-              Beyond fashion, Armani extends its philosophy of elegance and sophistication to a complete lifestyle experience.
-              Discover our exclusive services that embody the Armani vision of luxury living.
+              Beyond fashion, we extend our philosophy of elegance and sophistication to a complete lifestyle experience.
+              Discover our exclusive services that embody our vision of luxury living.
             </p>
           </div>
 
@@ -169,7 +169,7 @@ const ServicesPage = () => {
           </div>
           
           <div className="mt-20 py-16 bg-light text-center">
-            <h2 className="text-3xl font-serif mb-6">Experience Armani Excellence</h2>
+            <h2 className="text-3xl font-serif mb-6">Experience Atelier Excellence</h2>
             <p className="text-lg text-muted max-w-3xl mx-auto mb-10">
               To book any of our exclusive services or for more information, please contact our dedicated concierge team.
             </p>
