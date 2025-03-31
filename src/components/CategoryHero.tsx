@@ -27,7 +27,7 @@ export function CategoryHero({
         className="w-full h-full object-cover"
       />
       
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent flex items-center justify-center">
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent flex items-center justify-center">
         <div className="container-wide text-center">
           <div className="max-w-2xl mx-auto">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4">{title}</h1>
