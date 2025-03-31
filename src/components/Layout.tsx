@@ -2,5 +2,9 @@
 import { Outlet } from "react-router-dom";
 
 export function Layout() {
-  return <Outlet />;
+  return (
+    <main className="pt-20">
+      <Outlet />
+    </main>
+  );
 }

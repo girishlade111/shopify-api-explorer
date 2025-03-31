@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
 import { Layout } from '@/components/Layout';
+import Header from '@/components/Header';
 import Index from '@/pages/Index';
 import ProductDetail from '@/pages/ProductDetail';
 import SearchResults from '@/pages/SearchResults';
@@ -24,7 +25,7 @@ import { WishlistProvider } from '@/contexts/WishlistContext';
 import { FittingRoomProvider } from '@/contexts/FittingRoomContext';
 
 import { ScrollToTop } from '@/components/ScrollToTop';
-import CopilotDemoApp from '@/components/VoiceWidget/CopilotDemoApp';
+import VoiceWidget from '@/components/VoiceWidget';
 
 import './App.css';
 
@@ -40,6 +41,7 @@ function App() {
               <UserActivityProvider>
                 <ScrollToTop />
                 <Toaster position="top-right" richColors />
+                <Header />
                 <Routes>
                   <Route element={<Layout />}>
                     <Route index element={<Index />} />
@@ -56,7 +58,7 @@ function App() {
                     <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>
-                <CopilotDemoApp />
+                <VoiceWidget />
               </UserActivityProvider>
             </FittingRoomProvider>
           </WishlistProvider>

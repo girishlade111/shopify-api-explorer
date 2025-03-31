@@ -1,7 +1,5 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Layout } from "@/components/Layout";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CategoryNav } from "@/components/CategoryNav";
 import { Section, EmptyState } from "@/components/ui-components";
@@ -90,128 +88,122 @@ export default function SearchResults() {
   };
 
   return (
-    <Layout>
-      <Section>
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex-1 max-w-2xl">
-            <h1 className="text-3xl md:text-4xl font-semibold mb-4">
-              Search Results
-            </h1>
-            <SearchBar
-              placeholder="Refine your search..."
-              autoFocus={false}
-              className="w-full"
-            />
-          </div>
-          
-          <button
-            onClick={() => setShowFilterSidebar(!showFilterSidebar)}
-            className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            Filters
-          </button>
+    <Section>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex-1 max-w-2xl">
+          <h1 className="text-3xl md:text-4xl font-semibold mb-4">
+            Search Results
+          </h1>
+          <SearchBar
+            placeholder="Refine your search..."
+            autoFocus={false}
+            className="w-full"
+          />
         </div>
         
-        {searchQuery && (
-          <div className="mb-8">
-            <div className="text-lg">
-              Showing results for <span className="font-semibold">"{searchQuery}"</span>
-            </div>
-            
-            {categoryFilter && (
-              <div className="mt-2 flex">
-                <div className="bg-accent rounded-full px-3 py-1 text-sm inline-flex items-center">
-                  Category: {categoryFilter.replace(/-/g, " ")}
-                  <button
-                    onClick={clearCategoryFilter}
-                    className="ml-2 hover:text-primary"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          {/* Sidebar - shown by default on desktop, toggleable on mobile */}
-          <div 
-            className={cn(
-              "md:col-span-3",
-              showFilterSidebar 
-                ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" 
-                : "hidden md:block"
-            )}
-          >
-            {showFilterSidebar && (
-              <div className="flex items-center justify-between mb-6 md:hidden">
-                <h2 className="text-xl font-semibold">Filters</h2>
-                <button 
-                  onClick={() => setShowFilterSidebar(false)}
-                  className="p-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-              </div>
-            )}
-            
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Categories</h3>
-                <CategoryNav 
-                  activeCategory={categoryFilter}
-                  onCategoryClick={handleCategoryClick}
-                />
-              </div>
-              
-              {showFilterSidebar && (
-                <div className="md:hidden mt-6">
-                  <button
-                    onClick={() => setShowFilterSidebar(false)}
-                    className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    Apply Filters
-                  </button>
-                </div>
-              )}
-            </div>
+        <button
+          onClick={() => setShowFilterSidebar(!showFilterSidebar)}
+          className="md:hidden flex items-center gap-2 bg-accent px-4 py-2 rounded-md"
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          Filters
+        </button>
+      </div>
+      
+      {searchQuery && (
+        <div className="mb-8">
+          <div className="text-lg">
+            Showing results for <span className="font-semibold">"{searchQuery}"</span>
           </div>
           
-          {/* Main Content */}
-          <div className="md:col-span-9">
-            {/* Products count */}
-            {!loading && !error && products.length > 0 && (
-              <div className="text-sm text-muted mb-6">
-                Showing {products.length} of {totalProducts} products
-              </div>
-            )}
-            
-            <ProductGrid
-              products={products}
-              loading={loading}
-              error={error}
-              onRetry={() => fetchSearchResults()}
-              emptyTitle={`No results found for "${searchQuery}"`}
-              emptyDescription="Try checking your spelling or using more general terms."
-              cols={3}
-            />
-            
-            {/* Load More Button */}
-            {!loading && !error && products.length > 0 && currentPage < totalPages && (
-              <div className="mt-12 text-center">
+          {categoryFilter && (
+            <div className="mt-2 flex">
+              <div className="bg-accent rounded-full px-3 py-1 text-sm inline-flex items-center">
+                Category: {categoryFilter.replace(/-/g, " ")}
                 <button
-                  onClick={loadMore}
-                  className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors"
+                  onClick={clearCategoryFilter}
+                  className="ml-2 hover:text-primary"
                 >
-                  Load More Results
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div 
+          className={cn(
+            "md:col-span-3",
+            showFilterSidebar 
+              ? "fixed inset-0 z-50 bg-white md:static md:bg-transparent md:z-auto p-6 md:p-0 overflow-auto" 
+              : "hidden md:block"
+          )}
+        >
+          {showFilterSidebar && (
+            <div className="flex items-center justify-between mb-6 md:hidden">
+              <h2 className="text-xl font-semibold">Filters</h2>
+              <button 
+                onClick={() => setShowFilterSidebar(false)}
+                className="p-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          )}
+          
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Categories</h3>
+              <CategoryNav 
+                activeCategory={categoryFilter}
+                onCategoryClick={handleCategoryClick}
+              />
+            </div>
+            
+            {showFilterSidebar && (
+              <div className="md:hidden mt-6">
+                <button
+                  onClick={() => setShowFilterSidebar(false)}
+                  className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Apply Filters
                 </button>
               </div>
             )}
           </div>
         </div>
-      </Section>
-    </Layout>
+        
+        <div className="md:col-span-9">
+          {!loading && !error && products.length > 0 && (
+            <div className="text-sm text-muted mb-6">
+              Showing {products.length} of {totalProducts} products
+            </div>
+          )}
+          
+          <ProductGrid
+            products={products}
+            loading={loading}
+            error={error}
+            onRetry={() => fetchSearchResults()}
+            emptyTitle={`No results found for "${searchQuery}"`}
+            emptyDescription="Try checking your spelling or using more general terms."
+            cols={3}
+          />
+          
+          {!loading && !error && products.length > 0 && currentPage < totalPages && (
+            <div className="mt-12 text-center">
+              <button
+                onClick={loadMore}
+                className="bg-accent text-dark px-6 py-3 rounded-md font-medium hover:bg-accent/80 transition-colors"
+              >
+                Load More Results
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </Section>
   );
 }
