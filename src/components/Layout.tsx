@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "./Header";
@@ -12,7 +13,8 @@ export function Layout({ children }: LayoutProps) {
     <div className="flex min-h-screen flex-col">
       <Header />
       
-      <main className="flex-1">{children}</main>
+      {/* Added pt-[104px] to ensure content starts below the header */}
+      <main className="flex-1 pt-[104px]">{children}</main>
       
       {/* Footer */}
       <footer className="bg-black text-white mt-24">

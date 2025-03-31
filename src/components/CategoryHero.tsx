@@ -22,7 +22,7 @@ export function CategoryHero({
   className
 }: CategoryHeroProps) {
   return (
-    <div className={`relative w-full h-[650px] md:h-[700px] overflow-hidden mt-[104px] ${className}`}>
+    <div className={`relative w-full h-[650px] md:h-[700px] overflow-hidden ${className}`}>
       {videoSrc ? (
         <video 
           autoPlay

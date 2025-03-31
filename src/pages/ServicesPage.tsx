@@ -1,8 +1,8 @@
-
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { CategoryHero } from "../components/CategoryHero";
 import { CategorySubNav } from "../components/CategorySubNav";
+import { Layout } from "@/components/Layout";
 
 const ServicesPage = () => {
   // Scroll to top on page load
@@ -102,8 +102,8 @@ const ServicesPage = () => {
   ];
 
   return (
-    <div>
-      <div className="relative w-full h-[650px] md:h-[700px] overflow-hidden mt-[104px]">
+    <Layout>
+      <div className="relative w-full h-[650px] md:h-[700px] overflow-hidden">
         <video
           autoPlay
           muted
@@ -206,7 +206,7 @@ const ServicesPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

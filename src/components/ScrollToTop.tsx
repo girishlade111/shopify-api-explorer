@@ -6,9 +6,9 @@ export function ScrollToTop() {
   const { pathname } = useLocation();
   
   useEffect(() => {
-    // Use requestAnimationFrame to ensure the scroll happens after the DOM has updated
+    // Define a robust scroll reset function
     const scrollToTop = () => {
-      // Force scroll to top with both methods
+      // Methods to force scroll to top
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
@@ -17,16 +17,14 @@ export function ScrollToTop() {
     // Execute immediately
     scrollToTop();
     
-    // Also schedule with requestAnimationFrame for reliability
-    requestAnimationFrame(() => {
-      scrollToTop();
-    });
+    // Execute again after a short delay to handle any race conditions
+    setTimeout(scrollToTop, 0);
     
-    // And with a small timeout as a final fallback
-    setTimeout(() => {
-      scrollToTop();
-    }, 50);
+    // Use requestAnimationFrame for next frame rendering
+    requestAnimationFrame(scrollToTop);
     
+    // Final fallback with a slightly longer timeout
+    setTimeout(scrollToTop, 100);
   }, [pathname]);
   
   return null;
