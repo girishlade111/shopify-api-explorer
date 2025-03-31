@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX, AlertCircle } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, AlertCircle, MessageCircle, X } from 'lucide-react';
+import { TranscriptProvider } from './contexts/TranscriptContext';
+import { EventProvider } from './contexts/EventContext';
+import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
-import { useUserActivity } from '@/contexts/UserActivityContext';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -16,57 +18,20 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 // Maximum number of connection retries
 const MAX_CONNECTION_RETRIES = 3;
 
-interface VoiceDemoProps {
-  initialSessionStatus?: SessionStatus;
-  onSessionStatusChange?: React.Dispatch<React.SetStateAction<SessionStatus>>;
-  peerConnection?: RTCPeerConnection | null;
-  dataChannel?: RTCDataChannel | null;
-  isTranscriptionEnabled?: boolean;
-  isAudioEnabled?: boolean;
-  instructions?: string;
-  tools?: any[];
-}
-
-const VoiceDemo: React.FC<VoiceDemoProps> = ({
-  initialSessionStatus,
-  onSessionStatusChange,
-  peerConnection,
-  dataChannel,
-  isTranscriptionEnabled: initialTranscriptionEnabled,
-  isAudioEnabled: initialAudioEnabled,
-  instructions: externalInstructions,
-  tools: externalTools
-}) => {
-  const { userActivity } = useUserActivity();
-  const [sessionStatus, setSessionStatus] = useState<SessionStatus>(initialSessionStatus || 'DISCONNECTED');
-  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(initialTranscriptionEnabled ?? false);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(initialAudioEnabled ?? false);
+export default function VoiceDemo() {
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
+  const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
+  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [baseInstructions, setBaseInstructions] = useState<string>(externalInstructions || "");
-  const [tools, setTools] = useState<any[]>(externalTools || []);
+  const [instructions, setInstructions] = useState<string>("");
+  const [tools, setTools] = useState<any[]>([]);
+  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [connectionRetries, setConnectionRetries] = useState(0);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  const pcRef = useRef<RTCPeerConnection | null>(peerConnection || null);
-  const dcRef = useRef<RTCDataChannel | null>(dataChannel || null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Effect to sync local state with parent component if provided
-  useEffect(() => {
-    if (onSessionStatusChange) {
-      onSessionStatusChange(sessionStatus);
-    }
-  }, [sessionStatus, onSessionStatusChange]);
-
-  // Function to get combined instructions with user activity
-  const getCombinedInstructions = () => {
-    if (!baseInstructions) return "";
-    
-    // Format user activity as a string
-    const userActivityString = `\n\n# Customer Context\n${JSON.stringify(userActivity, null, 2)}`;
-    
-    return baseInstructions + userActivityString;
-  };
 
   // Load persisted settings on component mount
   useEffect(() => {
@@ -76,6 +41,7 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
         const settings = JSON.parse(storedSettings);
         setIsTranscriptionEnabled(settings.isTranscriptionEnabled ?? false);
         setIsAudioEnabled(settings.isAudioEnabled ?? false);
+        setIsWidgetOpen(settings.isWidgetOpen ?? false);
         
         // Auto-connect if it was previously connected
         if (settings.wasConnected && isInitialConnectionRef.current) {
@@ -96,9 +62,10 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
     localStorage.setItem('voiceWidgetSettings', JSON.stringify({
       isTranscriptionEnabled,
       isAudioEnabled,
+      isWidgetOpen,
       wasConnected: sessionStatus === 'CONNECTED'
     }));
-  }, [isTranscriptionEnabled, isAudioEnabled, sessionStatus]);
+  }, [isTranscriptionEnabled, isAudioEnabled, isWidgetOpen, sessionStatus]);
 
   useEffect(() => {
     if (!audioElementRef.current) {
@@ -117,13 +84,6 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
       }
     }
   }, [isAudioEnabled]);
-
-  // Update session when user activity changes
-  useEffect(() => {
-    if (sessionStatus === 'CONNECTED' && dcRef.current?.readyState === 'open') {
-      updateSession();
-    }
-  }, [userActivity]);
 
   // Clean up resources when component unmounts
   useEffect(() => {
@@ -154,7 +114,7 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
       cleanupResources();
       setSessionStatus('DISCONNECTED');
       setError(null);
-      setBaseInstructions("");
+      setInstructions("");
       setTools([]);
       setConnectionRetries(0);
     } else {
@@ -210,9 +170,10 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
 
           pcRef.current = pc;
           dcRef.current = dc;
-          setBaseInstructions(sessionInstructions || "");
+          setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
+          setIsWidgetOpen(true);
           setConnectionRetries(0); // Reset retries on successful connection
 
           if (audioElementRef.current && isAudioEnabled) {
@@ -314,100 +275,76 @@ const VoiceDemo: React.FC<VoiceDemoProps> = ({
     </button>
   );
 
-  const updateSession = () => {
-    if (!dcRef.current || dcRef.current.readyState !== "open") {
-      console.warn("Cannot update session - data channel not ready");
-      return;
-    }
-
-    sendClientEvent(
-      { type: "input_audio_buffer.clear" },
-      "clear audio buffer on session update"
-    );
-
-    const turnDetection = isPTTActive || !isTranscriptionEnabled
-      ? null
-      : {
-          type: "server_vad",
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 540,
-          create_response: true,
-        };
-
-    const sessionUpdateEvent = {
-      type: "session.update",
-      session: {
-        modalities: ["text", "audio"],
-        instructions: getCombinedInstructions(),
-        tools: tools || [],
-        voice: "alloy",
-        input_audio_format: "pcm16",
-        output_audio_format: "pcm16",
-        input_audio_transcription: isTranscriptionEnabled ? { model: "whisper-1" } : null,
-        turn_detection: turnDetection,
-      },
-    };
-
-    console.log("Session update event full details:", sessionUpdateEvent);
-    sendClientEvent(sessionUpdateEvent);
-  };
-
-  const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
-    if (dcRef.current && dcRef.current.readyState === "open") {
-      dcRef.current.send(JSON.stringify(eventObj));
-    } else {
-      console.error(
-        "Failed to send message - no data channel available",
-        eventObj
-      );
-    }
-  };
-
-  const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
-
   return (
-    <div className="fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform">
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Atelier Assistant</h2>
-          <div className="flex gap-2">
-            <IconButton
-              checked={isTranscriptionEnabled}
-              onChange={setIsTranscriptionEnabled}
-              icon={Mic}
-              iconOff={MicOff}
-            />
-            <IconButton
-              checked={isAudioEnabled}
-              onChange={setIsAudioEnabled}
-              icon={Volume2}
-              iconOff={VolumeX}
-            />
+    <>
+      {/* Chat Widget Toggle Button */}
+      <button
+        onClick={() => setIsWidgetOpen(!isWidgetOpen)}
+        className="fixed bottom-6 right-6 z-50 bg-[#5856d6] text-white p-4 rounded-full shadow-lg hover:bg-[#4745ac] transition-all duration-200"
+      >
+        {isWidgetOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <MessageCircle className="w-6 h-6" />
+        )}
+      </button>
+
+      {/* Chat Widget Container */}
+      <div
+        className={`fixed bottom-24 right-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform ${
+          isWidgetOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Atelier Assistant</h2>
+            <div className="flex gap-2">
+              <IconButton
+                checked={isTranscriptionEnabled}
+                onChange={setIsTranscriptionEnabled}
+                icon={Mic}
+                iconOff={MicOff}
+              />
+              <IconButton
+                checked={isAudioEnabled}
+                onChange={setIsAudioEnabled}
+                icon={Volume2}
+                iconOff={VolumeX}
+              />
+            </div>
           </div>
+
+          <button
+            onClick={handleToggleConnection}
+            className={`w-full ${getConnectionButtonClasses()}`}
+            disabled={sessionStatus === 'CONNECTING'}
+          >
+            {getConnectionButtonLabel()}
+          </button>
+
+          {error && (
+            <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
         </div>
 
-        <button
-          onClick={handleToggleConnection}
-          className={`w-full ${getConnectionButtonClasses()}`}
-          disabled={sessionStatus === 'CONNECTING'}
-        >
-          {getConnectionButtonLabel()}
-        </button>
-
-        {error && (
-          <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
+        <TranscriptProvider>
+          <EventProvider>
+            <CopilotDemoApp
+              initialSessionStatus={sessionStatus}
+              onSessionStatusChange={setSessionStatus}
+              peerConnection={pcRef.current}
+              dataChannel={dcRef.current}
+              isTranscriptionEnabled={isTranscriptionEnabled}
+              isAudioEnabled={isAudioEnabled}
+              instructions={instructions}
+              tools={tools}
+            />
+          </EventProvider>
+        </TranscriptProvider>
       </div>
-
-      <div className="p-4 h-[400px] overflow-y-auto">
-        {/* Transcript content would be rendered here */}
-      </div>
-    </div>
+    </>
   );
-};
-
-export default VoiceDemo;
+}
