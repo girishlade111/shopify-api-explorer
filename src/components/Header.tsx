@@ -41,6 +41,7 @@ const Header = () => {
   const mainCategories = [
     { name: "NEW IN", path: "/new-arrivals" },
     { name: "WOMENS", path: "/all-products/women" },
+    { name: "BEAUTY", path: "/all-products/beauty" },
     { name: "MENS", path: "/all-products/men" },
     { name: "FOOD", path: "/all-products/food" },
     { name: "SERVICES", path: "/services" },
