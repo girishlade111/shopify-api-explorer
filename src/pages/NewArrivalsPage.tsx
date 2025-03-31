@@ -60,7 +60,7 @@ export default function NewArrivalsPage() {
           <SectionHeader
             title="New Arrivals"
             subtitle="Discover our latest additions to the collection"
-            center
+            align="center" /* Changed "center" prop to "align" prop */
             className="mb-8"
           />
           

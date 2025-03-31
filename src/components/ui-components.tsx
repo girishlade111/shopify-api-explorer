@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { ExclamationTriangleIcon, Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react"; // Changed from ExclamationTriangleIcon to AlertTriangle
 
 interface SectionHeaderProps {
   title: string;
@@ -32,6 +32,22 @@ export function SectionHeader({
   );
 }
 
+interface SectionProps {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}
+
+export function Section({ children, className, id }: SectionProps) {
+  return (
+    <section id={id} className={cn("py-12 md:py-16", className)}>
+      <div className="container-wide">
+        {children}
+      </div>
+    </section>
+  );
+}
+
 interface EmptyStateProps {
   title: string;
   description?: string;
@@ -54,9 +70,37 @@ export function EmptyState({
     )}>
       {icon || (
         <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-6">
-          <ExclamationTriangleIcon className="h-8 w-8 text-muted" />
+          <AlertTriangle className="h-8 w-8 text-muted" /> {/* Changed from ExclamationTriangleIcon to AlertTriangle */}
         </div>
       )}
+      <h3 className="text-xl font-medium mb-2">{title}</h3>
+      {description && <p className="text-muted mb-6 max-w-md">{description}</p>}
+      {action}
+    </div>
+  );
+}
+
+interface ErrorStateProps {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  className?: string;
+}
+
+export function ErrorState({
+  title,
+  description,
+  action,
+  className
+}: ErrorStateProps) {
+  return (
+    <div className={cn(
+      "flex flex-col items-center justify-center text-center py-16 px-4",
+      className
+    )}>
+      <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6">
+        <AlertTriangle className="h-8 w-8 text-red-500" />
+      </div>
       <h3 className="text-xl font-medium mb-2">{title}</h3>
       {description && <p className="text-muted mb-6 max-w-md">{description}</p>}
       {action}
