@@ -14,7 +14,7 @@ interface SearchBarProps {
 
 export function SearchBar({ 
   className, 
-  placeholder = "Search products...",
+  placeholder = "Search",
   autoFocus = false
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
@@ -22,9 +22,20 @@ export function SearchBar({
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Track scroll position for styling
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Debounce search query
   useEffect(() => {
@@ -112,21 +123,27 @@ export function SearchBar({
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
             placeholder={placeholder}
-            className="w-full bg-accent rounded-md py-2 pl-10 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            className={cn(
+              "w-full rounded-sm py-2 pl-8 pr-8 text-sm transition-all border-b",
+              scrolled || isFocused
+                ? "bg-transparent text-dark border-gray-300 focus:border-primary"
+                : "bg-transparent text-white border-white/30 focus:border-white",
+              "placeholder:text-gray-400 focus:outline-none"
+            )}
             autoFocus={autoFocus}
           />
           
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search className="h-4 w-4 text-muted" />
+          <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
+            <Search className={`h-4 w-4 ${scrolled ? 'text-gray-500' : 'text-white/70'}`} />
           </div>
           
           {query && (
             <button
               type="button"
               onClick={clearSearch}
-              className="absolute inset-y-0 right-0 flex items-center pr-3"
+              className="absolute inset-y-0 right-0 flex items-center pr-2"
             >
-              <X className="h-4 w-4 text-muted hover:text-dark transition-colors" />
+              <X className={`h-4 w-4 ${scrolled ? 'text-gray-500' : 'text-white/70'}`} />
             </button>
           )}
         </div>
@@ -136,7 +153,7 @@ export function SearchBar({
       {isFocused && debouncedQuery.length >= 2 && (
         <div
           ref={suggestionsRef}
-          className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-medium border border-gray-100 py-2 max-h-60 overflow-auto animate-scale-up origin-top"
+          className="absolute z-10 mt-1 w-full bg-white rounded-none shadow-medium border border-gray-100 py-2 max-h-60 overflow-auto animate-scale-in origin-top"
         >
           {isLoading ? (
             <div className="px-4 py-2 text-center">
@@ -147,11 +164,11 @@ export function SearchBar({
             suggestions.map((suggestion, index) => (
               <button
                 key={`${suggestion.type}-${index}`}
-                className="w-full text-left px-4 py-2 hover:bg-accent flex items-center justify-between transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-light flex items-center justify-between transition-colors"
                 onClick={() => handleSuggestionClick(suggestion)}
               >
-                <span className="font-medium">{suggestion.text}</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-muted">
+                <span className="font-light">{suggestion.text}</span>
+                <span className="text-xs px-2 py-0.5 text-muted uppercase tracking-wider">
                   {suggestion.type === "category" ? "Category" : "Product"}
                 </span>
               </button>

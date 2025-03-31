@@ -3,7 +3,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Heart, User, Menu, X, Sparkles, Languages } from "lucide-react";
+import { ShoppingBag, Heart, User, Menu, X, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
@@ -58,29 +58,40 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <header 
-        className="sticky top-0 z-40 w-full transition-all duration-200 bg-secondary text-white"
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+          scrolled 
+            ? "bg-white border-b border-gray-200 text-dark py-2" 
+            : "bg-transparent text-white py-4"
+        }`}
       >
-        <div className="container-wide flex h-16 items-center justify-between">
-          {/* Left Section - Language Selector */}
+        <div className="container-wide flex items-center justify-between">
+          {/* Left Section - Logo */}
           <div className="flex items-center">
-            <button className="flex items-center space-x-1 text-sm hover:text-primary transition-colors">
-              <Languages className="h-4 w-4" />
-              <span className="hidden sm:inline">English</span>
-            </button>
-          </div>
-          
-          {/* Center Section - Logo */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold tracking-tight">ATELIER</span>
+              <span className="font-serif text-2xl sm:text-3xl tracking-tight">ATELIER</span>
             </Link>
           </div>
           
+          {/* Center Section - Navigation */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            <NavLink to="/all-products/men">MENS</NavLink>
+            <NavLink to="/all-products/women">WOMENS</NavLink>
+            <NavLink to="/all-products/beauty">BEAUTY</NavLink>
+            <NavLink to="/all-products/food">FOOD</NavLink>
+            <NavLink to="/services">SERVICES</NavLink>
+          </nav>
+          
           {/* Right Section - Icons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-6">
+            <div className="w-48">
+              <SearchBar />
+            </div>
+            
             <button 
               onClick={handleFittingRoomClick}
-              className="p-2 hover:text-primary transition-colors rounded-full"
+              className={`p-2 transition-colors rounded-full ${
+                scrolled ? "hover:text-primary" : "hover:text-white/80"
+              }`}
               aria-label="AI Fitting Room"
             >
               <Sparkles className="h-5 w-5" />
@@ -88,7 +99,9 @@ export function Layout({ children }: LayoutProps) {
             
             <button 
               onClick={handleWishlistClick}
-              className="relative p-2 hover:text-primary transition-colors rounded-full"
+              className={`relative p-2 transition-colors rounded-full ${
+                scrolled ? "hover:text-primary" : "hover:text-white/80"
+              }`}
               aria-label="Wishlist"
             >
               <Heart className="h-5 w-5" />
@@ -101,7 +114,9 @@ export function Layout({ children }: LayoutProps) {
             
             <button 
               onClick={handleAccountClick}
-              className="p-2 hover:text-primary transition-colors rounded-full"
+              className={`p-2 transition-colors rounded-full ${
+                scrolled ? "hover:text-primary" : "hover:text-white/80"
+              }`}
               aria-label="Account"
             >
               <User className="h-5 w-5" />
@@ -109,7 +124,9 @@ export function Layout({ children }: LayoutProps) {
             
             <button 
               onClick={handleCartClick}
-              className="relative p-2 hover:text-primary transition-colors rounded-full"
+              className={`relative p-2 transition-colors rounded-full ${
+                scrolled ? "hover:text-primary" : "hover:text-white/80"
+              }`}
               aria-label="Shopping Bag"
             >
               <ShoppingBag className="h-5 w-5" />
@@ -119,14 +136,10 @@ export function Layout({ children }: LayoutProps) {
                 </span>
               )}
             </button>
-            
-            <div className="pl-2 w-48">
-              <SearchBar />
-            </div>
           </div>
           
           <button 
-            className="md:hidden"
+            className="lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -137,40 +150,23 @@ export function Layout({ children }: LayoutProps) {
             )}
           </button>
         </div>
-        
-        {/* Secondary Navigation Bar */}
-        <div className="w-full bg-white border-b border-gray-200">
-          <div className="container-wide h-12">
-            <nav className="hidden md:flex items-center justify-center h-full">
-              <SecondaryNavLink to="/">Home</SecondaryNavLink>
-              <SecondaryNavLink to="/new-arrivals">New In</SecondaryNavLink>
-              <SecondaryNavLink to="/all-products/women">Women</SecondaryNavLink>
-              <SecondaryNavLink to="/all-products/men">Men</SecondaryNavLink>
-              <SecondaryNavLink to="/all-products/beauty">Beauty</SecondaryNavLink>
-              <SecondaryNavLink to="/all-products/food">Food</SecondaryNavLink>
-              <SecondaryNavLink to="/services">Services</SecondaryNavLink>
-              <SecondaryNavLink to="/all-products">All Products</SecondaryNavLink>
-            </nav>
-          </div>
-        </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-50 bg-white pt-16 animate-fade-in">
+          <div className="fixed inset-0 z-50 bg-white pt-16 animate-fade-in">
             <div className="container-wide py-6 flex flex-col space-y-6">
               <SearchBar />
               
               <nav className="flex flex-col space-y-4">
-                <MobileNavLink to="/">Home</MobileNavLink>
-                <MobileNavLink to="/new-arrivals">New In</MobileNavLink>
-                <MobileNavLink to="/all-products/women">Women</MobileNavLink>
-                <MobileNavLink to="/all-products/men">Men</MobileNavLink>
-                <MobileNavLink to="/all-products/beauty">Beauty</MobileNavLink>
-                <MobileNavLink to="/all-products/food">Food</MobileNavLink>
-                <MobileNavLink to="/services">Services</MobileNavLink>
-                <MobileNavLink to="/all-products">All Products</MobileNavLink>
+                <MobileNavLink to="/all-products/men">MENS</MobileNavLink>
+                <MobileNavLink to="/all-products/women">WOMENS</MobileNavLink>
+                <MobileNavLink to="/all-products/beauty">BEAUTY</MobileNavLink>
+                <MobileNavLink to="/all-products/food">FOOD</MobileNavLink>
+                <MobileNavLink to="/services">SERVICES</MobileNavLink>
+                <MobileNavLink to="/new-arrivals">NEW ARRIVALS</MobileNavLink>
+                <MobileNavLink to="/all-products">ALL PRODUCTS</MobileNavLink>
               </nav>
               
-              <div className="flex space-x-4 pt-4 border-t border-gray-100">
+              <div className="flex flex-col space-y-4 pt-4 border-t border-gray-100">
                 <button
                   className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent"
                   onClick={handleFittingRoomClick}
@@ -207,83 +203,82 @@ export function Layout({ children }: LayoutProps) {
       
       <main className="flex-1">{children}</main>
       
-      <footer className="bg-accent mt-24">
-        <div className="container-wide py-12 md:py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer className="bg-black text-white mt-24">
+        <div className="container-wide py-16 md:py-24">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div>
-              <h3 className="text-lg font-semibold mb-4">ATELIER</h3>
-              <p className="text-muted text-sm">
-                Discover the perfect blend of fashion and functionality with our curated collection.
+              <h3 className="font-serif text-2xl mb-6">ATELIER</h3>
+              <p className="text-gray-400 text-sm max-w-xs">
+                Discover the perfect blend of luxury and sophistication with our curated collections of fashion, beauty, and lifestyle products.
               </p>
-              <div className="mt-6">
-                <p className="text-sm text-muted">© {new Date().getFullYear()} Atelier. All rights reserved.</p>
-                <p className="text-xs text-muted mt-1">123 Fashion Avenue, New York, NY 10001</p>
+              <div className="mt-8">
+                <p className="text-sm text-gray-400">© {new Date().getFullYear()} Atelier. All rights reserved.</p>
+                <p className="text-xs text-gray-500 mt-1">123 Fashion Avenue, Milan, Italy</p>
               </div>
             </div>
             
             <div>
-              <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Shop</h4>
-              <ul className="space-y-2">
+              <h4 className="text-sm font-medium mb-6 uppercase tracking-wider">Shop</h4>
+              <ul className="space-y-4">
                 <li><FooterLink to="/new-arrivals">New Arrivals</FooterLink></li>
-                <li><FooterLink to="/all-products">All Products</FooterLink></li>
-                <li><FooterLink to="/all-products/women">Women</FooterLink></li>
                 <li><FooterLink to="/all-products/men">Men</FooterLink></li>
-                <li><FooterLink to="/all-products/accessories">Accessories</FooterLink></li>
+                <li><FooterLink to="/all-products/women">Women</FooterLink></li>
+                <li><FooterLink to="/all-products/beauty">Beauty</FooterLink></li>
+                <li><FooterLink to="/all-products/food">Food</FooterLink></li>
+                <li><FooterLink to="/services">Services</FooterLink></li>
                 <li><FooterLink to="/all-products/sale">Sale</FooterLink></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Company</h4>
-              <ul className="space-y-2">
-                <li><FooterLink to="/about">About Us</FooterLink></li>
+              <h4 className="text-sm font-medium mb-6 uppercase tracking-wider">About</h4>
+              <ul className="space-y-4">
+                <li><FooterLink to="/about">Our Story</FooterLink></li>
                 <li><FooterLink to="/sustainability">Sustainability</FooterLink></li>
                 <li><FooterLink to="/careers">Careers</FooterLink></li>
-                <li><FooterLink to="/stores">Store Locator</FooterLink></li>
+                <li><FooterLink to="/stores">Flagship Stores</FooterLink></li>
                 <li><FooterLink to="/privacy">Privacy Policy</FooterLink></li>
-                <li><FooterLink to="/terms">Terms & Conditions</FooterLink></li>
+                <li><FooterLink to="/terms">Terms of Service</FooterLink></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Customer Service</h4>
-              <ul className="space-y-2">
+              <h4 className="text-sm font-medium mb-6 uppercase tracking-wider">Customer Care</h4>
+              <ul className="space-y-4">
                 <li><FooterLink to="/contact">Contact Us</FooterLink></li>
-                <li><FooterLink to="/faq">FAQs</FooterLink></li>
+                <li><FooterLink to="/faq">FAQ</FooterLink></li>
                 <li><FooterLink to="/shipping">Shipping & Returns</FooterLink></li>
                 <li><FooterLink to="/size-guide">Size Guide</FooterLink></li>
               </ul>
               
-              <div className="mt-8">
-                <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Connect</h4>
+              <div className="mt-12">
+                <h4 className="text-sm font-medium mb-6 uppercase tracking-wider">Connect With Us</h4>
                 <div className="flex space-x-4">
                   <IconButton aria-label="Instagram">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                   </IconButton>
                   <IconButton aria-label="Twitter">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
                   </IconButton>
                   <IconButton aria-label="Facebook">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                  </IconButton>
-                  <IconButton aria-label="Pinterest">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 11.67c.15-.4.6-.9 1.3-.9 1.5 0 2.2 1.4 2.2 3.04 0 1.3-.5 2.54-1.7 2.54-.8 0-1.3-.6-1.1-1.42m.8-2.5c-.4 1.76-.2 3.37.2 3.77.2.2.6.05.8-.3.3-.5.4-1.4.3-2.4"/><path d="M12 21c5 0 9-4 9-9s-4-9-9-9-9 4-9 9c0 2 .6 3.9 1.7 5.5"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                   </IconButton>
                   <IconButton aria-label="YouTube">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/><path d="M15 8a7 7 0 0 0-4.3 7.3h.3c1 0 2.3.4 3.3 1.3l1.3-1.3a7 7 0 0 0-.6-7.3z"/><path d="M12 19v-9l-5 7h3v9l5-7h-3z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
                   </IconButton>
                 </div>
               </div>
               
-              <div className="mt-6">
-                <h4 className="text-sm font-semibold mb-2">Subscribe to our newsletter</h4>
+              <div className="mt-12">
+                <h4 className="text-sm font-medium mb-4 uppercase tracking-wider">Newsletter</h4>
+                <p className="text-gray-400 text-sm mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
                 <div className="flex">
                   <input
                     type="email"
-                    placeholder="Your email"
-                    className="bg-white border border-gray-200 rounded-l-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Your email address"
+                    className="bg-gray-900 border border-gray-800 text-white px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/30"
                   />
-                  <button className="bg-primary text-white px-4 py-2 rounded-r-md hover:bg-primary/90 transition-colors">
+                  <button className="bg-white text-black px-4 py-2 uppercase text-sm tracking-wider font-medium hover:bg-gray-200 transition-colors">
                     Subscribe
                   </button>
                 </div>
@@ -291,18 +286,17 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
           
-          <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <div className="flex space-x-6 mb-4 md:mb-0">
+          <div className="border-t border-gray-800 mt-16 pt-10 flex flex-col md:flex-row justify-between items-center">
+            <div className="flex space-x-8 mb-8 md:mb-0">
               <FooterLink to="/privacy">Privacy</FooterLink>
               <FooterLink to="/terms">Terms</FooterLink>
-              <FooterLink to="/accessibility">Accessibility</FooterLink>
-              <FooterLink to="/cookies">Cookie Preferences</FooterLink>
+              <FooterLink to="/cookies">Cookie Policy</FooterLink>
             </div>
             <div className="flex items-center space-x-4">
-              <img src="https://via.placeholder.com/40x25" alt="Visa" className="h-8" />
-              <img src="https://via.placeholder.com/40x25" alt="Mastercard" className="h-8" />
-              <img src="https://via.placeholder.com/40x25" alt="American Express" className="h-8" />
-              <img src="https://via.placeholder.com/40x25" alt="PayPal" className="h-8" />
+              <img src="https://via.placeholder.com/40x25" alt="Visa" className="h-6 opacity-50" />
+              <img src="https://via.placeholder.com/40x25" alt="Mastercard" className="h-6 opacity-50" />
+              <img src="https://via.placeholder.com/40x25" alt="American Express" className="h-6 opacity-50" />
+              <img src="https://via.placeholder.com/40x25" alt="PayPal" className="h-6 opacity-50" />
             </div>
           </div>
         </div>
@@ -311,45 +305,34 @@ export function Layout({ children }: LayoutProps) {
   );
 }
 
+// Navigation link component with transparent/scrolled state awareness
 const NavLink = ({ to, children }: { to: string; children: ReactNode }) => {
   const location = useLocation();
   const isActive = location.pathname === to || location.pathname.startsWith(`${to}/`);
+  const [scrolled, setScrolled] = useState(false);
   
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "text-sm font-medium transition-colors hover:text-primary px-3 py-2 rounded-md relative",
-        isActive 
-          ? "text-primary bg-primary/5" 
-          : "text-dark hover:bg-accent/60"
-      )}
-    >
-      {children}
-      {isActive && (
-        <span className="absolute bottom-0 left-0 right-0 mx-auto w-1/2 h-0.5 bg-primary rounded-full" />
-      )}
-    </Link>
-  );
-};
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
 
-const SecondaryNavLink = ({ to, children }: { to: string; children: ReactNode }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to || location.pathname.startsWith(`${to}/`);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   
   return (
     <Link
       to={to}
       className={cn(
-        "text-sm font-medium transition-colors px-4 py-2 relative mx-1",
+        "text-sm tracking-wider transition-colors relative px-1 py-1 font-light",
         isActive 
-          ? "text-primary" 
-          : "text-dark hover:text-primary"
+          ? scrolled ? "text-primary" : "text-white" 
+          : scrolled ? "text-dark hover:text-primary" : "text-white/90 hover:text-white"
       )}
     >
       {children}
       {isActive && (
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+        <span className={`absolute bottom-0 left-0 right-0 h-[1px] ${scrolled ? 'bg-primary' : 'bg-white'}`} />
       )}
     </Link>
   );
@@ -363,8 +346,8 @@ const MobileNavLink = ({ to, children }: { to: string; children: ReactNode }) =>
     <Link
       to={to}
       className={cn(
-        "text-lg font-medium p-3 rounded-md transition-colors",
-        isActive ? "text-primary bg-primary/5" : "text-dark hover:bg-accent"
+        "text-lg font-light p-3 tracking-wider transition-colors",
+        isActive ? "text-primary" : "text-dark hover:text-primary"
       )}
     >
       {children}
@@ -375,7 +358,7 @@ const MobileNavLink = ({ to, children }: { to: string; children: ReactNode }) =>
 const FooterLink = ({ to, children }: { to: string; children: ReactNode }) => (
   <Link
     to={to}
-    className="text-sm text-muted hover:text-primary transition-colors"
+    className="text-sm text-gray-400 hover:text-white transition-colors"
   >
     {children}
   </Link>
@@ -398,7 +381,7 @@ const IconButton = ({
 }: IconButtonProps) => (
   <button
     className={cn(
-      "flex items-center justify-center hover:text-primary rounded-full transition-colors p-2 relative",
+      "flex items-center justify-center w-10 h-10 rounded-full border border-gray-800 text-gray-400 hover:text-white hover:border-gray-600 transition-colors",
       className
     )}
     onClick={onClick}

@@ -1,263 +1,151 @@
-import { cn } from "@/lib/utils";
+
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { ExclamationTriangleIcon, Loader2 } from "lucide-react";
 
-// Section Container
-export const Section = ({
-  className,
-  children,
-  fullWidth = false,
-}: {
-  className?: string;
-  children: ReactNode;
-  fullWidth?: boolean;
-}) => (
-  <section className={cn("py-12 md:py-16", className)}>
-    {children}
-  </section>
-);
-
-// Section Header with optional subheading
-export const SectionHeader = ({
-  title,
-  subtitle,
-  className,
-  titleClassName,
-  subtitleClassName,
-  center = false,
-}: {
+interface SectionHeaderProps {
   title: string;
   subtitle?: string;
   className?: string;
-  titleClassName?: string;
-  subtitleClassName?: string;
-  center?: boolean;
-}) => (
-  <div className={cn("mb-8 md:mb-12", center && "text-center", className)}>
-    <h2 className={cn("text-3xl font-semibold tracking-tight", titleClassName)}>
-      {title}
-    </h2>
-    {subtitle && (
-      <p
-        className={cn(
-          "mt-2 text-lg text-muted",
-          subtitleClassName
-        )}
-      >
-        {subtitle}
-      </p>
-    )}
-  </div>
-);
+  align?: 'left' | 'center' | 'right';
+}
 
-// Badge Component
-export const Badge = ({
-  children,
+export function SectionHeader({ 
+  title, 
+  subtitle, 
   className,
-  variant = "default",
-}: {
-  children: ReactNode;
-  className?: string;
-  variant?: "default" | "outline" | "secondary" | "destructive";
-}) => {
-  const baseClasses = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors";
-  
-  const variantClasses = {
-    default: "bg-primary text-white",
-    outline: "border border-primary text-primary bg-transparent",
-    secondary: "bg-accent text-dark",
-    destructive: "bg-destructive text-white",
-  };
-  
+  align = 'left' 
+}: SectionHeaderProps) {
   return (
-    <span
-      className={cn(
-        baseClasses,
-        variantClasses[variant],
-        className
+    <div className={cn(
+      "mb-8",
+      {
+        'text-left': align === 'left',
+        'text-center': align === 'center',
+        'text-right': align === 'right'
+      },
+      className
+    )}>
+      <h2 className="text-3xl md:text-4xl font-serif tracking-tight mb-2">{title}</h2>
+      {subtitle && <p className="text-muted text-lg">{subtitle}</p>}
+    </div>
+  );
+}
+
+interface EmptyStateProps {
+  title: string;
+  description?: string;
+  icon?: ReactNode;
+  action?: ReactNode;
+  className?: string;
+}
+
+export function EmptyState({
+  title,
+  description,
+  icon,
+  action,
+  className
+}: EmptyStateProps) {
+  return (
+    <div className={cn(
+      "flex flex-col items-center justify-center text-center py-16 px-4",
+      className
+    )}>
+      {icon || (
+        <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-6">
+          <ExclamationTriangleIcon className="h-8 w-8 text-muted" />
+        </div>
       )}
-    >
+      <h3 className="text-xl font-medium mb-2">{title}</h3>
+      {description && <p className="text-muted mb-6 max-w-md">{description}</p>}
+      {action}
+    </div>
+  );
+}
+
+interface LoaderProps {
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+  text?: string;
+}
+
+export function Loader({ className, size = 'md', text }: LoaderProps) {
+  const sizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-6 w-6',
+    lg: 'h-8 w-8'
+  };
+
+  return (
+    <div className={cn(
+      "flex flex-col items-center justify-center gap-2",
+      className
+    )}>
+      <Loader2 className={cn(
+        "animate-spin text-primary",
+        sizeClasses[size]
+      )} />
+      {text && <p className="text-sm text-muted">{text}</p>}
+    </div>
+  );
+}
+
+interface DividerProps {
+  className?: string;
+  orientation?: 'horizontal' | 'vertical';
+  label?: string;
+}
+
+export function Divider({ className, orientation = 'horizontal', label }: DividerProps) {
+  if (orientation === 'vertical') {
+    return (
+      <div className={cn(
+        "relative h-full w-px bg-gray-200 mx-2",
+        className
+      )}>
+        {label && (
+          <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-xs text-muted">
+            {label}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn(
+      "relative h-px w-full bg-gray-200 my-6",
+      className
+    )}>
+      {label && (
+        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-sm text-muted">
+          {label}
+        </span>
+      )}
+    </div>
+  );
+}
+
+interface BadgeProps {
+  children: ReactNode;
+  variant?: 'default' | 'primary' | 'outline' | 'secondary';
+  className?: string;
+}
+
+export function Badge({ children, variant = 'default', className }: BadgeProps) {
+  return (
+    <span className={cn(
+      "inline-flex items-center rounded-sm px-2 py-1 text-xs font-medium transition-colors",
+      {
+        'bg-primary text-white': variant === 'primary',
+        'bg-accent text-muted': variant === 'default',
+        'border border-gray-200 text-muted': variant === 'outline',
+        'bg-light text-dark': variant === 'secondary'
+      },
+      className
+    )}>
       {children}
     </span>
   );
-};
-
-// Chip Component
-export const Chip = ({
-  children,
-  className,
-  active = false,
-  onClick,
-}: {
-  children: ReactNode;
-  className?: string;
-  active?: boolean;
-  onClick?: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors",
-      active
-        ? "bg-primary text-white"
-        : "bg-accent text-secondary hover:bg-accent/80",
-      className
-    )}
-  >
-    {children}
-  </button>
-);
-
-// Grid Container
-export const Grid = ({
-  children,
-  className,
-  cols = 3,
-}: {
-  children: ReactNode;
-  className?: string;
-  cols?: 1 | 2 | 3 | 4;
-}) => {
-  const colClasses = {
-    1: "grid-cols-1",
-    2: "grid-cols-1 sm:grid-cols-2",
-    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
-  };
-  
-  return (
-    <div
-      className={cn(
-        "grid gap-6 md:gap-8",
-        colClasses[cols],
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-};
-
-// Horizontal Scroll Container
-export const ScrollContainer = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => (
-  <div className={cn("relative", className)}>
-    <div className="flex overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-      <div className="flex space-x-4 md:space-x-6 px-4 sm:px-0">
-        {children}
-      </div>
-    </div>
-  </div>
-);
-
-// Animated Image
-export const AnimatedImage = ({
-  src,
-  alt,
-  className,
-  aspectRatio = "aspect-[3/4]",
-}: {
-  src: string;
-  alt: string;
-  className?: string;
-  aspectRatio?: string;
-}) => {
-  return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-lg bg-accent/30",
-        aspectRatio,
-        className
-      )}
-    >
-      <img
-        src={src}
-        alt={alt}
-        className="h-full w-full object-cover object-center transition-all duration-300 hover:scale-105"
-        loading="lazy"
-        onLoad={(e) => {
-          const target = e.target as HTMLImageElement;
-          target.classList.remove("image-loading");
-          target.classList.add("image-loaded");
-        }}
-      />
-    </div>
-  );
-};
-
-// Loader Component
-export const Loader = ({ className }: { className?: string }) => (
-  <div className={cn("flex justify-center py-8", className)}>
-    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-  </div>
-);
-
-// Empty State
-export const EmptyState = ({
-  title,
-  description,
-  action,
-  className,
-}: {
-  title: string;
-  description: string;
-  action?: ReactNode;
-  className?: string;
-}) => (
-  <div
-    className={cn(
-      "flex flex-col items-center justify-center py-12 text-center",
-      className
-    )}
-  >
-    <h3 className="text-xl font-semibold">{title}</h3>
-    <p className="mt-2 mb-6 text-muted max-w-md">{description}</p>
-    {action}
-  </div>
-);
-
-// Error State
-export const ErrorState = ({
-  title = "Something went wrong",
-  description = "We encountered an error while loading this data. Please try again later.",
-  action,
-  className,
-}: {
-  title?: string;
-  description?: string;
-  action?: ReactNode;
-  className?: string;
-}) => (
-  <div
-    className={cn(
-      "flex flex-col items-center justify-center py-12 text-center",
-      className
-    )}
-  >
-    <div className="rounded-full bg-red-100 p-3 mb-4">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="text-red-500"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-    </div>
-    <h3 className="text-xl font-semibold">{title}</h3>
-    <p className="mt-2 mb-6 text-muted max-w-md">{description}</p>
-    {action}
-  </div>
-);
+}
