@@ -52,6 +52,12 @@ export default function CategoryPage() {
   const fullPathFromUrl = categoryPath || "";
   const isRootCategory = !fullPathFromUrl;
 
+  // Check if we're on one of the special category pages that have hero images
+  const isSpecialCategory = fullPathFromUrl.includes('women') || 
+                          fullPathFromUrl.includes('beauty') || 
+                          fullPathFromUrl.includes('men') || 
+                          fullPathFromUrl.includes('food');
+
   const formatPathSegment = (segment: string): string => {
     return segment
       .split('-')
@@ -236,36 +242,39 @@ export default function CategoryPage() {
 
   return (
     <>
-      <div className="container-wide py-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            {!isRootCategory && (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link to="/all-products">All Products</Link>
-                  </BreadcrumbLink>
+      {/* Only show breadcrumbs if NOT a special category */}
+      {!isSpecialCategory && (
+        <div className="container-wide py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              {!isRootCategory && (
+                <>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link to="/all-products">All Products</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                </>
+              )}
+              
+              {breadcrumbSegments.map((segment, index) => (
+                <BreadcrumbItem key={segment.path}>
+                  {index > 0 || !isRootCategory ? <BreadcrumbSeparator /> : null}
+                  {index === breadcrumbSegments.length - 1 ? (
+                    <BreadcrumbPage>{segment.label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link to={segment.path.replace("/categories/", "/all-products/")}>
+                        {segment.label}
+                      </Link>
+                    </BreadcrumbLink>
+                  )}
                 </BreadcrumbItem>
-              </>
-            )}
-            
-            {breadcrumbSegments.map((segment, index) => (
-              <BreadcrumbItem key={segment.path}>
-                {index > 0 || !isRootCategory ? <BreadcrumbSeparator /> : null}
-                {index === breadcrumbSegments.length - 1 ? (
-                  <BreadcrumbPage>{segment.label}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link to={segment.path.replace("/categories/", "/all-products/")}>
-                      {segment.label}
-                    </Link>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            ))}
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      )}
       
       <div className="category-content">
         <CategoryPageEnhancement />
