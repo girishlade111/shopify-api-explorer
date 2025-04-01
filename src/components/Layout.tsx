@@ -8,7 +8,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <main className="pt-20">
+    <main className="pt-20 pb-20">
       {children || <Outlet />}
     </main>
   );
