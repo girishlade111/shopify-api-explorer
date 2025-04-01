@@ -54,9 +54,9 @@ const VoiceWidget = () => {
             {showChatView ? (
               activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
             ) : (
-              <div className="fixed bottom-24 left-6 z-40 w-[320px] bg-white rounded-lg shadow-lg transition-all duration-300">
-                <div className="p-4">
-                  <h2 className="text-center text-lg font-medium mb-4">How do you want to chat today?</h2>
+              <div className="fixed bottom-24 left-6 z-40 w-[320px] bg-white rounded-[20px] shadow-lg transition-all duration-300">
+                <div className="p-5">
+                  <h2 className="text-center text-xl font-medium mb-5 text-gray-800">How do you want to chat today?</h2>
                   
                   <div className="flex gap-4">
                     {/* Voice Chat Option */}
@@ -65,11 +65,11 @@ const VoiceWidget = () => {
                         setShowChatView(true);
                         setActiveChatType('ai');
                       }}
-                      className="flex-1 flex flex-col items-center justify-center bg-[#87CEEB] text-white p-4 rounded-lg hover:bg-[#6BBBDF] transition-colors"
+                      className="flex-1 flex flex-col items-center justify-center bg-[#87CEEB] text-white p-6 rounded-lg hover:bg-[#6BBBDF] transition-colors"
                       aria-label="Voice chat"
                     >
-                      <Mic className="w-7 h-7 mb-2" />
-                      <span>Voice</span>
+                      <Mic className="w-8 h-8 mb-2" />
+                      <span className="text-lg">Voice</span>
                     </button>
                     
                     {/* Text Chat Option */}
@@ -78,11 +78,11 @@ const VoiceWidget = () => {
                         setShowChatView(true);
                         setActiveChatType('atelier');
                       }}
-                      className="flex-1 flex flex-col items-center justify-center bg-[#87CEEB] text-white p-4 rounded-lg hover:bg-[#6BBBDF] transition-colors"
+                      className="flex-1 flex flex-col items-center justify-center bg-[#87CEEB] text-white p-6 rounded-lg hover:bg-[#6BBBDF] transition-colors"
                       aria-label="Text chat"
                     >
-                      <MessageSquare className="w-7 h-7 mb-2" />
-                      <span>Text</span>
+                      <MessageSquare className="w-8 h-8 mb-2" />
+                      <span className="text-lg">Text</span>
                     </button>
                   </div>
                 </div>
