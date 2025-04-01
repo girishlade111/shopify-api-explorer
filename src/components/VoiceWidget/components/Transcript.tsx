@@ -160,7 +160,7 @@ function Transcript({
 
   return (
     <div className="flex flex-col w-full h-full relative">
-      <div className="flex-1 overflow-y-auto p-4 space-y-5 pb-20">
+      <div className="flex-1 overflow-y-auto p-4 space-y-5 pb-16">
         {filteredItems.map(item => {
           if (item.type === 'BREADCRUMB') {
             const functionName = getFunctionName(item.data);
@@ -215,7 +215,7 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-white">
+        <div className="absolute bottom-2 left-0 right-0 p-3 bg-white">
           <div className="relative bg-gray-100 rounded-full py-1 px-4">
             <input 
               ref={inputRef}

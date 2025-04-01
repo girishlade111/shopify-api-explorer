@@ -80,11 +80,12 @@ body {
 }
 
 /* Reduce bottom padding for the message container */
-.flex-1.overflow-y-auto.p-4.space-y-5.pb-20 {
-  padding-bottom: 3.5rem !important;
+.flex-1.overflow-y-auto.p-4.space-y-5.pb-16 {
+  padding-bottom: 2.5rem !important;
 }
 
-/* Reduce input area container padding */
-.absolute.bottom-0.left-0.right-0.p-3 {
+/* Lift the input area from the bottom */
+.absolute.bottom-2.left-0.right-0.p-3 {
   padding: 0.5rem !important;
+  bottom: 10px !important;
 }
