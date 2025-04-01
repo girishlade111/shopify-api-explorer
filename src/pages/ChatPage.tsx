@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ChatWidget from '../components/ChatWidget';
+import VoiceWidget from '../components/VoiceWidget';
 
 const ChatPage: React.FC = () => {
   return (
@@ -8,6 +9,7 @@ const ChatPage: React.FC = () => {
       <div className="w-full max-w-md h-[440px] overflow-hidden">
         <ChatWidget />
       </div>
+      <VoiceWidget />
     </div>
   );
 };

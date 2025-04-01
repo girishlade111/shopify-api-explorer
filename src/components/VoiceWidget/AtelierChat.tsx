@@ -19,6 +19,7 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 const MAX_CONNECTION_RETRIES = 3;
 const CONNECTION_TIMEOUT_MS = 15000;
 const RETRY_DELAY_MS = 2000;
+const MAX_API_RETRIES = 3;
 
 interface AtelierChatProps {
   onClose: (e: React.MouseEvent) => void;
@@ -30,6 +31,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const [instructions, setInstructions] = useState<string>("");
   const [tools, setTools] = useState<any[]>([]);
   const [connectionRetries, setConnectionRetries] = useState(0);
+  const [apiRetries, setApiRetries] = useState(0);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
@@ -72,6 +74,51 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     dcRef.current = null;
     if (audioElementRef.current) {
       audioElementRef.current.srcObject = null;
+    }
+  };
+
+  const fetchSessionData = async (signal: AbortSignal): Promise<any> => {
+    const apiUrl = `${NGROK_URL}/openai-realtime/session/${STORE_URL}`;
+    console.log(`Attempting to fetch session data from: ${apiUrl} (Attempt ${apiRetries + 1}/${MAX_API_RETRIES})`);
+    
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          // Add a cache-busting parameter to prevent caching issues
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
+        signal
+      });
+      
+      if (!response.ok) {
+        const responseText = await response.text();
+        console.error(`API error (${response.status}): ${responseText}`);
+        throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.log("Fetch aborted");
+        throw new Error("Fetch aborted");
+      }
+      
+      console.error("Error fetching session data:", error);
+      
+      if (apiRetries < MAX_API_RETRIES - 1) {
+        setApiRetries(prev => prev + 1);
+        // Wait briefly before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Try again recursively with exponential backoff
+        return fetchSessionData(signal);
+      }
+      
+      throw error;
     }
   };
 
@@ -138,7 +185,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     }, CONNECTION_TIMEOUT_MS);
 
     try {
-      console.log("Attempting to fetch session data from:", `${NGROK_URL}/openai-realtime/session/${STORE_URL}`);
+      // Reset API retries counter before starting
+      setApiRetries(0);
       
       // Add debugging information
       console.log("Connection attempt details:", {
@@ -148,16 +196,9 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         maxAttempts: MAX_CONNECTION_RETRIES
       });
       
-      const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        signal
-      });
-
+      // Use our new fetchSessionData function with retry logic
+      const data = await fetchSessionData(signal);
+      
       if (!isMountedRef.current) return;
 
       if (connectionTimeoutRef.current) {
@@ -169,13 +210,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         return;
       }
 
-      if (!response.ok) {
-        const responseText = await response.text();
-        console.error(`API error (${response.status}): ${responseText}`);
-        throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
       console.log("Session data received:", data);
       
       const clientSecret = data.result?.client_secret?.value || fallbackTokenRef.current;
@@ -310,6 +344,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const resetChat = () => {
     cleanupResources();
     setConnectionRetries(0); // Reset retry counter on manual reset
+    setApiRetries(0);        // Reset API retry counter as well
     connectToService();
     setMenuOpen(false);
   };
