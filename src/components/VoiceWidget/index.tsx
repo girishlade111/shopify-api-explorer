@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { X, Mic, MessageSquare } from 'lucide-react';
+import { Mic, MessageSquare } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
 import AtelierChat from './AtelierChat';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -38,7 +38,7 @@ const VoiceWidget = () => {
         aria-label="Toggle voice assistant"
       >
         {isOpen ? (
-          <X className="w-6 h-6" />
+          <span className="w-6 h-6">×</span>
         ) : (
           <>
             <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0"></div>
