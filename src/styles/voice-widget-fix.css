@@ -57,21 +57,29 @@ body {
 }
 
 /* Ensure proper button positioning in input field */
-.relative .absolute.right-2 {
-  right: 5px;
+.relative .absolute.right-1 {
+  right: 2px;
 }
 
-/* Make the input field more compact */
-.relative.bg-gray-100.rounded-full {
+/* Style the input field with border */
+.relative.bg-white.border.rounded-full {
+  border-color: #e5e7eb !important;
   padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Reduce the height of the input field */
+/* Style the input text */
 .w-full.bg-transparent.px-3.py-2 {
   padding-top: 0.4rem !important;
   padding-bottom: 0.4rem !important;
   font-size: 0.875rem !important;
+  color: #6b7280 !important;
+}
+
+/* Style the input placeholder */
+.w-full.bg-transparent.px-3.py-2::placeholder {
+  color: #9ca3af !important;
 }
 
 /* Make the send/mic button larger */

@@ -217,16 +217,16 @@ function Transcript({
 
       {showTextInput && (
         <div className="absolute bottom-2 left-0 right-0 p-3 bg-white">
-          <div className="relative bg-gray-100 rounded-full py-1 px-4">
+          <div className="relative bg-white border border-gray-200 rounded-full py-1 px-4 shadow-sm">
             <input 
               ref={inputRef}
               value={userText}
               onChange={e => setUserText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
-              className="w-full bg-transparent px-3 py-2 focus:outline-none pr-14 text-sm"
+              className="w-full bg-transparent px-3 py-2 focus:outline-none pr-14 text-sm text-gray-600"
             />
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
               {userText.trim() ? (
                 <button 
                   onClick={onSendMessage}
