@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import * as TextChatConnection from './TextChatConnection';
 import { Button } from '../ui/button';
@@ -24,7 +23,6 @@ export const TextChatComponent: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [minimized, setMinimized] = useState(false);
   
-  // Add initial welcome message when chat first loads
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([{
@@ -36,12 +34,10 @@ export const TextChatComponent: React.FC = () => {
     }
   }, []);
   
-  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
   
-  // Handle incoming messages
   useEffect(() => {
     const handleMessage = (message: string) => {
       setMessages(prev => [...prev, {
@@ -66,17 +62,10 @@ export const TextChatComponent: React.FC = () => {
   const initializeConnection = async () => {
     setIsConnecting(true);
     try {
-      // Initialize WebRTC connection (no audio stream)
       const peerConnection = TextChatConnection.initializeConnection();
-      
-      // Create an offer
       const offer = await TextChatConnection.createOffer();
-      
-      // Here you would typically send this offer to your signaling server
-      // For demo purposes, we'll generate a connection ID
       const newConnectionId = crypto.randomUUID().substring(0, 8);
       setConnectionId(newConnectionId);
-      
       setIsConnected(true);
       toast.success('Connection initialized. Share your connection ID with others.');
     } catch (error) {
@@ -95,14 +84,9 @@ export const TextChatComponent: React.FC = () => {
     
     setIsConnecting(true);
     try {
-      // Here you would typically fetch the offer from your signaling server using the remotePeerId
-      // For demo purposes, we'll simulate receiving an offer
       const simulatedOffer = { type: 'offer', sdp: 'simulated-sdp' } as RTCSessionDescriptionInit;
-      
-      // Initialize connection and handle the offer
       TextChatConnection.initializeConnection();
       await TextChatConnection.handleOffer(simulatedOffer);
-      
       setIsConnected(true);
       toast.success('Connected successfully');
     } catch (error) {
@@ -121,7 +105,6 @@ export const TextChatComponent: React.FC = () => {
         TextChatConnection.sendMessage(inputValue);
       }
       
-      // Add message to local state
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         text: inputValue,
@@ -129,7 +112,6 @@ export const TextChatComponent: React.FC = () => {
         timestamp: new Date()
       }]);
       
-      // Clear input
       setInputValue('');
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -155,10 +137,8 @@ export const TextChatComponent: React.FC = () => {
     );
   }
   
-  // Main chat component with updated styling to match the reference image
   return (
     <div className="fixed bottom-6 right-6 w-[350px] h-[600px] bg-white rounded-[20px] shadow-xl overflow-hidden flex flex-col z-50">
-      {/* Header with simplified design */}
       <div className="flex items-center justify-between p-5 border-b border-gray-100">
         <div className="flex items-center">
           <h2 className="text-xl font-medium">Enzo AI</h2>
@@ -168,7 +148,6 @@ export const TextChatComponent: React.FC = () => {
         </button>
       </div>
 
-      {/* Chat area */}
       {!isConnected ? (
         <div className="flex-1 p-4 flex flex-col justify-center">
           <div className="space-y-4">
@@ -220,7 +199,7 @@ export const TextChatComponent: React.FC = () => {
           </div>
         </div>
       ) : (
-        <ScrollArea className="flex-1 p-4">
+        <ScrollArea className="flex-1 p-4 pb-24">
           <div className="space-y-4">
             {messages.map((message) => (
               <div 
@@ -248,9 +227,8 @@ export const TextChatComponent: React.FC = () => {
         </ScrollArea>
       )}
       
-      {/* Message input with new rounded styling */}
       {isConnected && (
-        <div className="p-4">
+        <div className="absolute bottom-0 left-0 right-0 p-4 pb-6">
           <form 
             onSubmit={(e) => {
               e.preventDefault();

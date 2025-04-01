@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -43,7 +42,6 @@ function Transcript({
     }
   };
 
-  // Get function icon based on function name
   const getFunctionIcon = (functionName: string) => {
     switch (functionName) {
       case 'search_products':
@@ -66,7 +64,6 @@ function Transcript({
     }
   };
 
-  // Get function colors based on function name
   const getFunctionStyles = (functionName: string) => {
     switch (functionName) {
       case 'search_products':
@@ -114,10 +111,9 @@ function Transcript({
     }
   };
 
-  // For voice mode, return a consistent bar UI with increased size
   if (isVoiceMode) {
     return (
-      <div className="p-4 pb-8">
+      <div className="p-4 pb-8 mt-auto">
         <div className="flex items-center bg-gray-100 rounded-full py-4 px-4">
           <div className="w-full bg-transparent px-4 py-4 text-gray-500 font-medium">
             Voice mode active - speak to interact
@@ -130,16 +126,13 @@ function Transcript({
     );
   }
 
-  // Extract function name from breadcrumb
   const getFunctionName = (data: any) => {
     if (!data) return null;
     
-    // Case 1: Direct function call from function_call_arguments.done event
     if (data.attemptedEvent?.type === 'function_call_arguments.done') {
       return data.attemptedEvent?.name;
     }
     
-    // Case 2: Function name in the title
     if (data.title) {
       const title = String(data.title || '').toLowerCase();
       if (title.includes('function call:')) {
@@ -147,7 +140,6 @@ function Transcript({
       }
     }
     
-    // Case 3: Check if we have a name property directly in the data
     if (data.name) {
       return data.name;
     }
@@ -156,12 +148,10 @@ function Transcript({
   };
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex flex-col w-full h-full relative">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
         {transcriptItems.map((item) => {
-          // Display function call breadcrumbs with special styling
           if (item.type === 'BREADCRUMB') {
-            // Extract function name from the breadcrumb data
             const functionName = getFunctionName(item.data);
             
             if (functionName) {
@@ -190,7 +180,6 @@ function Transcript({
             }
           }
           
-          // Regular user/assistant messages
           if (item.type === 'MESSAGE') {
             return (
               <div
@@ -221,7 +210,7 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="p-4 pb-24 mt-auto">
+        <div className="absolute bottom-0 left-0 right-0 p-4 pb-6">
           <div className="flex items-center bg-gray-100 rounded-full py-3 px-4">
             <input
               ref={inputRef}
