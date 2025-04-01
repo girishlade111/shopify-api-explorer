@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX, AlertCircle } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, AlertCircle, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
@@ -249,7 +249,7 @@ export default function VoiceDemo() {
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Atelier Assistant</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <IconButton
               checked={isTranscriptionEnabled}
               onChange={setIsTranscriptionEnabled}
@@ -264,6 +264,14 @@ export default function VoiceDemo() {
               iconOff={VolumeX}
               disabled={sessionStatus !== 'CONNECTED'}
             />
+            {/* Close Button - X in the corner */}
+            <button 
+              onClick={() => window.history.back()}
+              className="ml-2 rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
+              aria-label="Close voice assistant"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </div>
 

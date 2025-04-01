@@ -5,7 +5,7 @@ import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, X } from 'lucide-react';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -160,6 +160,14 @@ export default function AtelierChat() {
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Atelier Chat</h2>
+          {/* Close Button - X in the corner */}
+          <button 
+            onClick={() => window.history.back()}
+            className="rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
+            aria-label="Close chat assistant"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {error && (

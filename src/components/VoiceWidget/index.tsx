@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Mic, MessageSquare } from 'lucide-react';
+import { Mic, MessageSquare, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
 import AtelierChat from './AtelierChat';
 import { TranscriptProvider } from './contexts/TranscriptContext';
