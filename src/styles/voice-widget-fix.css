@@ -46,3 +46,11 @@ body {
 .fixed.bottom-6.left-6.z-40 .p-4 {
   padding: 0.75rem !important;
 }
+
+/* Style the muted indicators */
+.text-gray-400.flex.items-center {
+  opacity: 0.7;
+  padding: 2px 5px;
+  border-radius: 12px;
+  background: #f3f4f6;
+}

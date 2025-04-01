@@ -5,7 +5,8 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ScrollArea } from '../ui/scroll-area';
 import { toast } from 'sonner';
-import { Mic, X } from 'lucide-react';
+import { Mic, X, MicOff, VolumeX } from 'lucide-react';
+import { createRealtimeConnection, cleanupConnection } from '../VoiceWidget/lib/realtimeConnection';
 
 interface Message {
   id: string;
@@ -23,6 +24,8 @@ export const TextChatComponent: React.FC = () => {
   const [remotePeerId, setRemotePeerId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [minimized, setMinimized] = useState(false);
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
   
   useEffect(() => {
     if (messages.length === 0) {
@@ -57,8 +60,34 @@ export const TextChatComponent: React.FC = () => {
       if (isConnected) {
         TextChatConnection.closeConnection();
       }
+      // Always cleanup any real-time connections to ensure microphone is released
+      cleanupConnection(pcRef.current);
+      pcRef.current = null;
+      if (audioElementRef.current) {
+        audioElementRef.current.srcObject = null;
+      }
     };
   }, [isConnected]);
+
+  // Always ensure audio is muted in text chat mode
+  useEffect(() => {
+    // Create a silent audio element to maintain compatibility with WebRTC
+    if (!audioElementRef.current) {
+      const audio = new Audio();
+      audio.autoplay = false;
+      audio.muted = true; // Always muted in text chat
+      audioElementRef.current = audio;
+    }
+    
+    // Ensure any active microphone track is disabled
+    if (pcRef.current) {
+      pcRef.current.getSenders().forEach(sender => {
+        if (sender.track && sender.track.kind === 'audio') {
+          sender.track.enabled = false;
+        }
+      });
+    }
+  }, []);
   
   const initializeConnection = async () => {
     setIsConnecting(true);
@@ -139,14 +168,20 @@ export const TextChatComponent: React.FC = () => {
   }
   
   return (
-    <div className="fixed bottom-6 right-6 w-[350px] h-[600px] bg-white rounded-[20px] shadow-xl overflow-hidden flex flex-col z-50">
-      <div className="flex items-center justify-between p-5 border-b border-gray-100">
+    <div className="fixed bottom-6 right-6 w-[320px] h-[500px] bg-white rounded-[20px] shadow-xl overflow-hidden flex flex-col z-50">
+      <div className="flex items-center justify-between p-3 border-b border-gray-100">
         <div className="flex items-center">
-          <h2 className="text-xl font-medium">Enzo AI</h2>
+          <h2 className="text-lg font-medium">Enzo AI</h2>
         </div>
-        <button onClick={handleClose} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
-          <X className="h-5 w-5 text-gray-500" />
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="text-gray-400 flex items-center">
+            <MicOff size={16} className="mr-1" />
+            <VolumeX size={16} />
+          </div>
+          <button onClick={handleClose} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+            <X className="h-5 w-5 text-gray-500" />
+          </button>
+        </div>
       </div>
 
       {!isConnected ? (
@@ -229,7 +264,7 @@ export const TextChatComponent: React.FC = () => {
       )}
       
       {isConnected && (
-        <div className="px-4 py-4 pb-6 mt-auto">
+        <div className="px-4 py-3 pb-4 mt-auto">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
@@ -246,9 +281,9 @@ export const TextChatComponent: React.FC = () => {
               />
               <button 
                 type="submit"
-                className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center text-white"
+                className="w-8 h-8 rounded-full bg-[#33C3F0] flex items-center justify-center text-white"
               >
-                <Mic className="h-5 w-5" />
+                <MicOff className="h-4 w-4" />
               </button>
             </div>
           </form>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
