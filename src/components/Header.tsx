@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, User, Menu, X, Search, Sparkles, Heart } from "lucide-react";
@@ -53,7 +54,8 @@ const Header = () => {
           isScrolled ? "bg-white shadow-soft" : "bg-white"
         }`}
         style={{ 
-          padding: isScrolled ? "0.5rem 0" : "1.25rem 0"
+          padding: isScrolled ? "0.5rem 0" : "1.25rem 0",
+          top: 0
         }}
       >
         <div className="container-wide">

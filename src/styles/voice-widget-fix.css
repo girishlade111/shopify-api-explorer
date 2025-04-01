@@ -5,18 +5,27 @@
   padding-bottom: 0;
 }
 
-/* Ensure the widget container has no extra space */
+/* Ensure the widget container has no extra space but don't affect header positioning */
 #root {
   margin-bottom: 0;
   padding-bottom: 0;
   min-height: 100vh;
 }
 
-/* Remove any potential margin/padding on body */
+/* Remove any potential margin/padding on body but don't affect header */
 body {
   margin-bottom: 0;
   padding-bottom: 0;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Ensure header stays fixed at top */
+header.fixed {
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 50 !important; 
+  width: 100% !important;
 }
 
 /* Remove any border or shadow from the input area */
@@ -105,7 +114,7 @@ body {
 input[placeholder="Type your message here..."],
 textarea[placeholder="Type your message here..."] {
   padding-left: 0.5rem !important;
-  padding-right: 2rem !important;
+  padding-right: 2rem !important; /* Reduced to 2rem */
 }
 
 /* Style the textarea to match the input field */
@@ -118,7 +127,7 @@ textarea {
   border: none !important;
   outline: none !important;
   background: transparent !important;
-  padding-right: 2rem !important;
+  padding-right: 2rem !important; /* Reduced to 2rem */
 }
 
 /* Force all textareas to have sufficient padding */
@@ -126,18 +135,18 @@ textarea,
 textarea.pr-16, 
 textarea.pr-20,
 .w-full.bg-transparent {
-  padding-right: 2rem !important;
+  padding-right: 2rem !important; /* Reduced to 2rem */
 }
 
 /* Additional styling to prevent text overflow */
 .relative .textarea-container {
-  padding-right: 2rem !important;
+  padding-right: 2rem !important; /* Reduced to 2rem */
   width: 100%;
 }
 
 /* Give the textarea proper spacing from the button */
 .w-full.bg-transparent {
-  margin-right: 1.5rem !important;
+  margin-right: 1.5rem !important; /* Reduced to match the new padding */
 }
 
 /* Ensure button doesn't overlap text */
@@ -145,48 +154,14 @@ textarea.pr-20,
   z-index: 10;
 }
 
-/* Fix for the chat widget container to ensure proper layout */
+/* Make sure chat widget doesn't overlap with page content */
 .fixed.bottom-6.left-6.z-40 {
-  display: flex;
-  flex-direction: column;
+  max-height: 80vh;
+  bottom: 1.5rem !important;
+  z-index: 40 !important; /* Lower than header's z-index */
 }
 
-/* Make sure the header is always visible and fixed at the top */
-.fixed.bottom-6.left-6.z-40 > div:first-child {
-  display: flex !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 50 !important;
-  background-color: white !important;
-  border-bottom: 1px solid #f1f1f1 !important;
-  width: 100% !important;
-  padding: 12px !important;
-}
-
-/* Ensure the header has enough visual prominence */
-.fixed.bottom-6.left-6.z-40 .sticky.top-0 {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 50 !important;
-  background-color: white !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Ensure proper spacing between header and content */
-.fixed.bottom-6.left-6.z-40 > div > .flex-1.overflow-hidden {
-  padding-top: 0 !important;
-  height: calc(100% - 50px) !important;
-  overflow: hidden !important;
-}
-
-/* Ensure transcript content area doesn't overflow */
-.flex-1.overflow-y-auto.p-4.space-y-5.pb-16 {
-  height: calc(100% - 60px) !important;
-  overflow-y: auto !important;
-}
-
-/* Ensure proper menu positioning */
-.fixed.bottom-6.left-6.z-40 .absolute.top-12 {
-  top: 45px !important;
-  z-index: 60 !important;
+/* Ensure main content has proper padding to not get hidden under header */
+main.pt-20 {
+  padding-top: 5rem !important; /* Increased padding to account for header height */
 }

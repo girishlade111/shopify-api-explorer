@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -233,7 +232,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   return (
     <div className="fixed bottom-6 left-6 z-40 w-[320px] h-[500px] bg-white rounded-[20px] shadow-none transition-all duration-300 overflow-hidden flex flex-col">
-      <div className="sticky top-0 flex items-center justify-between p-3 bg-white z-30 border-b border-gray-100">
+      <div className="flex items-center justify-between p-3 relative">
         <button 
           onClick={() => setMenuOpen(!menuOpen)} 
           className="p-2"
@@ -294,23 +293,21 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         </div>
       )}
 
-      <div className="flex-1 overflow-hidden">
-        <TranscriptProvider>
-          <EventProvider>
-            <CopilotDemoApp
-              initialSessionStatus={sessionStatus}
-              onSessionStatusChange={setSessionStatus}
-              peerConnection={pcRef.current}
-              dataChannel={dcRef.current}
-              isTranscriptionEnabled={false}
-              isAudioEnabled={false}
-              instructions={instructions}
-              tools={tools}
-              onSwitchToVoiceMode={switchToVoiceMode}
-            />
-          </EventProvider>
-        </TranscriptProvider>
-      </div>
+      <TranscriptProvider>
+        <EventProvider>
+          <CopilotDemoApp
+            initialSessionStatus={sessionStatus}
+            onSessionStatusChange={setSessionStatus}
+            peerConnection={pcRef.current}
+            dataChannel={dcRef.current}
+            isTranscriptionEnabled={false}
+            isAudioEnabled={false}
+            instructions={instructions}
+            tools={tools}
+            onSwitchToVoiceMode={switchToVoiceMode}
+          />
+        </EventProvider>
+      </TranscriptProvider>
     </div>
   );
 }
