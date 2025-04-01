@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Mic, MessageSquare, X } from 'lucide-react';
+import { Menu, Mic, MessageSquare, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
 import AtelierChat from './AtelierChat';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -33,18 +33,13 @@ const VoiceWidget = () => {
           }
         }}
         className={isOpen 
-          ? "fixed bottom-6 left-6 z-50 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-200"
-          : "fixed bottom-6 left-6 z-50 bg-white text-black px-6 py-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 min-w-[280px]"}
+          ? "hidden" // Hide the button when chat is open
+          : "fixed bottom-6 right-6 z-50 bg-white text-black p-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"}
         aria-label="Toggle voice assistant"
       >
-        {isOpen ? (
-          <span className="w-6 h-6">×</span>
-        ) : (
-          <>
-            <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0"></div>
-            <span className="font-medium">Click here to chat with AI!</span>
-          </>
-        )}
+        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center">
+          <MessageSquare className="w-5 h-5 text-white" />
+        </div>
       </button>
 
       {/* Voice Widget Container */}
@@ -54,35 +49,50 @@ const VoiceWidget = () => {
             {showChatView ? (
               activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
             ) : (
-              <div className="fixed bottom-24 left-6 z-40 w-[320px] bg-white rounded-[20px] shadow-lg transition-all duration-300">
-                <div className="p-5">
-                  <h2 className="text-center text-xl font-medium mb-5 text-gray-800">How do you want to chat today?</h2>
-                  
-                  <div className="flex gap-4">
-                    {/* Voice Chat Option */}
+              <div className="fixed bottom-0 right-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b">
+                  <button className="p-2">
+                    <Menu className="w-6 h-6 text-gray-700" />
+                  </button>
+                  <h2 className="text-xl font-semibold">Enzo AI</h2>
+                  <button onClick={() => setIsOpen(false)} className="p-2">
+                    <X className="w-6 h-6 text-gray-700" />
+                  </button>
+                </div>
+                
+                {/* Chat content */}
+                <div className="flex-1 overflow-y-auto p-4">
+                  <div className="flex items-start mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
+                    <div className="bg-gray-100 rounded-lg p-4 max-w-[75%]">
+                      <p>Hello! I am Enzo, your AI Agent to help you shop.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Input area */}
+                <div className="p-4 border-t">
+                  <div className="flex items-center bg-gray-100 rounded-full">
+                    <input
+                      type="text"
+                      placeholder="Type your message here..."
+                      className="w-full bg-transparent px-4 py-3 focus:outline-none"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          setShowChatView(true);
+                          setActiveChatType('atelier');
+                        }
+                      }}
+                    />
                     <button 
                       onClick={() => {
                         setShowChatView(true);
                         setActiveChatType('ai');
                       }}
-                      className="flex-1 flex flex-col items-center justify-center bg-[#87CEEB] text-white p-6 rounded-lg hover:bg-[#6BBBDF] transition-colors"
-                      aria-label="Voice chat"
+                      className="bg-[#33C3F0] rounded-full p-3 mx-2"
                     >
-                      <Mic className="w-8 h-8 mb-2" />
-                      <span className="text-lg">Voice</span>
-                    </button>
-                    
-                    {/* Text Chat Option */}
-                    <button
-                      onClick={() => {
-                        setShowChatView(true);
-                        setActiveChatType('atelier');
-                      }}
-                      className="flex-1 flex flex-col items-center justify-center bg-[#87CEEB] text-white p-6 rounded-lg hover:bg-[#6BBBDF] transition-colors"
-                      aria-label="Text chat"
-                    >
-                      <MessageSquare className="w-8 h-8 mb-2" />
-                      <span className="text-lg">Text</span>
+                      <Mic className="w-5 h-5 text-white" />
                     </button>
                   </div>
                 </div>

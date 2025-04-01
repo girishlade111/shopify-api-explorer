@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
+import { Menu, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
-import { AlertCircle, X } from 'lucide-react';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -156,26 +155,20 @@ export default function AtelierChat() {
   };
 
   return (
-    <div className="fixed bottom-24 left-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Atelier Chat</h2>
-          {/* Close Button - X in the corner */}
-          <button 
-            onClick={() => window.history.back()}
-            className="rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
-            aria-label="Close chat assistant"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {error && (
-          <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
+    <div className="fixed bottom-0 right-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <button className="p-2">
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
+        <h2 className="text-xl font-semibold">Enzo AI</h2>
+        <button 
+          onClick={() => window.history.back()}
+          className="p-2"
+          aria-label="Close chat assistant"
+        >
+          <X className="w-6 h-6 text-gray-700" />
+        </button>
       </div>
 
       <TranscriptProvider>

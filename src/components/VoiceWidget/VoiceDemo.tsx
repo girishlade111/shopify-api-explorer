@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX, AlertCircle, X } from 'lucide-react';
+import { Menu, Mic, MicOff, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
@@ -20,7 +19,6 @@ const MAX_CONNECTION_RETRIES = 3;
 
 export default function VoiceDemo() {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
-  // Set microphone and speaker to true by default for voice mode
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,13 +31,11 @@ export default function VoiceDemo() {
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load persisted settings on component mount, but don't override default settings
   useEffect(() => {
     const storedSettings = localStorage.getItem('voiceWidgetSettings');
     if (storedSettings) {
       try {
         const settings = JSON.parse(storedSettings);
-        // Only apply stored settings if they exist, otherwise use our defaults
         if (settings.isTranscriptionEnabled !== undefined) {
           setIsTranscriptionEnabled(settings.isTranscriptionEnabled);
         }
@@ -52,11 +48,8 @@ export default function VoiceDemo() {
     }
   }, []);
 
-  // Auto-connect when component mounts
   useEffect(() => {
     connectToService();
-    
-    // Disconnect when component unmounts
     return () => {
       cleanupResources();
       if (connectionTimeoutRef.current) {
@@ -65,7 +58,6 @@ export default function VoiceDemo() {
     };
   }, []);
 
-  // Save settings whenever they change
   useEffect(() => {
     localStorage.setItem('voiceWidgetSettings', JSON.stringify({
       isTranscriptionEnabled,
@@ -93,21 +85,15 @@ export default function VoiceDemo() {
   }, [isAudioEnabled]);
 
   const cleanupResources = () => {
-    // Clean up RTCPeerConnection
     cleanupConnection(pcRef.current);
     pcRef.current = null;
-    
-    // Clear data channel reference
     dcRef.current = null;
-    
-    // Clear audio element
     if (audioElementRef.current) {
       audioElementRef.current.srcObject = null;
     }
   };
 
   const connectToService = async () => {
-    // Don't try to connect if we've exceeded the retry limit
     if (connectionRetries >= MAX_CONNECTION_RETRIES) {
       setError(`Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`);
       setSessionStatus('DISCONNECTED');
@@ -118,7 +104,6 @@ export default function VoiceDemo() {
     setError(null);
 
     try {
-      // Set a connection timeout
       const connectionPromise = new Promise<void>(async (resolve, reject) => {
         try {
           const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
@@ -143,7 +128,6 @@ export default function VoiceDemo() {
             throw new Error('No client secret found in response');
           }
 
-          // Clean up any existing connections before creating a new one
           cleanupResources();
 
           const { pc, dc } = await createRealtimeConnection(
@@ -157,7 +141,7 @@ export default function VoiceDemo() {
           setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
-          setConnectionRetries(0); // Reset retries on successful connection
+          setConnectionRetries(0);
 
           if (audioElementRef.current && isAudioEnabled) {
             try {
@@ -173,17 +157,14 @@ export default function VoiceDemo() {
         }
       });
 
-      // Set a connection timeout
       const timeoutPromise = new Promise<void>((_, reject) => {
         connectionTimeoutRef.current = setTimeout(() => {
           reject(new Error('Connection timed out. Please try again.'));
-        }, 10000); // 10 second timeout
+        }, 10000);
       });
 
-      // Race the connection promise against the timeout
       await Promise.race([connectionPromise, timeoutPromise]);
-      
-      // Clear the timeout if successful
+
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
         connectionTimeoutRef.current = null;
@@ -199,15 +180,13 @@ export default function VoiceDemo() {
       );
       setSessionStatus('DISCONNECTED');
       
-      // Increment retry counter
       setConnectionRetries(prev => prev + 1);
-      
-      // If we haven't exceeded the retry limit, try again after a delay
+
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
         console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
         setTimeout(() => {
           connectToService();
-        }, 2000); // Wait 2 seconds before retrying
+        }, 2000);
       }
     }
   };
@@ -234,53 +213,46 @@ export default function VoiceDemo() {
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         ${
           checked
-            ? 'bg-[#5856d6] text-white hover:bg-[#4745ac] cursor-pointer'
+            ? 'bg-[#33C3F0] text-white hover:bg-[#30B4DD] cursor-pointer'
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
         }
       `}
       disabled={disabled}
     >
-      {checked ? <Icon className="w-6 h-6" /> : <IconOff className="w-6 h-6" />}
+      {checked ? <Icon className="w-5 h-5" /> : <IconOff className="w-5 h-5" />}
     </button>
   );
 
   return (
-    <div className="fixed bottom-24 left-6 z-40 w-[400px] bg-white rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100">
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Atelier Assistant</h2>
-          <div className="flex gap-2 items-center">
-            <IconButton
-              checked={isTranscriptionEnabled}
-              onChange={setIsTranscriptionEnabled}
-              icon={Mic}
-              iconOff={MicOff}
-              disabled={sessionStatus !== 'CONNECTED'}
-            />
-            <IconButton
-              checked={isAudioEnabled}
-              onChange={setIsAudioEnabled}
-              icon={Volume2}
-              iconOff={VolumeX}
-              disabled={sessionStatus !== 'CONNECTED'}
-            />
-            {/* Close Button - X in the corner */}
-            <button 
-              onClick={() => window.history.back()}
-              className="ml-2 rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
-              aria-label="Close voice assistant"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+    <div className="fixed bottom-0 right-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+      <div className="flex items-center justify-between p-4 border-b">
+        <button className="p-2">
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
+        <h2 className="text-xl font-semibold">Enzo AI</h2>
+        <div className="flex items-center gap-1">
+          <IconButton
+            checked={isTranscriptionEnabled}
+            onChange={setIsTranscriptionEnabled}
+            icon={Mic}
+            iconOff={MicOff}
+            disabled={sessionStatus !== 'CONNECTED'}
+          />
+          <IconButton
+            checked={isAudioEnabled}
+            onChange={setIsAudioEnabled}
+            icon={Volume2}
+            iconOff={VolumeX}
+            disabled={sessionStatus !== 'CONNECTED'}
+          />
+          <button 
+            onClick={() => window.history.back()}
+            className="p-2 ml-1"
+            aria-label="Close voice assistant"
+          >
+            <X className="w-6 h-6 text-gray-700" />
+          </button>
         </div>
-
-        {error && (
-          <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-4">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
       </div>
 
       <TranscriptProvider>
@@ -294,7 +266,7 @@ export default function VoiceDemo() {
             isAudioEnabled={isAudioEnabled}
             instructions={instructions}
             tools={tools}
-            isVoiceMode={true} // This is a voice-only mode
+            isVoiceMode={true}
           />
         </EventProvider>
       </TranscriptProvider>
