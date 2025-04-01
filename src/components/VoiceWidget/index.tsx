@@ -34,12 +34,13 @@ const VoiceWidget = () => {
         }}
         className={isOpen 
           ? "hidden" // Hide the button when chat is open
-          : "fixed bottom-6 left-6 z-50 bg-white text-black p-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"}
+          : "fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"}
         aria-label="Toggle voice assistant"
       >
-        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center">
-          <MessageSquare className="w-5 h-5 text-white" />
+        <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
+          <MessageSquare className="w-6 h-6 text-white" />
         </div>
+        <span className="text-lg font-medium">Click here to chat with AI!</span>
       </button>
 
       {/* Voice Widget Container */}
