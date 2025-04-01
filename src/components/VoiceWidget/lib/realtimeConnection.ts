@@ -36,10 +36,13 @@ export function cleanupConnection(pc: RTCPeerConnection | null): void {
 export async function createRealtimeConnection(
   EPHEMERAL_KEY: string,
   audioElement: RefObject<HTMLAudioElement | null>,
-  isAudioEnabled: boolean = false
+  isAudioEnabled: boolean = false,
+  skipAudioStream: boolean = false // New parameter to skip audio stream creation
 ): Promise<{ pc: RTCPeerConnection; dc: RTCDataChannel }> {
-  // First check if microphone is supported
-  await checkMicrophoneSupport();
+  // Only check microphone support if we're not skipping audio stream
+  if (!skipAudioStream) {
+    await checkMicrophoneSupport();
+  }
   
   // Log user profile at session start
   try {
@@ -93,33 +96,39 @@ export async function createRealtimeConnection(
 
   let stream: MediaStream | null = null;
   try {
-    // Request microphone access with specific constraints for better quality
-    stream = await navigator.mediaDevices.getUserMedia({ 
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1,
-        sampleRate: 48000,
-        sampleSize: 16
-      }
-    });
+    // Only request microphone access if not skipping audio stream
+    if (!skipAudioStream) {
+      // Request microphone access with specific constraints for better quality
+      stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: 48000,
+          sampleSize: 16
+        }
+      });
 
-    // Add all audio tracks from the stream
-    stream.getAudioTracks().forEach(track => {
-      pc.addTrack(track, stream!);
-    });
-  } catch (err) {
-    if (err instanceof Error) {
-      if (err.name === "NotAllowedError") {
-        throw new Error("Microphone access was denied. Please allow microphone access in your browser settings and try again.");
-      } else if (err.name === "NotFoundError") {
-        throw new Error("No microphone found. Please connect a microphone and try again.");
-      } else if (err.name === "NotReadableError") {
-        throw new Error("Your microphone is busy or not responding. Please check your microphone connection and try again.");
-      }
+      // Add all audio tracks from the stream
+      stream.getAudioTracks().forEach(track => {
+        pc.addTrack(track, stream!);
+      });
     }
-    throw new Error("Failed to access microphone. Please check your microphone settings and try again.");
+  } catch (err) {
+    // Only throw errors related to microphone if we're not skipping audio stream
+    if (!skipAudioStream) {
+      if (err instanceof Error) {
+        if (err.name === "NotAllowedError") {
+          throw new Error("Microphone access was denied. Please allow microphone access in your browser settings and try again.");
+        } else if (err.name === "NotFoundError") {
+          throw new Error("No microphone found. Please connect a microphone and try again.");
+        } else if (err.name === "NotReadableError") {
+          throw new Error("Your microphone is busy or not responding. Please check your microphone connection and try again.");
+        }
+      }
+      throw new Error("Failed to access microphone. Please check your microphone settings and try again.");
+    }
   }
 
   // Create data channel with more reliable options
