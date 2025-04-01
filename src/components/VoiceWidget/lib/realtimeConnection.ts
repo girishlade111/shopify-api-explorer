@@ -1,3 +1,4 @@
+
 import { RefObject } from "react";
 
 async function checkMicrophoneSupport() {
@@ -118,7 +119,7 @@ export async function createRealtimeConnection(
     console.warn("ICE candidate error:", {
       errorCode: event.errorCode,
       errorText: event.errorText,
-      hostCandidate: event.hostCandidate,
+      // Remove hostCandidate property as it's not supported in the type
       url: event.url
     });
   };
