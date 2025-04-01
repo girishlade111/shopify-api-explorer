@@ -54,7 +54,7 @@ const VoiceWidget = () => {
             {showChatView ? (
               activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
             ) : (
-              <div className="fixed bottom-24 left-6 z-40 w-[320px] bg-white rounded-lg shadow-lg transition-all duration-300 transform translate-y-0 opacity-100">
+              <div className="fixed bottom-24 left-6 z-40 w-[320px] bg-white rounded-lg shadow-lg transition-all duration-300">
                 <div className="p-4">
                   <h2 className="text-center text-lg font-medium mb-4">How do you want to chat today?</h2>
                   
