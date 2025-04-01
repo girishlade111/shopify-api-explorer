@@ -84,22 +84,22 @@ const VoiceWidget = () => {
         <TranscriptProvider>
           <EventProvider>
             {showModeSelection ? (
-              <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[500px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[320px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
                 {/* Mode Selection Content - Simplified without header */}
-                <div className="flex-1 py-3 px-6 flex flex-col items-center justify-center">
-                  <h3 className="text-2xl font-bold mb-4">Choose your mode</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-md">
+                <div className="flex-1 py-2 px-4 flex flex-col items-center justify-center">
+                  <h3 className="text-xl font-bold mb-3">Choose your mode</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-md">
                     <button
                       onClick={() => {
                         setShowModeSelection(false);
                         setShowChatView(true);
                         setActiveChatType('atelier');
                       }}
-                      className="flex flex-col items-center p-4 bg-white border-2 border-gray-200 rounded-xl hover:border-[#33C3F0] transition-all duration-200"
+                      className="flex flex-col items-center p-3 bg-white border-2 border-gray-200 rounded-xl hover:border-[#33C3F0] transition-all duration-200"
                     >
-                      <MessageSquare size={40} className="text-[#33C3F0] mb-3" />
-                      <span className="text-lg font-semibold">Text Chat</span>
-                      <p className="text-gray-500 text-center mt-1">Chat by typing messages</p>
+                      <MessageSquare size={32} className="text-[#33C3F0] mb-2" />
+                      <span className="text-base font-semibold">Text Chat</span>
+                      <p className="text-gray-500 text-center text-sm">Chat by typing messages</p>
                     </button>
                     
                     <button
@@ -108,11 +108,11 @@ const VoiceWidget = () => {
                         setShowChatView(true);
                         setActiveChatType('ai');
                       }}
-                      className="flex flex-col items-center p-4 bg-white border-2 border-gray-200 rounded-xl hover:border-[#33C3F0] transition-all duration-200"
+                      className="flex flex-col items-center p-3 bg-white border-2 border-gray-200 rounded-xl hover:border-[#33C3F0] transition-all duration-200"
                     >
-                      <Mic size={40} className="text-[#33C3F0] mb-3" />
-                      <span className="text-lg font-semibold">Voice Chat</span>
-                      <p className="text-gray-500 text-center mt-1">Chat by speaking out loud</p>
+                      <Mic size={32} className="text-[#33C3F0] mb-2" />
+                      <span className="text-base font-semibold">Voice Chat</span>
+                      <p className="text-gray-500 text-center text-sm">Chat by speaking out loud</p>
                     </button>
                   </div>
                 </div>
