@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -176,9 +177,9 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           </SheetTrigger>
           <SheetContent 
             side="inner" 
-            className="p-0 bg-white/95 backdrop-blur-sm"
+            className="p-0"
           >
-            <div className="h-full flex flex-col justify-center items-center">
+            <div className="w-full h-full flex items-center justify-center">
               <div className="bg-white rounded-xl shadow-lg w-[250px] overflow-hidden">
                 <div className="flex flex-col py-2">
                   <button 
