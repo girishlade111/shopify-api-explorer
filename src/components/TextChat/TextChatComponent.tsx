@@ -26,6 +26,8 @@ export const TextChatComponent: React.FC = () => {
   const [minimized, setMinimized] = useState(false);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
+  const dcRef = useRef<RTCDataChannel | null>(null);
+  const ephemeralKeyRef = useRef<string>('');
   
   useEffect(() => {
     if (messages.length === 0) {
@@ -36,6 +38,11 @@ export const TextChatComponent: React.FC = () => {
         timestamp: new Date()
       }]);
     }
+
+    // Generate a dummy ephemeral key for demo purposes
+    // In a real application, this would be fetched from your backend
+    ephemeralKeyRef.current = "sk-" + Array.from(window.crypto.getRandomValues(new Uint8Array(32)))
+      .map(b => b.toString(16).padStart(2, "0")).join("");
   }, []);
   
   useEffect(() => {
@@ -63,6 +70,7 @@ export const TextChatComponent: React.FC = () => {
       // Always cleanup any real-time connections to ensure microphone is released
       cleanupConnection(pcRef.current);
       pcRef.current = null;
+      dcRef.current = null;
       if (audioElementRef.current) {
         audioElementRef.current.srcObject = null;
       }
@@ -92,12 +100,39 @@ export const TextChatComponent: React.FC = () => {
   const initializeConnection = async () => {
     setIsConnecting(true);
     try {
-      const peerConnection = TextChatConnection.initializeConnection();
-      const offer = await TextChatConnection.createOffer();
+      // Instead of using TextChatConnection, we'll use the real-time connection
+      // but with the audio stream disabled
+      const { pc, dc } = await createRealtimeConnection(
+        ephemeralKeyRef.current,
+        audioElementRef,
+        false, // isAudioEnabled
+        true // skipAudioStream - this will keep the microphone muted
+      );
+      
+      pcRef.current = pc;
+      dcRef.current = dc;
+      
+      // Set up data channel event handlers
+      dc.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data?.type && data?.item?.content?.[0]?.text) {
+            setMessages(prev => [...prev, {
+              id: crypto.randomUUID(),
+              text: data.item.content[0].text,
+              sender: 'remote',
+              timestamp: new Date()
+            }]);
+          }
+        } catch (err) {
+          console.error('Error parsing message:', err);
+        }
+      };
+      
       const newConnectionId = crypto.randomUUID().substring(0, 8);
       setConnectionId(newConnectionId);
       setIsConnected(true);
-      toast.success('Connection initialized. Share your connection ID with others.');
+      toast.success('Connection initialized successfully');
     } catch (error) {
       console.error('Failed to initialize connection:', error);
       toast.error('Failed to initialize connection');
@@ -114,10 +149,10 @@ export const TextChatComponent: React.FC = () => {
     
     setIsConnecting(true);
     try {
-      const simulatedOffer = { type: 'offer', sdp: 'simulated-sdp' } as RTCSessionDescriptionInit;
-      TextChatConnection.initializeConnection();
-      await TextChatConnection.handleOffer(simulatedOffer);
-      setIsConnected(true);
+      // For the demo, we'll just initialize a new connection instead of
+      // actually joining an existing one
+      await initializeConnection();
+      
       toast.success('Connected successfully');
     } catch (error) {
       console.error('Failed to join connection:', error);
@@ -131,16 +166,25 @@ export const TextChatComponent: React.FC = () => {
     if (!inputValue.trim()) return;
     
     try {
-      if (isConnected) {
-        TextChatConnection.sendMessage(inputValue);
-      }
-      
+      // Add message to local state
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         text: inputValue,
         sender: 'local',
         timestamp: new Date()
       }]);
+      
+      // Send message through data channel if connected
+      if (isConnected && dcRef.current && dcRef.current.readyState === 'open') {
+        const messageObj = {
+          type: "conversation.item.create",
+          item: {
+            role: "user",
+            content: [{ text: inputValue }],
+          },
+        };
+        dcRef.current.send(JSON.stringify(messageObj));
+      }
       
       setInputValue('');
     } catch (error) {
@@ -189,7 +233,7 @@ export const TextChatComponent: React.FC = () => {
           <div className="space-y-4">
             <div className="text-center">
               <h3 className="text-lg font-medium mb-1">Start a new chat</h3>
-              <p className="text-sm text-gray-500 mb-4">Connect with others to chat</p>
+              <p className="text-sm text-gray-500 mb-4">Connect with our AI shopping assistant</p>
             </div>
             
             <div className="flex flex-col gap-3">
@@ -198,39 +242,14 @@ export const TextChatComponent: React.FC = () => {
                 disabled={isConnecting}
                 className="w-full bg-[#33C3F0] hover:bg-[#2AA9D2]"
               >
-                Create New Chat
+                Connect to AI Assistant
               </Button>
               
               {connectionId && (
                 <div className="text-sm border p-3 rounded bg-gray-50 text-center">
-                  Share this ID: <span className="font-bold">{connectionId}</span>
+                  Connected successfully!
                 </div>
               )}
-              
-              <div className="relative mt-2">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">or join existing</span>
-                </div>
-              </div>
-              
-              <div className="flex gap-2 mt-2">
-                <Input
-                  value={remotePeerId}
-                  onChange={(e) => setRemotePeerId(e.target.value)}
-                  placeholder="Enter connection ID"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={joinConnection}
-                  disabled={isConnecting || !remotePeerId}
-                  variant="outline"
-                >
-                  Join
-                </Button>
-              </div>
             </div>
           </div>
         </div>
