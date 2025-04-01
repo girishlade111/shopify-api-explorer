@@ -40,8 +40,8 @@ const sheetVariants = cva(
         left: "inset-y-0 left-0 h-full w-3/4 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
         right:
           "inset-y-0 right-0 h-full w-3/4 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
-        // Add a new 'inner' variant for contained menu
-        inner: "absolute left-0 top-16 h-auto w-full max-w-[280px] rounded-lg data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+        // Update the inner variant to be more like an overlay within the parent container
+        inner: "absolute left-0 top-0 w-full h-full rounded-[24px] data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 border-none shadow-none",
       },
     },
     defaultVariants: {

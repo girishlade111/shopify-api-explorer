@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -36,11 +35,9 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // Auto-connect when component mounts
   useEffect(() => {
     connectToService();
     
-    // Disconnect when component unmounts
     return () => {
       cleanupResources();
       if (connectionTimeoutRef.current) {
@@ -50,21 +47,15 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   }, []);
 
   const cleanupResources = () => {
-    // Clean up RTCPeerConnection
     cleanupConnection(pcRef.current);
     pcRef.current = null;
-    
-    // Clear data channel reference
     dcRef.current = null;
-    
-    // Clear audio element
     if (audioElementRef.current) {
       audioElementRef.current.srcObject = null;
     }
   };
 
   const connectToService = async () => {
-    // Don't try to connect if we've exceeded the retry limit
     if (connectionRetries >= MAX_CONNECTION_RETRIES) {
       setError(`Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`);
       setSessionStatus('DISCONNECTED');
@@ -75,7 +66,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     setError(null);
 
     try {
-      // Set a connection timeout
       const connectionPromise = new Promise<void>(async (resolve, reject) => {
         try {
           const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
@@ -100,13 +90,12 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
             throw new Error('No client secret found in response');
           }
 
-          // Clean up any existing connections before creating a new one
           cleanupResources();
 
           const { pc, dc } = await createRealtimeConnection(
             clientSecret,
             audioElementRef,
-            false // Audio is always disabled for text chat
+            false
           );
 
           pcRef.current = pc;
@@ -114,25 +103,20 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           setInstructions(sessionInstructions || "");
           setTools(sessionTools);
           setSessionStatus('CONNECTED');
-          setConnectionRetries(0); // Reset retries on successful connection
-          
-          resolve();
+          setConnectionRetries(0);
         } catch (error) {
           reject(error);
         }
       });
 
-      // Set a connection timeout
       const timeoutPromise = new Promise<void>((_, reject) => {
         connectionTimeoutRef.current = setTimeout(() => {
           reject(new Error('Connection timed out. Please try again.'));
-        }, 10000); // 10 second timeout
+        }, 10000);
       });
 
-      // Race the connection promise against the timeout
       await Promise.race([connectionPromise, timeoutPromise]);
-      
-      // Clear the timeout if successful
+
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
         connectionTimeoutRef.current = null;
@@ -148,21 +132,18 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       );
       setSessionStatus('DISCONNECTED');
       
-      // Increment retry counter
       setConnectionRetries(prev => prev + 1);
       
-      // If we haven't exceeded the retry limit, try again after a delay
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
         console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
         setTimeout(() => {
           connectToService();
-        }, 2000); // Wait 2 seconds before retrying
+        }, 2000);
       }
     }
   };
 
   const switchToVoiceMode = () => {
-    // Instead of window.history.back()
     onClose({ preventDefault: () => {} } as React.MouseEvent);
     setTimeout(() => {
       const voiceButton = document.querySelector('.bg-[#33C3F0].rounded-full.p-3.mx-2');
@@ -186,7 +167,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   return (
     <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-      {/* Header without border */}
       <div className="flex items-center justify-between p-4 relative">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
@@ -196,32 +176,36 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           </SheetTrigger>
           <SheetContent 
             side="inner" 
-            className="w-[250px] p-0 rounded-xl bg-white shadow-md border border-gray-200 mt-2"
+            className="p-0 bg-white/95 backdrop-blur-sm"
           >
-            <div className="flex flex-col py-2">
-              <button 
-                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
-                onClick={switchToVoiceMode}
-              >
-                <Mic className="w-5 h-5" />
-                <span className="text-base">Switch to Voice</span>
-              </button>
-              
-              <button 
-                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
-                onClick={speakToHuman}
-              >
-                <Headphones className="w-5 h-5" />
-                <span className="text-base">Speak to Human</span>
-              </button>
-              
-              <button 
-                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
-                onClick={resetChat}
-              >
-                <RefreshCw className="w-5 h-5" />
-                <span className="text-base">Reset Chat</span>
-              </button>
+            <div className="h-full flex flex-col justify-center items-center">
+              <div className="bg-white rounded-xl shadow-lg w-[250px] overflow-hidden">
+                <div className="flex flex-col py-2">
+                  <button 
+                    className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                    onClick={switchToVoiceMode}
+                  >
+                    <Mic className="w-5 h-5" />
+                    <span className="text-base">Switch to Voice</span>
+                  </button>
+                  
+                  <button 
+                    className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                    onClick={speakToHuman}
+                  >
+                    <Headphones className="w-5 h-5" />
+                    <span className="text-base">Speak to Human</span>
+                  </button>
+                  
+                  <button 
+                    className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                    onClick={resetChat}
+                  >
+                    <RefreshCw className="w-5 h-5" />
+                    <span className="text-base">Reset Chat</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </SheetContent>
         </Sheet>
@@ -242,8 +226,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
             onSessionStatusChange={setSessionStatus}
             peerConnection={pcRef.current}
             dataChannel={dcRef.current}
-            isTranscriptionEnabled={false} // Always false for text chat
-            isAudioEnabled={false} // Always false for text chat
+            isTranscriptionEnabled={false}
+            isAudioEnabled={false}
             instructions={instructions}
             tools={tools}
           />
