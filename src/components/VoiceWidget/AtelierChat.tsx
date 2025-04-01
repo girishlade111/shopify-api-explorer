@@ -35,7 +35,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
-  const isMountedRef = useRef(true); // Add a ref to track component mount state
+  const isMountedRef = useRef(true); // Track component mount state
+  const connectionInProgressRef = useRef(false); // Prevent multiple connection attempts
 
   useEffect(() => {
     const audioEl = new Audio();
@@ -43,10 +44,13 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     audioEl.muted = true;
     audioElementRef.current = audioEl;
     
-    connectToService();
+    // Only start connecting if we're not already trying to connect
+    if (!connectionInProgressRef.current) {
+      connectToService();
+    }
     
     return () => {
-      isMountedRef.current = false; // Set to false on unmount
+      isMountedRef.current = false;
       cleanupResources();
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
@@ -68,6 +72,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   };
 
   const connectToService = async () => {
+    if (!isMountedRef.current) return;
+    
     if (connectionRetries >= MAX_CONNECTION_RETRIES) {
       const errorMsg = `Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`;
       setError(errorMsg);
@@ -76,6 +82,9 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       return;
     }
 
+    // Set flag to prevent multiple connection attempts
+    connectionInProgressRef.current = true;
+    
     setSessionStatus('CONNECTING');
     setError(null);
     
@@ -94,15 +103,16 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     
     let timeoutTriggered = false;
     connectionTimeoutRef.current = setTimeout(() => {
+      if (!isMountedRef.current) return;
+      
       timeoutTriggered = true;
       if (isMountedRef.current && abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
       
-      if (!isMountedRef.current) return;
-      
       setError('Connection timed out. Please try again.');
       setSessionStatus('DISCONNECTED');
+      connectionInProgressRef.current = false;
       
       setConnectionRetries(prev => prev + 1);
       
@@ -119,6 +129,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     }, CONNECTION_TIMEOUT_MS);
 
     try {
+      console.log("Attempting to fetch session data from:", `${NGROK_URL}/openai-realtime/session/${STORE_URL}`);
+      
       const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
         method: 'GET',
         mode: 'cors',
@@ -129,7 +141,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         signal
       });
 
-      if (!isMountedRef.current) return; // Check if component is still mounted
+      if (!isMountedRef.current) return;
 
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
@@ -145,6 +157,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       }
 
       const data = await response.json();
+      console.log("Session data received:", data);
+      
       const clientSecret = data.result?.client_secret?.value;
       const sessionInstructions = data.result?.instructions;
       const sessionTools = data.result?.tools || [];
@@ -155,11 +169,12 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
       cleanupResources();
 
+      console.log("Creating new real-time connection with received client secret");
       const { pc, dc } = await createRealtimeConnection(
         clientSecret,
         audioElementRef,
-        false,
-        false
+        false, // isAudioEnabled
+        true  // skipAudioStream - we want to keep the microphone muted for text chat
       );
 
       if (!isMountedRef.current) {
@@ -168,17 +183,46 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         return;
       }
 
+      // Store the peer connection and data channel refs for later use
       pcRef.current = pc;
       dcRef.current = dc;
+      
+      // Add extra event listeners for connection stability
+      dc.onclose = () => {
+        console.log("Data channel closed unexpectedly");
+        if (isMountedRef.current && sessionStatus === 'CONNECTED') {
+          setSessionStatus('DISCONNECTED');
+          toast.error("Connection lost. Attempting to reconnect...");
+          setTimeout(() => {
+            if (isMountedRef.current) connectToService();
+          }, 2000);
+        }
+      };
+      
+      pc.oniceconnectionstatechange = () => {
+        console.log(`ICE connection state: ${pc.iceConnectionState}`);
+        if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'disconnected') {
+          if (isMountedRef.current && sessionStatus === 'CONNECTED') {
+            setSessionStatus('DISCONNECTED');
+            toast.error("Connection lost. Attempting to reconnect...");
+            setTimeout(() => {
+              if (isMountedRef.current) connectToService();
+            }, 2000);
+          }
+        }
+      };
+
       setInstructions(sessionInstructions || "");
       setTools(sessionTools);
       setSessionStatus('CONNECTED');
       setConnectionRetries(0);
+      connectionInProgressRef.current = false;
       
       console.log("Chat session established successfully.");
+      toast.success("Connected successfully!");
       
     } catch (error) {
-      if (!isMountedRef.current) return; // Check if component is still mounted
+      if (!isMountedRef.current) return;
       
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
@@ -194,8 +238,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         console.error('Error connecting:', error);
       }
       
-      if (!isMountedRef.current) return;
-      
       cleanupResources();
       
       const errorMessage = error instanceof Error
@@ -204,6 +246,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       
       setError(errorMessage);
       setSessionStatus('DISCONNECTED');
+      connectionInProgressRef.current = false;
       
       setConnectionRetries(prev => prev + 1);
       
@@ -216,6 +259,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         }, 2000);
       } else {
         console.error(`Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`);
+        toast.error("Failed to connect after multiple attempts. Please try again later.");
       }
     }
   };
@@ -241,6 +285,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   const resetChat = () => {
     cleanupResources();
+    setConnectionRetries(0); // Reset retry counter on manual reset
     connectToService();
     setMenuOpen(false);
   };
@@ -319,6 +364,19 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
                 {error}
               </p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {sessionStatus === 'CONNECTING' && (
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mx-3 mb-2">
+          <div className="flex items-center">
+            <div className="mr-2">
+              <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+            </div>
+            <p className="text-xs text-blue-700">
+              Connecting to assistant...
+            </p>
           </div>
         </div>
       )}

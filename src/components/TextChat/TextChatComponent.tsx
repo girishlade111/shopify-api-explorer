@@ -1,11 +1,10 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import * as TextChatConnection from './TextChatConnection';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ScrollArea } from '../ui/scroll-area';
 import { toast } from 'sonner';
-import { Mic, X, MicOff, VolumeX } from 'lucide-react';
+import { Mic, X, MicOff, VolumeX, Send } from 'lucide-react';
 import { createRealtimeConnection, cleanupConnection } from '../VoiceWidget/lib/realtimeConnection';
 
 interface Message {
@@ -28,6 +27,7 @@ export const TextChatComponent: React.FC = () => {
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
   const ephemeralKeyRef = useRef<string>('');
+  const connectionAttemptRef = useRef<boolean>(false);
   
   useEffect(() => {
     if (messages.length === 0) {
@@ -43,43 +43,8 @@ export const TextChatComponent: React.FC = () => {
     // In a real application, this would be fetched from your backend
     ephemeralKeyRef.current = "sk-" + Array.from(window.crypto.getRandomValues(new Uint8Array(32)))
       .map(b => b.toString(16).padStart(2, "0")).join("");
-  }, []);
-  
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-  
-  useEffect(() => {
-    const handleMessage = (message: string) => {
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(),
-        text: message,
-        sender: 'remote',
-        timestamp: new Date()
-      }]);
-    };
-    
-    if (isConnected) {
-      TextChatConnection.onMessageReceived(handleMessage);
-    }
-    
-    return () => {
-      if (isConnected) {
-        TextChatConnection.closeConnection();
-      }
-      // Always cleanup any real-time connections to ensure microphone is released
-      cleanupConnection(pcRef.current);
-      pcRef.current = null;
-      dcRef.current = null;
-      if (audioElementRef.current) {
-        audioElementRef.current.srcObject = null;
-      }
-    };
-  }, [isConnected]);
-
-  // Always ensure audio is muted in text chat mode
-  useEffect(() => {
-    // Create a silent audio element to maintain compatibility with WebRTC
+      
+    // Initialize audio element
     if (!audioElementRef.current) {
       const audio = new Audio();
       audio.autoplay = false;
@@ -87,39 +52,76 @@ export const TextChatComponent: React.FC = () => {
       audioElementRef.current = audio;
     }
     
-    // Ensure any active microphone track is disabled
-    if (pcRef.current) {
-      pcRef.current.getSenders().forEach(sender => {
-        if (sender.track && sender.track.kind === 'audio') {
-          sender.track.enabled = false;
-        }
-      });
+    // Auto-connect when the component mounts
+    if (!isConnected && !isConnecting && !connectionAttemptRef.current) {
+      connectionAttemptRef.current = true;
+      initializeConnection();
     }
+    
+    return () => {
+      // Clean up WebRTC resources when component unmounts
+      cleanupResources();
+    };
   }, []);
+  
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+  
+  const cleanupResources = () => {
+    if (isConnected) {
+      setIsConnected(false);
+    }
+    
+    // Always cleanup any real-time connections to ensure microphone is released
+    cleanupConnection(pcRef.current);
+    pcRef.current = null;
+    dcRef.current = null;
+    
+    if (audioElementRef.current) {
+      audioElementRef.current.srcObject = null;
+    }
+  };
   
   const initializeConnection = async () => {
     setIsConnecting(true);
     try {
-      // Instead of using TextChatConnection, we'll use the real-time connection
-      // but with the audio stream disabled
+      console.log("Initializing WebRTC connection for text chat");
+      // Create real-time connection with audio stream disabled
       const { pc, dc } = await createRealtimeConnection(
         ephemeralKeyRef.current,
         audioElementRef,
         false, // isAudioEnabled
-        true // skipAudioStream - this will keep the microphone muted
+        true   // skipAudioStream - this will keep the microphone muted
       );
       
       pcRef.current = pc;
       dcRef.current = dc;
       
+      console.log("Connection established successfully");
+      
       // Set up data channel event handlers
       dc.onmessage = (event) => {
         try {
+          console.log("Received message:", event.data);
           const data = JSON.parse(event.data);
-          if (data?.type && data?.item?.content?.[0]?.text) {
+          if (data?.type === "response.done") {
+            // Handle response.done event
+            if (data?.response?.output?.[0]?.content?.[0]?.transcript) {
+              const transcript = data.response.output[0].content[0].transcript;
+              setMessages(prev => [...prev, {
+                id: crypto.randomUUID(),
+                text: transcript,
+                sender: 'remote',
+                timestamp: new Date()
+              }]);
+            }
+          }
+          else if (data?.item?.content?.[0]?.text || data?.item?.content?.[0]?.transcript) {
+            const messageText = data.item.content[0].text || data.item.content[0].transcript;
             setMessages(prev => [...prev, {
               id: crypto.randomUUID(),
-              text: data.item.content[0].text,
+              text: messageText,
               sender: 'remote',
               timestamp: new Date()
             }]);
@@ -129,15 +131,50 @@ export const TextChatComponent: React.FC = () => {
         }
       };
       
+      dc.onopen = () => {
+        console.log("Data channel opened");
+        setIsConnected(true);
+        setIsConnecting(false);
+        
+        // Initialize the session with text-only mode
+        const sessionUpdateEvent = {
+          type: "session.update",
+          session: {
+            modalities: ["text"],
+            instructions: "You are Enzo, a helpful AI shopping assistant.",
+            tools: [],
+            voice: "alloy",
+            input_audio_format: "pcm16",
+            output_audio_format: "pcm16",
+            input_audio_transcription: null,
+            turn_detection: null,
+          },
+        };
+        
+        dc.send(JSON.stringify(sessionUpdateEvent));
+      };
+      
+      dc.onclose = () => {
+        console.log("Data channel closed");
+        setIsConnected(false);
+      };
+      
+      dc.onerror = (error) => {
+        console.error("Data channel error:", error);
+        setIsConnected(false);
+        setIsConnecting(false);
+        toast.error("Connection error. Please try again.");
+      };
+      
       const newConnectionId = crypto.randomUUID().substring(0, 8);
       setConnectionId(newConnectionId);
-      setIsConnected(true);
+      
       toast.success('Connection initialized successfully');
     } catch (error) {
       console.error('Failed to initialize connection:', error);
-      toast.error('Failed to initialize connection');
-    } finally {
+      toast.error('Failed to initialize connection: ' + (error instanceof Error ? error.message : 'Unknown error'));
       setIsConnecting(false);
+      cleanupResources();
     }
   };
   
@@ -179,11 +216,22 @@ export const TextChatComponent: React.FC = () => {
         const messageObj = {
           type: "conversation.item.create",
           item: {
+            id: crypto.randomUUID(),
+            type: "message",
             role: "user",
-            content: [{ text: inputValue }],
+            content: [{ type: "input_text", text: inputValue }],
           },
         };
         dcRef.current.send(JSON.stringify(messageObj));
+        
+        // Request a response
+        const responseObj = {
+          type: "response.create"
+        };
+        dcRef.current.send(JSON.stringify(responseObj));
+      } else {
+        console.error('Cannot send message: not connected');
+        toast.error('Not connected to AI. Please try reconnecting.');
       }
       
       setInputValue('');
@@ -195,6 +243,13 @@ export const TextChatComponent: React.FC = () => {
 
   const handleClose = () => {
     setMinimized(true);
+  };
+  
+  const handleReconnect = () => {
+    cleanupResources();
+    setTimeout(() => {
+      initializeConnection();
+    }, 500);
   };
   
   if (minimized) {
@@ -228,7 +283,7 @@ export const TextChatComponent: React.FC = () => {
         </div>
       </div>
 
-      {!isConnected ? (
+      {!isConnected && !isConnecting ? (
         <div className="flex-1 p-4 flex flex-col justify-center">
           <div className="space-y-4">
             <div className="text-center">
@@ -242,7 +297,7 @@ export const TextChatComponent: React.FC = () => {
                 disabled={isConnecting}
                 className="w-full bg-[#33C3F0] hover:bg-[#2AA9D2]"
               >
-                Connect to AI Assistant
+                {isConnecting ? 'Connecting...' : 'Connect to AI Assistant'}
               </Button>
               
               {connectionId && (
@@ -252,6 +307,11 @@ export const TextChatComponent: React.FC = () => {
               )}
             </div>
           </div>
+        </div>
+      ) : isConnecting ? (
+        <div className="flex-1 p-4 flex flex-col justify-center items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#33C3F0]"></div>
+          <p className="mt-4 text-gray-500">Connecting to AI Assistant...</p>
         </div>
       ) : (
         <ScrollArea className="flex-1 py-2">
@@ -302,10 +362,21 @@ export const TextChatComponent: React.FC = () => {
                 type="submit"
                 className="w-8 h-8 rounded-full bg-[#33C3F0] flex items-center justify-center text-white"
               >
-                <MicOff className="h-4 w-4" />
+                <Send className="h-4 w-4" />
               </button>
             </div>
           </form>
+          
+          {!isConnected && (
+            <div className="mt-2 text-center">
+              <button 
+                onClick={handleReconnect} 
+                className="text-xs text-[#33C3F0] hover:underline"
+              >
+                Connection lost. Click to reconnect.
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
