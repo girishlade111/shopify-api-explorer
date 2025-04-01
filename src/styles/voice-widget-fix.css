@@ -5,18 +5,27 @@
   padding-bottom: 0;
 }
 
-/* Ensure the widget container has no extra space */
+/* Ensure the widget container has no extra space but don't affect header positioning */
 #root {
   margin-bottom: 0;
   padding-bottom: 0;
   min-height: 100vh;
 }
 
-/* Remove any potential margin/padding on body */
+/* Remove any potential margin/padding on body but don't affect header */
 body {
   margin-bottom: 0;
   padding-bottom: 0;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Ensure header stays fixed at top */
+header.fixed {
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 50 !important; 
+  width: 100% !important;
 }
 
 /* Remove any border or shadow from the input area */
@@ -143,4 +152,16 @@ textarea.pr-20,
 /* Ensure button doesn't overlap text */
 .absolute.right-2.top-1\/2.transform.-translate-y-1\/2 {
   z-index: 10;
+}
+
+/* Make sure chat widget doesn't overlap with page content */
+.fixed.bottom-6.left-6.z-40 {
+  max-height: 80vh;
+  bottom: 1.5rem !important;
+  z-index: 40 !important; /* Lower than header's z-index */
+}
+
+/* Ensure main content has proper padding to not get hidden under header */
+main.pt-20 {
+  padding-top: 5rem !important; /* Increased padding to account for header height */
 }
