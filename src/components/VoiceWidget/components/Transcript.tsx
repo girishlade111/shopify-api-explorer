@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -217,25 +216,25 @@ function Transcript({
 
       {showTextInput && (
         <div className="absolute bottom-2 left-0 right-0 p-3 bg-white">
-          <div className="relative bg-white border border-gray-200 rounded-full py-1 px-4 shadow-sm">
+          <div className="relative bg-gray-100 rounded-full py-1 px-4">
             <input 
               ref={inputRef}
               value={userText}
               onChange={e => setUserText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
-              className="w-full bg-transparent px-3 py-2 focus:outline-none pr-14 text-sm text-gray-600"
+              className="w-full bg-transparent px-3 py-2 focus:outline-none pr-14 text-sm"
             />
-            <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
               {userText.trim() ? (
                 <button 
                   onClick={onSendMessage}
                   disabled={!canSend || !userText.trim()}
-                  className={`bg-[#33C3F0] rounded-full p-2.5 text-white ${
+                  className={`bg-[#33C3F0] rounded-full p-2 text-white ${
                     canSend && userText.trim() ? 'hover:bg-[#30B4DD]' : 'opacity-50 cursor-not-allowed'
                   }`}
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4" />
                 </button>
               ) : (
                 <button 
@@ -244,10 +243,10 @@ function Transcript({
                       onSwitchToVoiceMode();
                     }
                   }}
-                  className="bg-[#33C3F0] rounded-full p-2.5 text-white hover:bg-[#30B4DD]"
+                  className="bg-[#33C3F0] rounded-full p-2 text-white hover:bg-[#30B4DD]"
                   aria-label="Switch to voice mode"
                 >
-                  <Mic className="w-5 h-5" />
+                  <Mic className="w-4 h-4" />
                 </button>
               )}
             </div>
