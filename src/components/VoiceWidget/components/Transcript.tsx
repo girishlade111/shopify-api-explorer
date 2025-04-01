@@ -87,7 +87,7 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="p-4">
+        <div className="p-4 pb-6 mt-2">
           <div className="flex items-center bg-gray-100 rounded-full">
             <input
               ref={inputRef}
