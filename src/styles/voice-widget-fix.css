@@ -85,64 +85,9 @@ body {
 
 /* Reduce bottom padding for the message container */
 .flex-1.overflow-y-auto.p-4.space-y-5.pb-16 {
-  padding-bottom: 2.5rem !important;
-}
-
-/* Lift the input area from the bottom */
-.absolute.bottom-2.left-0.right-0.p-3 {
-  padding: 0.5rem !important;
-  bottom: 10px !important;
-}
-
-/* Reduce input field horizontal padding */
-.relative.bg-gray-100.rounded-full.py-1.px-4,
-.relative.bg-gray-100.rounded-full.py-1.px-2 {
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
-}
-
-/* Ensure text starts closer to the left edge but has adequate space on the right */
-input[placeholder="Type your message here..."],
-textarea[placeholder="Type your message here..."] {
-  padding-left: 0.5rem !important;
-  padding-right: 2rem !important;
-}
-
-/* Style the textarea to match the input field */
-.resize-none.min-h-\[40px\] {
-  line-height: 1.5 !important;
-}
-
-/* Remove default textarea styling */
-textarea {
-  border: none !important;
-  outline: none !important;
-  background: transparent !important;
-  padding-right: 2rem !important;
-}
-
-/* Force all textareas to have sufficient padding */
-textarea, 
-textarea.pr-16, 
-textarea.pr-20,
-.w-full.bg-transparent {
-  padding-right: 2rem !important;
-}
-
-/* Additional styling to prevent text overflow */
-.relative .textarea-container {
-  padding-right: 2rem !important;
-  width: 100%;
-}
-
-/* Give the textarea proper spacing from the button */
-.w-full.bg-transparent {
-  margin-right: 1.5rem !important;
-}
-
-/* Ensure button doesn't overlap text */
-.absolute.right-2.top-1\/2.transform.-translate-y-1\/2 {
-  z-index: 10;
+  padding-bottom: 5rem !important;
+  height: calc(100% - 60px) !important;
+  overflow-y: auto !important;
 }
 
 /* Fix for the chat widget container to ensure proper layout */
@@ -179,14 +124,65 @@ textarea.pr-20,
   overflow: hidden !important;
 }
 
-/* Ensure transcript content area doesn't overflow */
-.flex-1.overflow-y-auto.p-4.space-y-5.pb-16 {
-  height: calc(100% - 60px) !important;
-  overflow-y: auto !important;
-}
-
 /* Ensure proper menu positioning */
 .fixed.bottom-6.left-6.z-40 .absolute.top-12 {
   top: 45px !important;
   z-index: 60 !important;
+}
+
+/* Fix the input box positioning - ADDED */
+.absolute.bottom-2.left-0.right-0.p-3 {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  padding: 10px !important;
+  background-color: white !important;
+  z-index: 40 !important;
+}
+
+/* Make sure the text input is visible - ADDED */
+.relative.bg-gray-100.rounded-full.py-1.px-4,
+.relative.bg-gray-100.rounded-full.py-1.px-2 {
+  display: flex !important;
+  padding: 8px 16px !important;
+  border-radius: 9999px !important;
+}
+
+/* Ensure text area is properly styled - ADDED */
+.resize-none.min-h-\[40px\] {
+  min-height: 40px !important;
+  max-height: 100px !important;
+}
+
+/* Remove default textarea styling */
+textarea {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding-right: 2rem !important;
+}
+
+/* Force all textareas to have sufficient padding */
+textarea, 
+textarea.pr-16, 
+textarea.pr-20,
+.w-full.bg-transparent {
+  padding-right: 2rem !important;
+}
+
+/* Additional styling to prevent text overflow */
+.relative .textarea-container {
+  padding-right: 2rem !important;
+  width: 100%;
+}
+
+/* Give the textarea proper spacing from the button */
+.w-full.bg-transparent {
+  margin-right: 1.5rem !important;
+}
+
+/* Ensure button doesn't overlap text */
+.absolute.right-2.top-1\/2.transform.-translate-y-1\/2 {
+  z-index: 10;
 }
