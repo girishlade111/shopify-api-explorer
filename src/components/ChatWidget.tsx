@@ -31,7 +31,7 @@ const ChatWidget: React.FC = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -103,6 +103,19 @@ const ChatWidget: React.FC = () => {
     }
   };
 
+  const ChatMessage = ({ message }: { message: Message }) => (
+    <div 
+      className={`message-container ${message.isUser ? 'justify-end' : 'justify-start'}`}
+    >
+      {!message.isUser && (
+        <div className="bot-avatar">E</div>
+      )}
+      <div className={`message ${message.isUser ? 'user-message' : 'bot-message'}`}>
+        {message.text}
+      </div>
+    </div>
+  );
+
   if (isMinimized) {
     return (
       <div 
@@ -167,10 +180,9 @@ const ChatWidget: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 w-80 bg-white rounded-lg shadow-lg 
-                    overflow-hidden flex flex-col animate-fade-in z-50" style={{ height: '500px' }}>
-      {/* Fixed position header that stays in place */}
-      <div className="chat-header">
+    <div className="chat-widget-container animate-fade-in">
+      {/* Fixed position header */}
+      <div className="fixed-chat-header">
         <button 
           onClick={() => setIsSidePanelOpen(true)}
           className="p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
@@ -190,54 +202,59 @@ const ChatWidget: React.FC = () => {
       
       {/* Scrollable chat content */}
       <div 
-        ref={messagesContainerRef}
-        className="chat-widget-messages"
+        ref={chatContainerRef}
+        className="chat-message-container"
       >
         {messages.map(message => (
-          <div 
-            key={message.id} 
-            className={`message-container ${message.isUser ? 'justify-end' : 'justify-start'}`}
-          >
-            {!message.isUser && (
-              <div className="bot-avatar">E</div>
-            )}
-            <div className={`message ${message.isUser ? 'user-message' : 'bot-message'}`}>
-              {message.text}
-            </div>
-          </div>
+          <ChatMessage key={message.id} message={message} />
         ))}
         <div ref={messagesEndRef} />
       </div>
       
       {/* Fixed position footer input area */}
-      <div className="chat-widget-input">
-        <div className="chat-input-container">
+      <div className="fixed-chat-input">
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }} 
+          className="flex items-center gap-2 bg-gray-50 rounded-full p-2 pl-4 focus-within:ring-2 focus-within:ring-gray-200 transition-all"
+        >
           <input
             type="text"
-            className="chat-input"
-            placeholder="Type your message here..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            placeholder="Type your message here..."
+            className="flex-1 bg-transparent border-none text-gray-700 focus:outline-none text-sm"
           />
           
           {input.trim() ? (
             <button 
-              onClick={handleSend}
-              className="chat-send-button"
-              aria-label="Send message"
+              type="submit" 
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-colors"
+              style={{
+                background: "linear-gradient(135deg, #70e7fd, #3ac7fb, #96edf5)",
+                backgroundSize: "200% 200%",
+                animation: "gradientShift 10s ease infinite"
+              }}
             >
               <ArrowUp size={16} />
             </button>
           ) : (
             <button 
-              className="chat-send-button"
-              aria-label="Voice input"
+              type="button"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-colors"
+              style={{
+                background: "linear-gradient(135deg, #70e7fd, #3ac7fb, #96edf5)",
+                backgroundSize: "200% 200%",
+                animation: "gradientShift 10s ease infinite"
+              }}
             >
-              <Mic size={16} />
+              <Mic size={16} className="text-white" />
             </button>
           )}
-        </div>
+        </form>
       </div>
     </div>
   );
