@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Headphones, Menu, Mic, RefreshCw, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -28,6 +29,7 @@ export default function AtelierChat() {
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   // Auto-connect when component mounts
   useEffect(() => {
@@ -154,13 +156,66 @@ export default function AtelierChat() {
     }
   };
 
+  const switchToVoiceMode = () => {
+    window.history.back();
+    setTimeout(() => {
+      const voiceButton = document.querySelector('.bg-[#33C3F0].rounded-full.p-3.mx-2');
+      if (voiceButton) {
+        (voiceButton as HTMLElement).click();
+      }
+    }, 100);
+    setSheetOpen(false);
+  };
+
+  const speakToHuman = () => {
+    console.log("Speak to human functionality would be implemented here");
+    setSheetOpen(false);
+  };
+
+  const resetChat = () => {
+    cleanupResources();
+    connectToService();
+    setSheetOpen(false);
+  };
+
   return (
-    <div className="fixed bottom-0 right-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
-        <button className="p-2">
-          <Menu className="w-6 h-6 text-gray-700" />
-        </button>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetTrigger asChild>
+            <button className="p-2">
+              <Menu className="w-6 h-6 text-gray-700" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[300px] p-0">
+            <div className="flex flex-col py-4">
+              <button 
+                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                onClick={switchToVoiceMode}
+              >
+                <Mic className="w-6 h-6" />
+                <span className="text-lg">Switch to Voice</span>
+              </button>
+              
+              <button 
+                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                onClick={speakToHuman}
+              >
+                <Headphones className="w-6 h-6" />
+                <span className="text-lg">Speak to Human</span>
+              </button>
+              
+              <button 
+                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                onClick={resetChat}
+              >
+                <RefreshCw className="w-6 h-6" />
+                <span className="text-lg">Reset Chat</span>
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
         <h2 className="text-xl font-semibold">Enzo AI</h2>
         <button 
           onClick={() => window.history.back()}

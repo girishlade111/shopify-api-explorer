@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Mic, MicOff, Volume2, VolumeX, X } from 'lucide-react';
+import { Headphones, Menu, Mic, MicOff, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -30,6 +31,7 @@ export default function VoiceDemo() {
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
     const storedSettings = localStorage.getItem('voiceWidgetSettings');
@@ -191,60 +193,102 @@ export default function VoiceDemo() {
     }
   };
 
-  const IconButton = ({
-    checked,
-    onChange,
-    icon: Icon,
-    iconOff: IconOff,
-    disabled = false,
-  }: {
-    checked: boolean;
-    onChange: (val: boolean) => void;
-    icon: React.ComponentType<any>;
-    iconOff: React.ComponentType<any>;
-    disabled?: boolean;
-  }) => (
-    <button
-      role="switch"
-      aria-checked={checked}
-      onClick={() => !disabled && onChange(!checked)}
-      className={`
-        p-3 rounded-full transition-all duration-200
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        ${
-          checked
-            ? 'bg-[#33C3F0] text-white hover:bg-[#30B4DD] cursor-pointer'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
-        }
-      `}
-      disabled={disabled}
-    >
-      {checked ? <Icon className="w-5 h-5" /> : <IconOff className="w-5 h-5" />}
-    </button>
-  );
+  const switchToTextMode = () => {
+    window.history.back();
+    setTimeout(() => {
+      const textButton = document.querySelector('input[type="text"]');
+      if (textButton) {
+        (textButton as HTMLElement).focus();
+      }
+    }, 100);
+    setSheetOpen(false);
+  };
+
+  const speakToHuman = () => {
+    console.log("Speak to human functionality would be implemented here");
+    setSheetOpen(false);
+  };
+
+  const resetChat = () => {
+    cleanupResources();
+    connectToService();
+    setSheetOpen(false);
+  };
 
   return (
-    <div className="fixed bottom-0 right-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
-        <button className="p-2">
-          <Menu className="w-6 h-6 text-gray-700" />
-        </button>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetTrigger asChild>
+            <button className="p-2">
+              <Menu className="w-6 h-6 text-gray-700" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[300px] p-0">
+            <div className="flex flex-col py-4">
+              <button 
+                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                onClick={switchToTextMode}
+              >
+                <Mic className="w-6 h-6" />
+                <span className="text-lg">Switch to Text</span>
+              </button>
+              
+              <button 
+                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                onClick={speakToHuman}
+              >
+                <Headphones className="w-6 h-6" />
+                <span className="text-lg">Speak to Human</span>
+              </button>
+              
+              <button 
+                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                onClick={resetChat}
+              >
+                <RefreshCw className="w-6 h-6" />
+                <span className="text-lg">Reset Chat</span>
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
         <h2 className="text-xl font-semibold">Enzo AI</h2>
         <div className="flex items-center gap-1">
-          <IconButton
-            checked={isTranscriptionEnabled}
-            onChange={setIsTranscriptionEnabled}
-            icon={Mic}
-            iconOff={MicOff}
+          <button 
+            role="switch"
+            aria-checked={isTranscriptionEnabled}
+            onClick={() => setIsTranscriptionEnabled(!isTranscriptionEnabled)}
+            className={`
+              p-3 rounded-full transition-all duration-200
+              ${sessionStatus !== 'CONNECTED' ? 'opacity-50 cursor-not-allowed' : ''}
+              ${
+                isTranscriptionEnabled
+                  ? 'bg-[#33C3F0] text-white hover:bg-[#30B4DD] cursor-pointer'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
+              }
+            `}
             disabled={sessionStatus !== 'CONNECTED'}
-          />
-          <IconButton
-            checked={isAudioEnabled}
-            onChange={setIsAudioEnabled}
-            icon={Volume2}
-            iconOff={VolumeX}
+          >
+            {isTranscriptionEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+          </button>
+          <button 
+            role="switch"
+            aria-checked={isAudioEnabled}
+            onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+            className={`
+              p-3 rounded-full transition-all duration-200
+              ${sessionStatus !== 'CONNECTED' ? 'opacity-50 cursor-not-allowed' : ''}
+              ${
+                isAudioEnabled
+                  ? 'bg-[#33C3F0] text-white hover:bg-[#30B4DD] cursor-pointer'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
+              }
+            `}
             disabled={sessionStatus !== 'CONNECTED'}
-          />
+          >
+            {isAudioEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </button>
           <button 
             onClick={() => window.history.back()}
             className="p-2 ml-1"

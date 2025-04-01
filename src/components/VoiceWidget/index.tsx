@@ -34,7 +34,7 @@ const VoiceWidget = () => {
         }}
         className={isOpen 
           ? "hidden" // Hide the button when chat is open
-          : "fixed bottom-6 right-6 z-50 bg-white text-black p-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"}
+          : "fixed bottom-6 left-6 z-50 bg-white text-black p-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"}
         aria-label="Toggle voice assistant"
       >
         <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center">
@@ -49,7 +49,7 @@ const VoiceWidget = () => {
             {showChatView ? (
               activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
             ) : (
-              <div className="fixed bottom-0 right-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+              <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b">
                   <button className="p-2">
