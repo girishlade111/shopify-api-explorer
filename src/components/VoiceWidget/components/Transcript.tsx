@@ -63,7 +63,7 @@ function Transcript({
             key={item.itemId}
             className={`flex ${
               item.role === 'user' ? 'justify-end' : 'items-start'
-            }`}
+            } mb-4`}
           >
             {item.role !== 'user' && (
               <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
