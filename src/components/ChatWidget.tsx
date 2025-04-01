@@ -133,7 +133,7 @@ const ChatWidget: React.FC = () => {
   if (isSidePanelOpen) {
     return (
       <div className="fixed bottom-6 left-6 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-50" 
-           style={{ height: '500px' }}>
+           style={{ height: '440px' }}>
         <div className="w-full h-full flex flex-col">
           <div className="flex-1 p-6 overflow-y-auto">
             <div className="flex justify-end mb-6">
