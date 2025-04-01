@@ -47,7 +47,7 @@ function Transcript({
   if (isVoiceMode) {
     return (
       <div className="p-4">
-        <div className="flex items-center bg-gray-100 rounded-full">
+        <div className="flex items-center bg-gray-100 rounded-full py-2 px-4">
           <div className="w-full bg-transparent px-4 py-3 text-gray-500">
             Voice mode active - speak to interact
           </div>
@@ -87,8 +87,8 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="p-4 pb-6 mt-2">
-          <div className="flex items-center bg-gray-100 rounded-full">
+        <div className="p-4 pb-8 mt-4">
+          <div className="flex items-center bg-gray-100 rounded-full py-2 px-4">
             <input
               ref={inputRef}
               value={userText}

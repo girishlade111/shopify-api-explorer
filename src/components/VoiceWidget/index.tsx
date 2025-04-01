@@ -75,7 +75,7 @@ const VoiceWidget = () => {
       <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
         {/* Empty blue circle without an icon */}
       </div>
-      <span className="text-lg font-medium">Click here to chat with AI!</span>
+      <span className="text-lg font-serif font-bold">Click here to chat with AI!</span>
       {isHovering && (
         <button 
           onClick={(e) => {
@@ -99,10 +99,10 @@ const VoiceWidget = () => {
       className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"
       aria-label="Expand chat widget"
     >
-      <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
         {/* Empty blue circle without an icon */}
       </div>
-      <span className="text-lg font-medium">Enzo AI</span>
+      <span className="text-lg font-serif font-bold">Enzo AI</span>
     </button>
   );
 
@@ -156,7 +156,7 @@ const VoiceWidget = () => {
                     <button className="p-2">
                       <Menu className="w-6 h-6 text-gray-700" />
                     </button>
-                    <h2 className="text-xl font-semibold">Enzo AI</h2>
+                    <h2 className="text-xl font-serif font-bold">Enzo AI</h2>
                     <div className="flex items-center">
                       <button
                         onClick={() => setIsMinimized(true)}
@@ -172,8 +172,8 @@ const VoiceWidget = () => {
                     {/* Auto-connecting, no initial message needed */}
                   </div>
                   
-                  <div className="p-4">
-                    <div className="flex items-center bg-gray-100 rounded-full">
+                  <div className="p-4 pb-8 mt-4">
+                    <div className="flex items-center bg-gray-100 rounded-full py-2 px-4">
                       <input
                         type="text"
                         placeholder="Type your message here..."

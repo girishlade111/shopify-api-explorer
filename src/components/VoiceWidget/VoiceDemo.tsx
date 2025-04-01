@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -241,9 +240,9 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full shadow-lg transition-all duration-300 overflow-hidden max-w-[300px]">
+    <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full shadow-lg transition-all duration-300 overflow-hidden max-w-[360px]">
       <div className="flex items-center py-2 px-4">
-        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3 overflow-hidden">
+        <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3 overflow-hidden">
           <video 
             ref={videoRef}
             className="w-full h-full object-cover"
@@ -254,7 +253,7 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
           />
         </div>
         <div className="flex-1">
-          <p className="text-sm">Listening...</p>
+          <p className="text-base font-medium">Listening...</p>
         </div>
         <button 
           onClick={onClose}

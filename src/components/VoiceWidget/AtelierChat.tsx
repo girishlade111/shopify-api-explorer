@@ -181,7 +181,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
           {/* Empty blue circle without an icon */}
         </div>
-        <span className="text-lg font-medium">Enzo AI</span>
+        <span className="text-lg font-serif font-bold">Enzo AI</span>
       </button>
     );
   }
@@ -195,7 +195,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         >
           <Menu className="w-6 h-6 text-gray-700" />
         </button>
-        <h2 className="text-xl font-semibold">Enzo AI</h2>
+        <h2 className="text-xl font-serif font-bold">Enzo AI</h2>
         <div className="flex items-center">
           <button
             onClick={() => setIsMinimized(true)}
