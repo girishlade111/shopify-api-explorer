@@ -77,3 +77,8 @@
 .fixed.bottom-6.left-6.z-40 > div > div > div.mx-4 {
   display: none !important;
 }
+
+/* Hide duplicate function calls */
+.fixed.bottom-6.left-6.z-40 div[class*="rounded-full"] + div[class*="rounded-full"] {
+  margin-top: -1.5rem;
+}

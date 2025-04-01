@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -135,9 +136,33 @@ function Transcript({
     }
     return null;
   };
+
+  // Filter out duplicate consecutive function calls with the same name
+  const filteredItems = transcriptItems.reduce((acc, current, index, array) => {
+    if (current.type === 'BREADCRUMB') {
+      // Get function name of current item
+      const currentFunctionName = getFunctionName(current.data);
+      
+      // Check if the previous item exists and is also a breadcrumb
+      const prevItem = array[index - 1];
+      if (prevItem && prevItem.type === 'BREADCRUMB') {
+        const prevFunctionName = getFunctionName(prevItem.data);
+        
+        // If the current and previous function names are the same, skip this item
+        if (currentFunctionName && prevFunctionName && currentFunctionName === prevFunctionName) {
+          return acc;
+        }
+      }
+    }
+    
+    // Add item to the filtered list
+    acc.push(current);
+    return acc;
+  }, [] as typeof transcriptItems);
+
   return <div className="flex flex-col w-full h-full relative">
       <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
-        {transcriptItems.map(item => {
+        {filteredItems.map(item => {
         if (item.type === 'BREADCRUMB') {
           const functionName = getFunctionName(item.data);
           if (functionName) {
