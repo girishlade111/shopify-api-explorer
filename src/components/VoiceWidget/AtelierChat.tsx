@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Headphones, Menu, Mic, RefreshCw, X } from 'lucide-react';
+import { Menu, Mic, Headphones, RefreshCw, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
@@ -186,16 +186,16 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   return (
     <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      {/* Header without border */}
+      <div className="flex items-center justify-between p-4">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <button className="p-2">
               <Menu className="w-6 h-6 text-gray-700" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] p-0">
-            <div className="flex flex-col py-4">
+          <SheetContent side="left" className="w-[280px] p-0 rounded-r-2xl bg-white">
+            <div className="flex flex-col py-6">
               <button 
                 className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
                 onClick={switchToVoiceMode}

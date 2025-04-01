@@ -118,7 +118,7 @@ const VoiceWidget = () => {
                 activeChatType === 'ai' ? <VoiceDemo onClose={handleCloseWidget} /> : <AtelierChat onClose={handleCloseWidget} />
               ) : (
                 <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-                  <div className="flex items-center justify-between p-4 border-b">
+                  <div className="flex items-center justify-between p-4">
                     <button className="p-2">
                       <Menu className="w-6 h-6 text-gray-700" />
                     </button>
@@ -137,7 +137,7 @@ const VoiceWidget = () => {
                     </div>
                   </div>
                   
-                  <div className="p-4 border-t">
+                  <div className="p-4">
                     <div className="flex items-center bg-gray-100 rounded-full">
                       <input
                         type="text"
