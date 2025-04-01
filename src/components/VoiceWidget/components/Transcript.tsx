@@ -114,28 +114,15 @@ function Transcript({
     }
   };
 
-  // Extract function name from breadcrumb
-  const getFunctionName = (data: any) => {
-    if (!data) return null;
-    if (data.attemptedEvent?.type === 'function_call_arguments.done') {
-      return data.attemptedEvent?.name;
-    }
-    const title = String(data.title || '').toLowerCase();
-    if (title.includes('function call:')) {
-      return title.split('function call:')[1].trim();
-    }
-    return null;
-  };
-
-  // For voice mode, return a consistent bar UI
+  // For voice mode, return a consistent bar UI with increased size
   if (isVoiceMode) {
     return (
       <div className="p-4 pb-8">
-        <div className="flex items-center bg-gray-100 rounded-full py-3 px-4">
-          <div className="w-full bg-transparent px-4 py-3 text-gray-500 font-medium">
+        <div className="flex items-center bg-gray-100 rounded-full py-4 px-4">
+          <div className="w-full bg-transparent px-4 py-4 text-gray-500 font-medium">
             Voice mode active - speak to interact
           </div>
-          <button className="bg-[#33C3F0] rounded-full p-3 mx-2">
+          <button className="bg-[#33C3F0] rounded-full p-4 mx-2">
             <Mic className="w-6 h-6 text-white" />
           </button>
         </div>
@@ -143,13 +130,40 @@ function Transcript({
     );
   }
 
+  // Extract function name from breadcrumb
+  const getFunctionName = (data: any) => {
+    if (!data) return null;
+    
+    // Case 1: Direct function call from function_call_arguments.done event
+    if (data.attemptedEvent?.type === 'function_call_arguments.done') {
+      return data.attemptedEvent?.name;
+    }
+    
+    // Case 2: Function name in the title
+    if (data.title) {
+      const title = String(data.title || '').toLowerCase();
+      if (title.includes('function call:')) {
+        return title.split('function call:')[1].trim();
+      }
+    }
+    
+    // Case 3: Check if we have a name property directly in the data
+    if (data.name) {
+      return data.name;
+    }
+    
+    return null;
+  };
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {transcriptItems.map((item) => {
           // Display function call breadcrumbs with special styling
-          if (item.type === 'BREADCRUMB' && item.data) {
+          if (item.type === 'BREADCRUMB') {
+            // Extract function name from the breadcrumb data
             const functionName = getFunctionName(item.data);
+            
             if (functionName) {
               const { bg, border, text, icon } = getFunctionStyles(functionName);
               const formattedName = functionName
@@ -160,7 +174,7 @@ function Transcript({
               return (
                 <div
                   key={item.itemId}
-                  className={`flex items-start mb-4`}
+                  className="flex items-start mb-4"
                 >
                   <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
                   <div className={`p-2 pr-6 rounded-full ${bg} ${border} border`}>
@@ -207,8 +221,8 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="p-4 pb-10 mt-auto">
-          <div className="flex items-center bg-gray-100 rounded-full py-2 px-4">
+        <div className="p-4 pb-24 mt-auto">
+          <div className="flex items-center bg-gray-100 rounded-full py-3 px-4">
             <input
               ref={inputRef}
               value={userText}
@@ -216,7 +230,6 @@ function Transcript({
               onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
               className="w-full bg-transparent px-4 py-3 focus:outline-none rounded-full"
-              // Allow typing even when not connected
             />
             {userText.trim() ? (
               <button

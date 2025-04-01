@@ -156,7 +156,7 @@ const VoiceWidget = () => {
                     <button className="p-2">
                       <Menu className="w-6 h-6 text-gray-700" />
                     </button>
-                    <h2 className="text-xl font-serif font-bold">Enzo AI</h2>
+                    <h2 className="text-xl font-serif font-black text-[#333]">Enzo AI</h2>
                     <div className="flex items-center">
                       <button
                         onClick={() => setIsMinimized(true)}
@@ -172,8 +172,8 @@ const VoiceWidget = () => {
                     {/* Auto-connecting, no initial message needed */}
                   </div>
                   
-                  <div className="p-4 pb-8 mt-4">
-                    <div className="flex items-center bg-gray-100 rounded-full py-2 px-4">
+                  <div className="p-4 pb-24 mt-4">
+                    <div className="flex items-center bg-gray-100 rounded-full py-3 px-4">
                       <input
                         type="text"
                         placeholder="Type your message here..."

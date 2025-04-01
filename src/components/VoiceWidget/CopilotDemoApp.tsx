@@ -241,7 +241,7 @@ function CopilotDemoApp(props: AppProps) {
   }, [isPTTActive]);
 
   return (
-    <div className={`flex flex-col bg-white ${props.isVoiceMode ? 'h-0' : 'h-[500px]'}`}>
+    <div className={`flex flex-col bg-white ${props.isVoiceMode ? 'h-auto' : 'h-[500px]'}`}>
       <div className={`flex flex-1 overflow-hidden relative ${props.isVoiceMode ? 'min-h-0' : ''}`}>
         <Transcript
           userText={userText}

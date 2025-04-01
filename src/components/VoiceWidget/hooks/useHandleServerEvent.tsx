@@ -734,7 +734,12 @@ export function useHandleServerEvent({
     }
 
     addTranscriptBreadcrumb(`function call: ${functionCallParams.name}`, {
-      ...args
+      ...args,
+      name: functionCallParams.name,
+      attemptedEvent: {
+        type: 'function_call_arguments.done',
+        name: functionCallParams.name
+      }
     });
 
     const fn = fns[functionCallParams.name as keyof typeof fns];
@@ -744,7 +749,8 @@ export function useHandleServerEvent({
       try {
         result = await fn(args);
         addTranscriptBreadcrumb(`function result: ${functionCallParams.name}`, {
-          ...result
+          ...result,
+          name: functionCallParams.name
         });
       } catch (error) {
         console.error(`Error executing function ${functionCallParams.name}:`, error);
@@ -754,7 +760,8 @@ export function useHandleServerEvent({
           sessionId: currentSessionId.current
         };
         addTranscriptBreadcrumb(`function error: ${functionCallParams.name}`, {
-          ...result
+          ...result,
+          name: functionCallParams.name
         });
       }
     } else {
@@ -764,7 +771,8 @@ export function useHandleServerEvent({
         sessionId: currentSessionId.current
       };
       addTranscriptBreadcrumb(`function not found: ${functionCallParams.name}`, {
-        ...result
+        ...result,
+        name: functionCallParams.name
       });
     }
 
