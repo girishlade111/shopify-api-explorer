@@ -82,3 +82,24 @@
 .fixed.bottom-6.left-6.z-40 div[class*="rounded-full"] + div[class*="rounded-full"] {
   margin-top: -1.5rem;
 }
+
+/* Improve spacing and alignment in the chat */
+.fixed.bottom-6.left-6.z-40 .flex-1.overflow-y-auto {
+  padding-bottom: 80px !important;
+}
+
+/* Ensure avatar spacing is consistent */
+.fixed.bottom-6.left-6.z-40 .flex.items-start .w-10.h-10.rounded-full {
+  margin-right: 12px !important;
+}
+
+/* Make sure text alignment is correct for AI messages */
+.fixed.bottom-6.left-6.z-40 .bg-gray-100.text-gray-800 p {
+  text-align: left !important;
+}
+
+/* Add a clean background to the input area */
+.fixed.bottom-6.left-6.z-40 .absolute.bottom-0 {
+  background-color: white !important;
+  border-top: 1px solid rgba(229, 231, 235, 0.5) !important;
+}
