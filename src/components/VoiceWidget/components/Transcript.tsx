@@ -60,15 +60,6 @@ function Transcript({
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {transcriptItems.length === 0 && (
-          <div className="flex items-start mb-4">
-            <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
-            <div className="bg-gray-100 rounded-lg p-4 max-w-[75%]">
-              <p>Hello! I am Enzo, your AI Agent to help you shop.</p>
-            </div>
-          </div>
-        )}
-        
         {transcriptItems.map((item) => (
           <div
             key={item.itemId}

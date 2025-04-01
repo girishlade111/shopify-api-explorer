@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Mic, Headphones, RefreshCw, X } from 'lucide-react';
+import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
@@ -191,20 +191,13 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           <Menu className="w-6 h-6 text-gray-700" />
         </button>
         <h2 className="text-xl font-semibold">Enzo AI</h2>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center">
           <button
             onClick={() => setIsMinimized(true)}
             className="p-2 hover:bg-gray-100 rounded-full"
             aria-label="Minimize chat assistant"
           >
             <span className="w-5 h-1.5 bg-gray-500 rounded-full block"></span>
-          </button>
-          <button 
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full"
-            aria-label="Close chat assistant"
-          >
-            <X className="w-6 h-6 text-gray-700" />
           </button>
         </div>
         
