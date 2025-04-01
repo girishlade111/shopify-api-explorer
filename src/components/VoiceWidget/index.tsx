@@ -38,7 +38,7 @@ const VoiceWidget = () => {
         aria-label="Toggle voice assistant"
       >
         <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
-          <MessageSquare className="w-6 h-6 text-white" />
+          {/* Empty blue circle without an icon */}
         </div>
         <span className="text-lg font-medium">Click here to chat with AI!</span>
       </button>
