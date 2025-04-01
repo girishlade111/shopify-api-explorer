@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -233,7 +232,7 @@ function Transcript({
                 borderRadius: '9999px',
                 boxShadow: 'none',
                 paddingLeft: '0.5rem',
-                paddingRight: '7rem'
+                paddingRight: '4rem'
               }}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
