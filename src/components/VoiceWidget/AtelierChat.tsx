@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -74,11 +73,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       const errorMsg = `Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`;
       setError(errorMsg);
       setSessionStatus('DISCONNECTED');
-      toast({
-        title: "Connection Failed",
-        description: errorMsg,
-        variant: "destructive"
-      });
+      console.error(errorMsg);
       return;
     }
 
@@ -116,11 +111,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           connectToService();
         }, 2000);
       } else {
-        toast({
-          title: "Connection Failed",
-          description: `Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`,
-          variant: "destructive"
-        });
+        console.error(`Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`);
       }
     }, CONNECTION_TIMEOUT_MS);
 
@@ -175,10 +166,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setSessionStatus('CONNECTED');
       setConnectionRetries(0);
       
-      toast({
-        title: "Connected",
-        description: "Chat session established successfully.",
-      });
+      console.log("Chat session established successfully.");
       
     } catch (error) {
       // Clear timeout if it exists
@@ -210,11 +198,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           connectToService();
         }, 2000);
       } else {
-        toast({
-          title: "Connection Failed",
-          description: `Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`,
-          variant: "destructive"
-        });
+        console.error(`Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`);
       }
     }
   };

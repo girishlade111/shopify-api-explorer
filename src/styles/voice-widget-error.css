@@ -46,3 +46,34 @@
 .fixed.bottom-6.left-6.z-40 > div > div:first-child {
   background: transparent !important;
 }
+
+/* Hide success messages and notifications */
+.fixed.bottom-6.left-6.z-40 *:contains("Connected"),
+.fixed.bottom-6.left-6.z-40 *:contains("Chat session established successfully"),
+.fixed.bottom-6.left-6.z-40 *:contains("successfully"),
+.fixed.bottom-6.left-6.z-40 .bg-green-50,
+.fixed.bottom-6.left-6.z-40 .bg-green-100,
+.fixed.bottom-6.left-6.z-40 .border-green-500,
+.fixed.bottom-6.left-6.z-40 .text-green-500,
+.fixed.bottom-6.left-6.z-40 .text-green-600,
+.fixed.bottom-6.left-6.z-40 .text-green-700,
+.fixed.bottom-6.left-6.z-40 div[class*="bg-green-"],
+.fixed.bottom-6.left-6.z-40 div[class*="text-green-"] {
+  display: none !important;
+}
+
+/* Hide toast notifications in the widget */
+.fixed.bottom-6.left-6.z-40 [role="status"],
+.fixed.bottom-6.left-6.z-40 [aria-live="polite"],
+.fixed.bottom-6.left-6.z-40 .toast,
+.fixed.bottom-6.left-6.z-40 .notification,
+.fixed.bottom-6.left-6.z-40 .alert {
+  display: none !important;
+}
+
+/* Hide all notification banners inside the widget */
+.fixed.bottom-6.left-6.z-40 > div > div > div.p-4,
+.fixed.bottom-6.left-6.z-40 > div > div > div.mb-2,
+.fixed.bottom-6.left-6.z-40 > div > div > div.mx-4 {
+  display: none !important;
+}
