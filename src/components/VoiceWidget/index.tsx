@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Menu, Mic, MessageSquare, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
@@ -77,10 +78,10 @@ const VoiceWidget = () => {
         <TranscriptProvider>
           <EventProvider>
             {showModeSelection ? (
-              <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[180px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-                <div className="flex-1 py-4 px-4 flex flex-col items-center justify-center">
-                  <h3 className="text-lg font-medium mb-4">How do you want to chat today?</h3>
-                  <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+              <div className="fixed bottom-6 left-6 z-40 w-[350px] h-[180px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+                <div className="flex-1 py-6 px-6 flex flex-col items-start justify-center">
+                  <h3 className="text-[#333] text-xl font-medium mb-5 ml-1">How do you want to chat today?</h3>
+                  <div className="grid grid-cols-2 gap-4 w-full">
                     <button
                       onClick={() => {
                         setShowModeSelection(false);
@@ -111,7 +112,7 @@ const VoiceWidget = () => {
               showChatView ? (
                 activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
               ) : (
-                <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+                <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
                   <div className="flex items-center justify-between p-4 border-b">
                     <button className="p-2">
                       <Menu className="w-6 h-6 text-gray-700" />
