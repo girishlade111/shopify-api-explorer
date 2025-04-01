@@ -9,6 +9,7 @@
 #root {
   margin-bottom: 0;
   padding-bottom: 0;
+  min-height: 100vh;
 }
 
 /* Remove any potential margin/padding on body */
@@ -53,4 +54,9 @@ body {
   padding: 2px 5px;
   border-radius: 12px;
   background: #f3f4f6;
+}
+
+/* Ensure proper button positioning in input field */
+.relative .absolute.right-2 {
+  right: 8px;
 }

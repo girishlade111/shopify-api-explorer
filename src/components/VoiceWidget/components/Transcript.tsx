@@ -28,7 +28,7 @@ function Transcript({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = () =>  {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'
     });
@@ -217,38 +217,40 @@ function Transcript({
 
       {showTextInput && (
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-white">
-          <div className="flex items-center bg-gray-100 rounded-full py-2 px-4">
+          <div className="relative bg-gray-100 rounded-full py-2 px-4">
             <input 
               ref={inputRef}
               value={userText}
               onChange={e => setUserText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
-              className="w-full bg-transparent px-4 py-3 focus:outline-none"
+              className="w-full bg-transparent px-4 py-3 focus:outline-none pr-14"
             />
-            {userText.trim() ? (
-              <button 
-                onClick={onSendMessage}
-                disabled={!canSend || !userText.trim()}
-                className={`bg-[#33C3F0] rounded-full p-3 mx-2 text-white ${
-                  canSend && userText.trim() ? 'hover:bg-[#30B4DD]' : 'opacity-50 cursor-not-allowed'
-                }`}
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            ) : (
-              <button 
-                onClick={() => {
-                  if (onSwitchToVoiceMode) {
-                    onSwitchToVoiceMode();
-                  }
-                }}
-                className="bg-[#33C3F0] rounded-full p-3 mx-2 text-white hover:bg-[#30B4DD]"
-                aria-label="Switch to voice mode"
-              >
-                <Mic className="w-5 h-5" />
-              </button>
-            )}
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+              {userText.trim() ? (
+                <button 
+                  onClick={onSendMessage}
+                  disabled={!canSend || !userText.trim()}
+                  className={`bg-[#33C3F0] rounded-full p-3 text-white ${
+                    canSend && userText.trim() ? 'hover:bg-[#30B4DD]' : 'opacity-50 cursor-not-allowed'
+                  }`}
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    if (onSwitchToVoiceMode) {
+                      onSwitchToVoiceMode();
+                    }
+                  }}
+                  className="bg-[#33C3F0] rounded-full p-3 text-white hover:bg-[#30B4DD]"
+                  aria-label="Switch to voice mode"
+                >
+                  <Mic className="w-5 h-5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
