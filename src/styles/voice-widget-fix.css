@@ -17,14 +17,3 @@ body {
   padding-bottom: 0;
   min-height: 100vh;
 }
-
-/* Remove shadows from all components in the chat widget */
-.fixed.bottom-6.left-6.z-40 {
-  box-shadow: none !important;
-}
-
-/* Remove borders from the chat container */
-.fixed.bottom-6.left-6.z-40 * {
-  border: none !important;
-}
-

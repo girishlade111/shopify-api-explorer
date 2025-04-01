@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -188,7 +189,7 @@ function Transcript({
               <div key={item.itemId} className={`flex ${item.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
                 {item.role !== 'user' && (
                   <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3 flex items-center justify-center">
-                    {/* AI icon */}
+                    {/* AI icon could go here */}
                   </div>
                 )}
                 <div 
@@ -202,7 +203,7 @@ function Transcript({
                 </div>
                 {item.role === 'user' && (
                   <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0 ml-3 flex items-center justify-center">
-                    {/* User icon */}
+                    {/* User icon could go here */}
                   </div>
                 )}
               </div>

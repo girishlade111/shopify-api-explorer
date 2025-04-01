@@ -111,8 +111,8 @@
 /* Clean up the input area */
 .fixed.bottom-6.left-6.z-40 .absolute.bottom-0 {
   background-color: white !important;
+  box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.05) !important;
   border: none !important;
-  box-shadow: none !important;
 }
 
 /* Enhance the chat bubbles */
@@ -120,17 +120,7 @@
   border-radius: 18px !important;
 }
 
-/* Remove all shadows */
-.fixed.bottom-6.left-6.z-40,
-.fixed.bottom-6.left-6.z-40 *,
-.fixed.bottom-6.left-6.z-40 .rounded-full,
-.fixed.bottom-6.left-6.z-40 .shadow-lg,
-.fixed.bottom-6.left-6.z-40 [class*="shadow"] {
-  box-shadow: none !important;
-}
-
-/* Clean styling for function buttons without shadows */
+/* Add some shadow to the function buttons for better visibility without borders */
 .fixed.bottom-6.left-6.z-40 .rounded-full {
-  background-color: transparent !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
 }
-
