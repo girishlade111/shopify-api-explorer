@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -6,7 +5,6 @@ import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
 import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 
 // Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
@@ -34,7 +32,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     connectToService();
@@ -152,64 +150,29 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         (voiceButton as HTMLElement).click();
       }
     }, 100);
-    setSheetOpen(false);
+    setMenuOpen(false);
   };
 
   const speakToHuman = () => {
     console.log("Speak to human functionality would be implemented here");
-    setSheetOpen(false);
+    setMenuOpen(false);
   };
 
   const resetChat = () => {
     cleanupResources();
     connectToService();
-    setSheetOpen(false);
+    setMenuOpen(false);
   };
 
   return (
     <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
       <div className="flex items-center justify-between p-4 relative">
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <button className="p-2">
-              <Menu className="w-6 h-6 text-gray-700" />
-            </button>
-          </SheetTrigger>
-          <SheetContent 
-            side="inner" 
-            className="p-0"
-          >
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="bg-white rounded-xl shadow-lg w-[250px] overflow-hidden">
-                <div className="flex flex-col py-2">
-                  <button 
-                    className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
-                    onClick={switchToVoiceMode}
-                  >
-                    <Mic className="w-5 h-5" />
-                    <span className="text-base">Switch to Voice</span>
-                  </button>
-                  
-                  <button 
-                    className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
-                    onClick={speakToHuman}
-                  >
-                    <Headphones className="w-5 h-5" />
-                    <span className="text-base">Speak to Human</span>
-                  </button>
-                  
-                  <button 
-                    className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
-                    onClick={resetChat}
-                  >
-                    <RefreshCw className="w-5 h-5" />
-                    <span className="text-base">Reset Chat</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <button 
+          onClick={() => setMenuOpen(!menuOpen)} 
+          className="p-2"
+        >
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
         <h2 className="text-xl font-semibold">Enzo AI</h2>
         <button 
           onClick={onClose}
@@ -218,6 +181,36 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         >
           <X className="w-6 h-6 text-gray-700" />
         </button>
+        
+        {menuOpen && (
+          <div className="absolute top-14 left-2 bg-white rounded-xl shadow-lg w-[250px] z-50">
+            <div className="flex flex-col py-2">
+              <button 
+                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                onClick={switchToVoiceMode}
+              >
+                <Mic className="w-5 h-5" />
+                <span className="text-base">Switch to Voice</span>
+              </button>
+              
+              <button 
+                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                onClick={speakToHuman}
+              >
+                <Headphones className="w-5 h-5" />
+                <span className="text-base">Speak to Human</span>
+              </button>
+              
+              <button 
+                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                onClick={resetChat}
+              >
+                <RefreshCw className="w-5 h-5" />
+                <span className="text-base">Reset Chat</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <TranscriptProvider>

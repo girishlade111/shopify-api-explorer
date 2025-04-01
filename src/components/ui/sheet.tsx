@@ -40,8 +40,8 @@ const sheetVariants = cva(
         left: "inset-y-0 left-0 h-full w-3/4 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
         right:
           "inset-y-0 right-0 h-full w-3/4 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
-        // Update to position absolutely within the parent container with proper size constraints
-        inner: "absolute inset-0 w-full h-full bg-black/60 data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 border-none shadow-none flex items-center justify-center",
+        // Simple menu that appears within the parent component
+        inner: "absolute top-12 left-2 w-auto h-auto bg-white rounded-xl shadow-lg data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 border border-gray-200",
       },
     },
     defaultVariants: {
