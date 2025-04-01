@@ -187,37 +187,40 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   return (
     <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
       {/* Header without border */}
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-4 relative">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <button className="p-2">
               <Menu className="w-6 h-6 text-gray-700" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] p-0 rounded-r-2xl bg-white">
-            <div className="flex flex-col py-6">
+          <SheetContent 
+            side="inner" 
+            className="w-[250px] p-0 rounded-xl bg-white shadow-md border border-gray-200 mt-2"
+          >
+            <div className="flex flex-col py-2">
               <button 
-                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
                 onClick={switchToVoiceMode}
               >
-                <Mic className="w-6 h-6" />
-                <span className="text-lg">Switch to Voice</span>
+                <Mic className="w-5 h-5" />
+                <span className="text-base">Switch to Voice</span>
               </button>
               
               <button 
-                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
                 onClick={speakToHuman}
               >
-                <Headphones className="w-6 h-6" />
-                <span className="text-lg">Speak to Human</span>
+                <Headphones className="w-5 h-5" />
+                <span className="text-base">Speak to Human</span>
               </button>
               
               <button 
-                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
+                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
                 onClick={resetChat}
               >
-                <RefreshCw className="w-6 h-6" />
-                <span className="text-lg">Reset Chat</span>
+                <RefreshCw className="w-5 h-5" />
+                <span className="text-base">Reset Chat</span>
               </button>
             </div>
           </SheetContent>
