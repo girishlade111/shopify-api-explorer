@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Menu, Mic, MessageSquare, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
@@ -24,7 +23,6 @@ const VoiceWidget = () => {
     }
   }, [isOpen]);
 
-  // Add event listener for custom voice mode activation
   useEffect(() => {
     const handleActivateVoiceMode = () => {
       activateVoiceMode();
@@ -42,7 +40,6 @@ const VoiceWidget = () => {
     setIsOpen(false);
   };
 
-  // Function to directly activate voice mode
   const activateVoiceMode = () => {
     setIsOpen(true);
     setShowChatView(true);
@@ -50,7 +47,6 @@ const VoiceWidget = () => {
     setShowModeSelection(false);
   };
 
-  // Function to directly activate text mode
   const activateTextMode = () => {
     setIsOpen(true);
     setShowChatView(true);
@@ -116,9 +112,9 @@ const VoiceWidget = () => {
         <TranscriptProvider>
           <EventProvider>
             {showModeSelection ? (
-              <div className="fixed bottom-6 left-6 z-40 w-[350px] h-[140px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-                <div className="flex-1 py-3 px-6 flex flex-col items-start justify-center">
-                  <h3 className="text-[#333] text-xl font-medium mb-3 ml-1">How do you want to chat today?</h3>
+              <div className="fixed bottom-6 left-6 z-40 w-[350px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden">
+                <div className="py-4 px-6">
+                  <h3 className="text-[#333] text-xl font-medium mb-3">How do you want to chat today?</h3>
                   <div className="grid grid-cols-2 gap-4 w-full">
                     <button
                       onClick={() => {
@@ -126,7 +122,7 @@ const VoiceWidget = () => {
                         setShowChatView(true);
                         setActiveChatType('ai');
                       }}
-                      className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
+                      className="flex flex-col items-center justify-center p-3 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
                       id="voice-mode-button"
                     >
                       <Mic size={24} className="text-white mb-1" />
@@ -139,7 +135,7 @@ const VoiceWidget = () => {
                         setShowChatView(true);
                         setActiveChatType('atelier');
                       }}
-                      className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
+                      className="flex flex-col items-center justify-center p-3 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
                       id="text-mode-button"
                     >
                       <MessageSquare size={24} className="text-white mb-1" />
