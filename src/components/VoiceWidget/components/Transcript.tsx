@@ -1,8 +1,6 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
-
 interface TranscriptProps {
   userText: string;
   setUserText: (text: string) => void;
@@ -12,28 +10,28 @@ interface TranscriptProps {
   isVoiceMode?: boolean; // Controls if we're in voice-only mode
   onSwitchToVoiceMode?: () => void; // New prop for switching to voice mode
 }
-
-function Transcript({ 
-  userText, 
-  setUserText, 
-  onSendMessage, 
-  canSend, 
+function Transcript({
+  userText,
+  setUserText,
+  onSendMessage,
+  canSend,
   showTextInput = true,
   isVoiceMode = false,
   onSwitchToVoiceMode
 }: TranscriptProps) {
-  const { transcriptItems } = useTranscript();
+  const {
+    transcriptItems
+  } = useTranscript();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
-
   useEffect(() => {
     scrollToBottom();
   }, [transcriptItems]);
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -42,7 +40,6 @@ function Transcript({
       }
     }
   };
-
   const getFunctionIcon = (functionName: string) => {
     switch (functionName) {
       case 'search_products':
@@ -64,7 +61,6 @@ function Transcript({
         return <DollarSign className="w-5 h-5" />;
     }
   };
-
   const getFunctionStyles = (functionName: string) => {
     switch (functionName) {
       case 'search_products':
@@ -111,10 +107,8 @@ function Transcript({
         };
     }
   };
-
   if (isVoiceMode) {
-    return (
-      <div className="p-4 pb-8 mt-auto">
+    return <div className="p-4 pb-8 mt-auto">
         <div className="flex items-center bg-gray-100 rounded-full py-4 px-4">
           <div className="w-full bg-transparent px-4 py-4 text-gray-500 font-medium">
             Voice mode active - speak to interact
@@ -123,50 +117,38 @@ function Transcript({
             <Mic className="w-6 h-6 text-white" />
           </button>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   const getFunctionName = (data: any) => {
     if (!data) return null;
-    
     if (data.attemptedEvent?.type === 'function_call_arguments.done') {
       return data.attemptedEvent?.name;
     }
-    
     if (data.title) {
       const title = String(data.title || '').toLowerCase();
       if (title.includes('function call:')) {
         return title.split('function call:')[1].trim();
       }
     }
-    
     if (data.name) {
       return data.name;
     }
-    
     return null;
   };
-
-  return (
-    <div className="flex flex-col w-full h-full relative">
+  return <div className="flex flex-col w-full h-full relative">
       <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
-        {transcriptItems.map((item) => {
-          if (item.type === 'BREADCRUMB') {
-            const functionName = getFunctionName(item.data);
-            
-            if (functionName) {
-              const { bg, border, text, icon } = getFunctionStyles(functionName);
-              const formattedName = functionName
-                .split('_')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-              
-              return (
-                <div
-                  key={item.itemId}
-                  className="flex items-start mb-4"
-                >
+        {transcriptItems.map(item => {
+        if (item.type === 'BREADCRUMB') {
+          const functionName = getFunctionName(item.data);
+          if (functionName) {
+            const {
+              bg,
+              border,
+              text,
+              icon
+            } = getFunctionStyles(functionName);
+            const formattedName = functionName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            return <div key={item.itemId} className="flex items-start mb-4">
                   <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
                   <div className={`p-2 pr-6 rounded-full ${bg} ${border} border`}>
                     <div className="flex items-center">
@@ -176,81 +158,36 @@ function Transcript({
                       <span className={`${text} font-medium`}>{formattedName}</span>
                     </div>
                   </div>
-                </div>
-              );
-            }
+                </div>;
           }
-          
-          if (item.type === 'MESSAGE') {
-            return (
-              <div
-                key={item.itemId}
-                className={`flex ${
-                  item.role === 'user' ? 'justify-end' : 'items-start'
-                } mb-4`}
-              >
-                {item.role !== 'user' && (
-                  <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
-                )}
-                <div
-                  className={`p-4 rounded-lg ${
-                    item.role === 'user'
-                      ? 'bg-[#33C3F0] text-white ml-auto max-w-[75%]'
-                      : 'bg-gray-100 text-gray-800 max-w-[75%]'
-                  }`}
-                >
+        }
+        if (item.type === 'MESSAGE') {
+          return <div key={item.itemId} className={`flex ${item.role === 'user' ? 'justify-end' : 'items-start'} mb-4`}>
+                {item.role !== 'user' && <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>}
+                <div className={`p-4 rounded-lg ${item.role === 'user' ? 'bg-[#33C3F0] text-white ml-auto max-w-[75%]' : 'bg-gray-100 text-gray-800 max-w-[75%]'}`}>
                   <p className="whitespace-pre-wrap">{item.title}</p>
                 </div>
-              </div>
-            );
-          }
-          
-          return null;
-        })}
+              </div>;
+        }
+        return null;
+      })}
         <div ref={messagesEndRef} />
       </div>
 
-      {showTextInput && (
-        <div className="absolute bottom-2 left-0 right-0 p-4 pb-4">
+      {showTextInput && <div className="absolute bottom-0 left-0 right-0 p-4 pb-2">
           <div className="flex items-center bg-gray-100 rounded-full py-3 px-4">
-            <input
-              ref={inputRef}
-              value={userText}
-              onChange={(e) => setUserText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your message here..."
-              className="w-full bg-transparent px-4 py-3 focus:outline-none rounded-full"
-            />
-            {userText.trim() ? (
-              <button
-                onClick={onSendMessage}
-                disabled={!canSend || !userText.trim()}
-                className={`bg-[#33C3F0] rounded-full p-3 mx-2 text-white ${
-                  canSend && userText.trim()
-                    ? 'hover:bg-[#30B4DD]'
-                    : 'opacity-50 cursor-not-allowed'
-                }`}
-              >
+            <input ref={inputRef} value={userText} onChange={e => setUserText(e.target.value)} onKeyDown={handleKeyDown} placeholder="Type your message here..." className="w-full bg-transparent px-4 py-3 focus:outline-none rounded-full" />
+            {userText.trim() ? <button onClick={onSendMessage} disabled={!canSend || !userText.trim()} className={`bg-[#33C3F0] rounded-full p-3 mx-2 text-white ${canSend && userText.trim() ? 'hover:bg-[#30B4DD]' : 'opacity-50 cursor-not-allowed'}`}>
                 <Send className="w-5 h-5" />
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  if (onSwitchToVoiceMode) {
-                    onSwitchToVoiceMode();
-                  }
-                }}
-                className="bg-[#33C3F0] rounded-full p-3 mx-2 text-white hover:bg-[#30B4DD]"
-                aria-label="Switch to voice mode"
-              >
+              </button> : <button onClick={() => {
+          if (onSwitchToVoiceMode) {
+            onSwitchToVoiceMode();
+          }
+        }} className="bg-[#33C3F0] rounded-full p-3 mx-2 text-white hover:bg-[#30B4DD]" aria-label="Switch to voice mode">
                 <Mic className="w-5 h-5" />
-              </button>
-            )}
+              </button>}
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 }
-
 export default Transcript;
