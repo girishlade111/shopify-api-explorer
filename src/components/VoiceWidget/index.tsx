@@ -126,7 +126,7 @@ const VoiceWidget = () => {
                         setActiveChatType('ai');
                       }}
                       className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
-                      id="voice-mode-button" // Add ID for easier selection
+                      id="voice-mode-button"
                     >
                       <Mic size={24} className="text-white mb-1" />
                       <span className="text-white font-medium">Voice</span>
@@ -139,7 +139,7 @@ const VoiceWidget = () => {
                         setActiveChatType('atelier');
                       }}
                       className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
-                      id="text-mode-button" // Add ID for easier selection
+                      id="text-mode-button"
                     >
                       <MessageSquare size={24} className="text-white mb-1" />
                       <span className="text-white font-medium">Text</span>
@@ -169,7 +169,7 @@ const VoiceWidget = () => {
                   </div>
                   
                   <div className="flex-1 overflow-y-auto p-4">
-                    {/* Auto-connecting, no initial message needed */}
+                    {/* Removed "Connected" and "Chat session established successfully" messages */}
                   </div>
                   
                   <div className="p-4 pb-6 mt-auto">
