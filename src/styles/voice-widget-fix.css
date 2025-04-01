@@ -74,9 +74,14 @@ body {
   font-size: 0.875rem !important;
 }
 
-/* Make the send button more compact */
-.bg-\[\#33C3F0\].rounded-full.p-2 {
-  padding: 0.375rem !important;
+/* Make the send/mic button larger */
+.bg-\[\#33C3F0\].rounded-full.p-2\.5 {
+  padding: 0.625rem !important;
+}
+
+.bg-\[\#33C3F0\].rounded-full.p-2\.5 svg {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
 }
 
 /* Reduce bottom padding for the message container */

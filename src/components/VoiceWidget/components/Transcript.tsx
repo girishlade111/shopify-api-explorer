@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -230,11 +231,11 @@ function Transcript({
                 <button 
                   onClick={onSendMessage}
                   disabled={!canSend || !userText.trim()}
-                  className={`bg-[#33C3F0] rounded-full p-2 text-white ${
+                  className={`bg-[#33C3F0] rounded-full p-2.5 text-white ${
                     canSend && userText.trim() ? 'hover:bg-[#30B4DD]' : 'opacity-50 cursor-not-allowed'
                   }`}
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                 </button>
               ) : (
                 <button 
@@ -243,10 +244,10 @@ function Transcript({
                       onSwitchToVoiceMode();
                     }
                   }}
-                  className="bg-[#33C3F0] rounded-full p-2 text-white hover:bg-[#30B4DD]"
+                  className="bg-[#33C3F0] rounded-full p-2.5 text-white hover:bg-[#30B4DD]"
                   aria-label="Switch to voice mode"
                 >
-                  <Mic className="w-4 h-4" />
+                  <Mic className="w-5 h-5" />
                 </button>
               )}
             </div>
