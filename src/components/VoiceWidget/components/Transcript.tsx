@@ -232,7 +232,7 @@ function Transcript({
                 borderRadius: '9999px',
                 boxShadow: 'none',
                 paddingLeft: '0.5rem',
-                paddingRight: '4rem'
+                paddingRight: '2rem'
               }}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
