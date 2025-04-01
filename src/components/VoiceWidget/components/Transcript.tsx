@@ -112,8 +112,13 @@ function Transcript({
               </button>
             ) : (
               <button
-                onClick={onSwitchToVoiceMode}
+                onClick={() => {
+                  if (onSwitchToVoiceMode) {
+                    onSwitchToVoiceMode();
+                  }
+                }}
                 className="bg-[#33C3F0] rounded-full p-3 mx-2 text-white hover:bg-[#30B4DD]"
+                aria-label="Switch to voice mode"
               >
                 <Mic className="w-5 h-5" />
               </button>

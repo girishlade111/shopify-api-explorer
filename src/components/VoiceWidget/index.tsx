@@ -23,6 +23,19 @@ const VoiceWidget = () => {
     }
   }, [isOpen]);
 
+  // Add event listener for custom voice mode activation
+  useEffect(() => {
+    const handleActivateVoiceMode = () => {
+      activateVoiceMode();
+    };
+    
+    document.addEventListener('activateVoiceMode', handleActivateVoiceMode);
+    
+    return () => {
+      document.removeEventListener('activateVoiceMode', handleActivateVoiceMode);
+    };
+  }, []);
+
   const handleCloseWidget = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsOpen(false);

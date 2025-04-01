@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -145,10 +146,15 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   const switchToVoiceMode = () => {
     onClose({ preventDefault: () => {} } as React.MouseEvent);
+    // Directly activate the voice mode without going through the selection screen
     setTimeout(() => {
-      const voiceButton = document.querySelector('.grid.grid-cols-2 .bg-\\[\\#8DD6F0\\]:first-child');
-      if (voiceButton) {
-        (voiceButton as HTMLElement).click();
+      const voiceModeButton = document.getElementById('voice-mode-button');
+      if (voiceModeButton) {
+        voiceModeButton.click();
+      } else {
+        // If button can't be found, try an alternative approach
+        const event = new CustomEvent('activateVoiceMode');
+        document.dispatchEvent(event);
       }
     }, 100);
     setMenuOpen(false);
