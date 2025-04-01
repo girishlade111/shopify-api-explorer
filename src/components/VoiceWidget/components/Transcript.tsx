@@ -116,7 +116,7 @@ function Transcript({
   if (isVoiceMode) {
     return <div className="p-4 pb-8 mt-auto">
         <div className="flex items-center bg-gray-100 rounded-full py-3 px-4">
-          <div className="w-full bg-transparent px-4 py-2 text-gray-500 font-medium">
+          <div className="w-full bg-transparent px-4 py-2 text-gray-500 font-medium text-sm">
             Voice mode active - speak to interact
           </div>
           <button className="bg-[#33C3F0] rounded-full p-3 mx-2">
@@ -178,7 +178,7 @@ function Transcript({
                       <div className={`${icon} rounded-full mr-2 flex-shrink-0`}>
                         {getFunctionIcon(functionName)}
                       </div>
-                      <span className={`${text} font-medium`}>{formattedName}</span>
+                      <span className={`${text} font-medium text-xs`}>{formattedName}</span>
                     </div>
                   </div>
                 </div>
@@ -190,7 +190,7 @@ function Transcript({
             return (
               <div key={item.itemId} className={`flex ${item.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                 {item.role !== 'user' && (
-                  <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3 flex items-center justify-center">
                     {/* AI icon could go here */}
                   </div>
                 )}
@@ -201,10 +201,10 @@ function Transcript({
                       : 'bg-gray-100 text-gray-800 max-w-[70%] text-left'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{item.title}</p>
+                  <p className="whitespace-pre-wrap text-sm">{item.title}</p>
                 </div>
                 {item.role === 'user' && (
-                  <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0 ml-3 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 ml-3 flex items-center justify-center">
                     {/* User icon could go here */}
                   </div>
                 )}
