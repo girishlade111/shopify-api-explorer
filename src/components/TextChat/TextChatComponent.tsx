@@ -155,19 +155,16 @@ export const TextChatComponent: React.FC = () => {
     );
   }
   
-  // Main chat component
+  // Main chat component with updated styling to match the reference image
   return (
-    <div className="fixed bottom-6 right-6 w-[350px] h-[600px] bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col z-50 border border-gray-100">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button className="p-2 rounded-lg hover:bg-gray-100">
-          <div className="w-5 h-[3px] bg-gray-600 rounded-full mb-1"></div>
-          <div className="w-5 h-[3px] bg-gray-600 rounded-full mb-1"></div>
-          <div className="w-5 h-[3px] bg-gray-600 rounded-full"></div>
-        </button>
-        <h2 className="text-xl font-bold">Enzo AI</h2>
-        <button onClick={handleClose} className="p-2 rounded-lg hover:bg-gray-100">
-          <X className="h-5 w-5" />
+    <div className="fixed bottom-6 right-6 w-[350px] h-[600px] bg-white rounded-[20px] shadow-xl overflow-hidden flex flex-col z-50">
+      {/* Header with simplified design */}
+      <div className="flex items-center justify-between p-5 border-b border-gray-100">
+        <div className="flex items-center">
+          <h2 className="text-xl font-medium">Enzo AI</h2>
+        </div>
+        <button onClick={handleClose} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+          <X className="h-5 w-5 text-gray-500" />
         </button>
       </div>
 
@@ -231,16 +228,18 @@ export const TextChatComponent: React.FC = () => {
                 className={`flex ${message.sender === 'local' ? 'justify-end' : 'justify-start'}`}
               >
                 {message.sender === 'remote' && (
-                  <div className="w-8 h-8 rounded-full bg-[#33C3F0] flex-shrink-0 mr-2"></div>
+                  <div className="w-8 h-8 rounded-full bg-[#33C3F0] flex-shrink-0 mr-2 flex items-center justify-center">
+                    {/* AI icon could go here */}
+                  </div>
                 )}
                 <div 
-                  className={`max-w-[80%] px-4 py-2 rounded-lg ${
+                  className={`max-w-[75%] px-4 py-2 rounded-[18px] ${
                     message.sender === 'local' 
-                      ? 'bg-[#33C3F0] text-white' 
-                      : 'bg-gray-100 text-gray-800'
+                      ? 'bg-[#33C3F0] text-white rounded-tr-none' 
+                      : 'bg-gray-100 text-gray-800 rounded-tl-none'
                   }`}
                 >
-                  <p>{message.text}</p>
+                  <p className="text-sm">{message.text}</p>
                 </div>
               </div>
             ))}
@@ -249,28 +248,30 @@ export const TextChatComponent: React.FC = () => {
         </ScrollArea>
       )}
       
-      {/* Message input */}
+      {/* Message input with new rounded styling */}
       {isConnected && (
-        <div className="p-4 bg-gray-50">
+        <div className="p-4">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
               sendMessage();
             }}
-            className="flex items-center gap-2 bg-white rounded-full border pl-4 pr-2 py-2"
+            className="flex items-center gap-2"
           >
-            <Input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Type your message here..."
-              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
-            />
-            <button 
-              type="submit"
-              className="w-10 h-10 bg-[#33C3F0] rounded-full flex items-center justify-center text-white"
-            >
-              <Mic className="h-5 w-5" />
-            </button>
+            <div className="flex-1 bg-gray-100 rounded-full overflow-hidden flex items-center pl-4 pr-2">
+              <Input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Type your message here..."
+                className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+              />
+              <button 
+                type="submit"
+                className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center text-white"
+              >
+                <Mic className="h-5 w-5" />
+              </button>
+            </div>
           </form>
         </div>
       )}
