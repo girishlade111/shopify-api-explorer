@@ -58,7 +58,7 @@ const VoiceWidget = () => {
   };
 
   const VoiceBar = () => (
-    <button
+    <div
       onClick={() => {
         setIsOpen(!isOpen);
         if (!isOpen) {
@@ -67,7 +67,7 @@ const VoiceWidget = () => {
           setActiveChatType(null);
         }
       }}
-      className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"
+      className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 cursor-pointer"
       aria-label="Toggle voice assistant"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -88,22 +88,22 @@ const VoiceWidget = () => {
           <X className="w-4 h-4" />
         </button>
       )}
-    </button>
+    </div>
   );
 
   const MinimizedBar = () => (
-    <button
+    <div
       onClick={() => {
         setIsMinimized(false);
       }}
-      className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"
+      className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 cursor-pointer"
       aria-label="Expand chat widget"
     >
       <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
         {/* Empty blue circle without an icon */}
       </div>
       <span className="text-lg font-serif font-bold">Enzo AI</span>
-    </button>
+    </div>
   );
 
   return (
