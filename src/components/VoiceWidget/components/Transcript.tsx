@@ -10,6 +10,7 @@ interface TranscriptProps {
   canSend: boolean;
   showTextInput?: boolean; // Controls visibility of the text input
   isVoiceMode?: boolean; // Controls if we're in voice-only mode
+  onSwitchToVoiceMode?: () => void; // New prop for switching to voice mode
 }
 
 function Transcript({ 
@@ -18,7 +19,8 @@ function Transcript({
   onSendMessage, 
   canSend, 
   showTextInput = true,
-  isVoiceMode = false 
+  isVoiceMode = false,
+  onSwitchToVoiceMode
 }: TranscriptProps) {
   const { transcriptItems } = useTranscript();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -85,7 +87,7 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="p-4 border-t">
+        <div className="p-4">
           <div className="flex items-center bg-gray-100 rounded-full">
             <input
               ref={inputRef}
@@ -96,17 +98,27 @@ function Transcript({
               className="w-full bg-transparent px-4 py-3 focus:outline-none rounded-full"
               disabled={!canSend}
             />
-            <button
-              onClick={onSendMessage}
-              disabled={!canSend || !userText.trim()}
-              className={`bg-[#33C3F0] rounded-full p-3 mx-2 text-white ${
-                canSend && userText.trim()
-                  ? 'hover:bg-[#30B4DD]'
-                  : 'opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <Send className="w-5 h-5" />
-            </button>
+            {userText.trim() ? (
+              <button
+                onClick={onSendMessage}
+                disabled={!canSend || !userText.trim()}
+                className={`bg-[#33C3F0] rounded-full p-3 mx-2 text-white ${
+                  canSend && userText.trim()
+                    ? 'hover:bg-[#30B4DD]'
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                onClick={onSwitchToVoiceMode}
+                className="bg-[#33C3F0] rounded-full p-3 mx-2 text-white hover:bg-[#30B4DD]"
+                disabled={!onSwitchToVoiceMode}
+              >
+                <Mic className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       )}
