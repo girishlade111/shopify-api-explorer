@@ -7,15 +7,12 @@ import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 
-// Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
 const DEFAULT_STORE_URL = "appella-test.myshopify.com";
 
-// Use environment variables or fallback to defaults
 const NGROK_URL = import.meta.env.VITE_NGROK_URL || DEFAULT_NGROK_URL;
 const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 
-// Maximum number of connection retries
 const MAX_CONNECTION_RETRIES = 3;
 
 interface VoiceDemoProps {
@@ -126,7 +123,6 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
 
   const connectToService = async () => {
     if (connectionRetries >= MAX_CONNECTION_RETRIES) {
-      // Don't set error message to display to the user
       console.error(`Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`);
       setSessionStatus('DISCONNECTED');
       return;
@@ -205,7 +201,6 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
       console.error('Error connecting:', error);
       cleanupResources();
       
-      // Log the error to console instead of showing it to the user
       console.error(
         error instanceof Error
           ? error.message
@@ -225,7 +220,6 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
   };
 
   const switchToTextMode = () => {
-    // Instead of window.history.back()
     onClose({ preventDefault: () => {} } as React.MouseEvent);
     setSheetOpen(false);
   };
@@ -242,9 +236,9 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full shadow-none transition-all duration-300 overflow-hidden max-w-[360px]">
-      <div className="flex items-center py-2 px-4">
-        <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3 overflow-hidden">
+    <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full shadow-none transition-all duration-300 overflow-hidden max-w-[320px]">
+      <div className="flex items-center py-2 px-3">
+        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center mr-2 overflow-hidden">
           <video 
             ref={videoRef}
             className="w-full h-full object-cover"
@@ -255,14 +249,14 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
           />
         </div>
         <div className="flex-1">
-          <p className="text-base font-medium">Listening...</p>
+          <p className="text-sm font-medium">Listening...</p>
         </div>
         <button 
           onClick={onClose}
-          className="p-2 ml-1"
+          className="p-1.5 ml-1"
           aria-label="Close voice assistant"
         >
-          <X className="w-5 h-5 text-gray-700" />
+          <X className="w-4 h-4 text-gray-700" />
         </button>
       </div>
 

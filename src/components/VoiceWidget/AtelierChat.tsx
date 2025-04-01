@@ -7,18 +7,14 @@ import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
 import { useToast } from "@/hooks/use-toast";
 
-// Default values for environment variables
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
 const DEFAULT_STORE_URL = "appella-test.myshopify.com";
 
-// Use environment variables or fallback to defaults
 const NGROK_URL = import.meta.env.VITE_NGROK_URL || DEFAULT_NGROK_URL;
 const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 
-// Maximum number of connection retries
 const MAX_CONNECTION_RETRIES = 3;
-// Default timeout for API calls (in milliseconds)
-const CONNECTION_TIMEOUT_MS = 15000; // Increased from 10s to 15s
+const CONNECTION_TIMEOUT_MS = 15000;
 
 interface AtelierChatProps {
   onClose: (e: React.MouseEvent) => void;
@@ -40,10 +36,9 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Create audio element for handling audio output
     const audioEl = new Audio();
     audioEl.autoplay = true;
-    audioEl.muted = true; // Start muted for text chat
+    audioEl.muted = true;
     audioElementRef.current = audioEl;
     
     connectToService();
@@ -80,15 +75,12 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     setSessionStatus('CONNECTING');
     setError(null);
     
-    // Cancel any previous in-flight request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     
-    // Create a new abort controller for this request
     abortControllerRef.current = new AbortController();
     
-    // Set up connection timeout
     if (connectionTimeoutRef.current) {
       clearTimeout(connectionTimeoutRef.current);
     }
@@ -102,7 +94,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setError('Connection timed out. Please try again.');
       setSessionStatus('DISCONNECTED');
       
-      // Increment retry counter
       setConnectionRetries(prev => prev + 1);
       
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
@@ -116,7 +107,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     }, CONNECTION_TIMEOUT_MS);
 
     try {
-      // Use the abort signal for fetch
       const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
         method: 'GET',
         mode: 'cors',
@@ -127,14 +117,13 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         signal: abortControllerRef.current.signal
       });
 
-      // Clear timeout since fetch completed
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
         connectionTimeoutRef.current = null;
       }
 
       if (timeoutTriggered) {
-        return; // Timeout already triggered, abort further processing
+        return;
       }
 
       if (!response.ok) {
@@ -155,8 +144,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       const { pc, dc } = await createRealtimeConnection(
         clientSecret,
         audioElementRef,
-        false, // Audio not enabled
-        false  // Don't skip audio stream - we need it for the API
+        false,
+        false
       );
 
       pcRef.current = pc;
@@ -169,14 +158,13 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       console.log("Chat session established successfully.");
       
     } catch (error) {
-      // Clear timeout if it exists
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
         connectionTimeoutRef.current = null;
       }
     
       if (timeoutTriggered) {
-        return; // Timeout already triggered, abort further processing
+        return;
       }
     
       console.error('Error connecting:', error);
@@ -189,7 +177,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setError(errorMessage);
       setSessionStatus('DISCONNECTED');
       
-      // Increment retry counter
       setConnectionRetries(prev => prev + 1);
       
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
@@ -205,13 +192,11 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   const switchToVoiceMode = () => {
     onClose({ preventDefault: () => {} } as React.MouseEvent);
-    // Directly activate the voice mode without going through the selection screen
     setTimeout(() => {
       const voiceModeButton = document.getElementById('voice-mode-button');
       if (voiceModeButton) {
         voiceModeButton.click();
       } else {
-        // If button can't be found, try an alternative approach
         const event = new CustomEvent('activateVoiceMode');
         document.dispatchEvent(event);
       }
@@ -234,10 +219,10 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     return (
       <div
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 cursor-pointer"
+        className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-none hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 cursor-pointer"
         aria-label="Expand chat widget"
       >
-        <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center">
           {/* Empty blue circle without an icon */}
         </div>
         <span className="text-lg font-serif font-bold">Enzo AI</span>
@@ -246,50 +231,50 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-      <div className="flex items-center justify-between p-4 relative">
+    <div className="fixed bottom-6 left-6 z-40 w-[320px] h-[500px] bg-white rounded-[20px] shadow-none transition-all duration-300 overflow-hidden flex flex-col">
+      <div className="flex items-center justify-between p-3 relative">
         <button 
           onClick={() => setMenuOpen(!menuOpen)} 
           className="p-2"
         >
-          <Menu className="w-6 h-6 text-gray-700" />
+          <Menu className="w-5 h-5 text-gray-700" />
         </button>
-        <h2 className="text-xl font-serif font-bold">Enzo AI</h2>
+        <h2 className="text-lg font-serif font-bold">Enzo AI</h2>
         <div className="flex items-center">
           <button
             onClick={() => setIsMinimized(true)}
             className="p-2 hover:bg-gray-100 rounded-full"
             aria-label="Minimize chat assistant"
           >
-            <span className="w-5 h-1.5 bg-gray-500 rounded-full block"></span>
+            <span className="w-4 h-1.5 bg-gray-500 rounded-full block"></span>
           </button>
         </div>
         
         {menuOpen && (
-          <div className="absolute top-14 left-2 bg-white rounded-xl shadow-lg w-[250px] z-50">
+          <div className="absolute top-12 left-2 bg-white rounded-xl shadow-none w-[230px] z-50">
             <div className="flex flex-col py-2">
               <button 
-                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                className="flex items-center gap-3 py-2.5 px-4 hover:bg-gray-100 w-full text-left"
                 onClick={switchToVoiceMode}
               >
-                <Mic className="w-5 h-5" />
-                <span className="text-base">Switch to Voice</span>
+                <Mic className="w-4 h-4" />
+                <span className="text-sm">Switch to Voice</span>
               </button>
               
               <button 
-                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                className="flex items-center gap-3 py-2.5 px-4 hover:bg-gray-100 w-full text-left"
                 onClick={speakToHuman}
               >
-                <Headphones className="w-5 h-5" />
-                <span className="text-base">Speak to Human</span>
+                <Headphones className="w-4 h-4" />
+                <span className="text-sm">Speak to Human</span>
               </button>
               
               <button 
-                className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
+                className="flex items-center gap-3 py-2.5 px-4 hover:bg-gray-100 w-full text-left"
                 onClick={resetChat}
               >
-                <RefreshCw className="w-5 h-5" />
-                <span className="text-base">Reset Chat</span>
+                <RefreshCw className="w-4 h-4" />
+                <span className="text-sm">Reset Chat</span>
               </button>
             </div>
           </div>
@@ -297,10 +282,10 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 mx-4 mb-2">
+        <div className="bg-red-50 border-l-4 border-red-500 p-3 mx-3 mb-2">
           <div className="flex">
-            <div className="ml-3">
-              <p className="text-sm text-red-700">
+            <div className="ml-2">
+              <p className="text-xs text-red-700">
                 {error}
               </p>
             </div>

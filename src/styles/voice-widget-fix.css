@@ -36,3 +36,13 @@ body {
 .fixed.bottom-6.left-6.z-40 * {
   box-shadow: none !important;
 }
+
+/* Scale down font size for more compact display */
+.fixed.bottom-6.left-6.z-40 .text-base {
+  font-size: 0.875rem !important;
+}
+
+/* Reduce padding in chat messages */
+.fixed.bottom-6.left-6.z-40 .p-4 {
+  padding: 0.75rem !important;
+}
