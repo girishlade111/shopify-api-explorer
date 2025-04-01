@@ -87,3 +87,19 @@
   color: #333;
   border-top-left-radius: 0.25rem;
 }
+
+/* New styles for the chat header */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  opacity: 0.2; /* Make header semi-transparent */
+  transition: opacity 0.3s ease;
+  height: 3rem;
+}
+
+.chat-header:hover {
+  opacity: 1; /* Make header fully visible on hover */
+}

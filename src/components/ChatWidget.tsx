@@ -182,7 +182,7 @@ const ChatWidget: React.FC = () => {
   return (
     <div className="fixed bottom-6 left-6 w-80 bg-white rounded-lg shadow-lg 
                     overflow-hidden flex flex-col animate-fade-in z-50" style={{ height: '500px' }}>
-      <div className="flex justify-between items-center p-3">
+      <div className="chat-header">
         <button 
           onClick={() => setIsSidePanelOpen(true)}
           className="p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
