@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Menu, Mic, MessageSquare, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
@@ -85,18 +84,7 @@ const VoiceWidget = () => {
           <EventProvider>
             {showModeSelection ? (
               <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b">
-                  <button className="p-2 invisible">
-                    <Menu className="w-6 h-6 text-gray-700" />
-                  </button>
-                  <h2 className="text-xl font-semibold">Enzo AI</h2>
-                  <button onClick={() => setIsOpen(false)} className="p-2">
-                    <X className="w-6 h-6 text-gray-700" />
-                  </button>
-                </div>
-                
-                {/* Mode Selection Content */}
+                {/* Mode Selection Content - Simplified without header */}
                 <div className="flex-1 p-6 flex flex-col items-center justify-center">
                   <h3 className="text-2xl font-bold mb-8">Choose your mode</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-md">
