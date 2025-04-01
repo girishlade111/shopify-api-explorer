@@ -41,9 +41,20 @@ function Transcript({
     }
   };
 
-  // For voice mode, return null to render nothing
+  // For voice mode, return a consistent bar UI
   if (isVoiceMode) {
-    return null;
+    return (
+      <div className="p-4">
+        <div className="flex items-center bg-gray-100 rounded-full">
+          <div className="w-full bg-transparent px-4 py-3 text-gray-500">
+            Voice mode active - speak to interact
+          </div>
+          <button className="bg-[#33C3F0] rounded-full p-3 mx-2">
+            <Mic className="w-5 h-5 text-white" />
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

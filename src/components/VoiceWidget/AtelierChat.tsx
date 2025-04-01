@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -33,6 +34,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   useEffect(() => {
     connectToService();
@@ -164,6 +166,21 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     setMenuOpen(false);
   };
 
+  if (isMinimized) {
+    return (
+      <button
+        onClick={() => setIsMinimized(false)}
+        className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"
+        aria-label="Expand chat widget"
+      >
+        <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
+          {/* Empty blue circle without an icon */}
+        </div>
+        <span className="text-lg font-medium">Enzo AI</span>
+      </button>
+    );
+  }
+
   return (
     <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
       <div className="flex items-center justify-between p-4 relative">
@@ -174,13 +191,22 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           <Menu className="w-6 h-6 text-gray-700" />
         </button>
         <h2 className="text-xl font-semibold">Enzo AI</h2>
-        <button 
-          onClick={onClose}
-          className="p-2"
-          aria-label="Close chat assistant"
-        >
-          <X className="w-6 h-6 text-gray-700" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setIsMinimized(true)}
+            className="p-2 hover:bg-gray-100 rounded-full"
+            aria-label="Minimize chat assistant"
+          >
+            <span className="w-5 h-1.5 bg-gray-500 rounded-full block"></span>
+          </button>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full"
+            aria-label="Close chat assistant"
+          >
+            <X className="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
         
         {menuOpen && (
           <div className="absolute top-14 left-2 bg-white rounded-xl shadow-lg w-[250px] z-50">
