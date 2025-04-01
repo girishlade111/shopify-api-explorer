@@ -1,0 +1,19 @@
+
+/* Fix white space below the voice widget transcript component */
+.absolute.bottom-0.left-0.right-0.p-4.pb-2 {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Ensure the widget container has no extra space */
+#root {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Remove any potential margin/padding on body */
+body {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  min-height: 100vh;
+}
