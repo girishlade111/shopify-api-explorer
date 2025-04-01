@@ -41,9 +41,9 @@ function Transcript({
     }
   };
 
-  // For voice mode, return empty div without any padding
+  // For voice mode, return empty div without any padding or content
   if (isVoiceMode) {
-    return <div></div>;
+    return null;
   }
 
   return (

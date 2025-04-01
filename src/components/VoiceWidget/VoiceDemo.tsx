@@ -216,13 +216,21 @@ export default function VoiceDemo() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+    <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full shadow-lg transition-all duration-300 overflow-hidden max-w-[300px]">
+      <div className="flex items-center py-2 px-4">
+        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3"></div>
+        <div className="flex-1">
+          <p className="font-medium">Enzo AI</p>
+          <p className="text-sm text-gray-500">
+            {sessionStatus === 'CONNECTING' ? 'Connecting...' : 
+             sessionStatus === 'CONNECTED' ? 'Listening...' : 
+             'Disconnected'}
+          </p>
+        </div>
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <button className="p-2">
-              <Menu className="w-6 h-6 text-gray-700" />
+              <Menu className="w-5 h-5 text-gray-700" />
             </button>
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] p-0">
@@ -253,67 +261,32 @@ export default function VoiceDemo() {
             </div>
           </SheetContent>
         </Sheet>
-        <h2 className="text-xl font-semibold">Enzo AI</h2>
-        <div className="flex items-center gap-1">
-          <button 
-            role="switch"
-            aria-checked={isTranscriptionEnabled}
-            onClick={() => setIsTranscriptionEnabled(!isTranscriptionEnabled)}
-            className={`
-              p-3 rounded-full transition-all duration-200
-              ${sessionStatus !== 'CONNECTED' ? 'opacity-50 cursor-not-allowed' : ''}
-              ${
-                isTranscriptionEnabled
-                  ? 'bg-[#33C3F0] text-white hover:bg-[#30B4DD] cursor-pointer'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
-              }
-            `}
-            disabled={sessionStatus !== 'CONNECTED'}
-          >
-            {isTranscriptionEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
-          </button>
-          <button 
-            role="switch"
-            aria-checked={isAudioEnabled}
-            onClick={() => setIsAudioEnabled(!isAudioEnabled)}
-            className={`
-              p-3 rounded-full transition-all duration-200
-              ${sessionStatus !== 'CONNECTED' ? 'opacity-50 cursor-not-allowed' : ''}
-              ${
-                isAudioEnabled
-                  ? 'bg-[#33C3F0] text-white hover:bg-[#30B4DD] cursor-pointer'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
-              }
-            `}
-            disabled={sessionStatus !== 'CONNECTED'}
-          >
-            {isAudioEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-          </button>
-          <button 
-            onClick={() => window.history.back()}
-            className="p-2 ml-1"
-            aria-label="Close voice assistant"
-          >
-            <X className="w-6 h-6 text-gray-700" />
-          </button>
-        </div>
+        <button 
+          onClick={() => window.history.back()}
+          className="p-2 ml-1"
+          aria-label="Close voice assistant"
+        >
+          <X className="w-5 h-5 text-gray-700" />
+        </button>
       </div>
 
-      <TranscriptProvider>
-        <EventProvider>
-          <CopilotDemoApp
-            initialSessionStatus={sessionStatus}
-            onSessionStatusChange={setSessionStatus}
-            peerConnection={pcRef.current}
-            dataChannel={dcRef.current}
-            isTranscriptionEnabled={isTranscriptionEnabled}
-            isAudioEnabled={isAudioEnabled}
-            instructions={instructions}
-            tools={tools}
-            isVoiceMode={true}
-          />
-        </EventProvider>
-      </TranscriptProvider>
+      <div className="hidden">
+        <TranscriptProvider>
+          <EventProvider>
+            <CopilotDemoApp
+              initialSessionStatus={sessionStatus}
+              onSessionStatusChange={setSessionStatus}
+              peerConnection={pcRef.current}
+              dataChannel={dcRef.current}
+              isTranscriptionEnabled={isTranscriptionEnabled}
+              isAudioEnabled={isAudioEnabled}
+              instructions={instructions}
+              tools={tools}
+              isVoiceMode={true}
+            />
+          </EventProvider>
+        </TranscriptProvider>
+      </div>
     </div>
   );
 }
