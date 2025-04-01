@@ -98,8 +98,29 @@
   text-align: left !important;
 }
 
-/* Add a clean background to the input area */
+/* Remove all border lines */
+.fixed.bottom-6.left-6.z-40 .border,
+.fixed.bottom-6.left-6.z-40 .border-t,
+.fixed.bottom-6.left-6.z-40 .border-b,
+.fixed.bottom-6.left-6.z-40 .border-l,
+.fixed.bottom-6.left-6.z-40 .border-r,
+.fixed.bottom-6.left-6.z-40 [class*="border-"] {
+  border: none !important;
+}
+
+/* Clean up the input area */
 .fixed.bottom-6.left-6.z-40 .absolute.bottom-0 {
   background-color: white !important;
-  border-top: 1px solid rgba(229, 231, 235, 0.5) !important;
+  box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.05) !important;
+  border: none !important;
+}
+
+/* Enhance the chat bubbles */
+.fixed.bottom-6.left-6.z-40 .rounded-lg {
+  border-radius: 18px !important;
+}
+
+/* Add some shadow to the function buttons for better visibility without borders */
+.fixed.bottom-6.left-6.z-40 .rounded-full {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
 }

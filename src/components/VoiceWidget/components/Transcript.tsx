@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -75,14 +76,12 @@ function Transcript({
       case 'display_products':
         return {
           bg: 'bg-[#FEF7CD]',
-          border: 'border-[#F97316]',
           text: 'text-[#8B5CF6]',
           icon: 'text-[#F97316]'
         };
       case 'get_weather':
         return {
           bg: 'bg-[#D3E4FD]',
-          border: 'border-[#0EA5E9]',
           text: 'text-[#0EA5E9]',
           icon: 'text-[#0EA5E9]'
         };
@@ -91,7 +90,6 @@ function Transcript({
       case 'navigate_to_wishlist':
         return {
           bg: 'bg-[#D3E4FD]',
-          border: 'border-[#0EA5E9]',
           text: 'text-[#0EA5E9]',
           icon: 'text-[#0EA5E9]'
         };
@@ -101,14 +99,12 @@ function Transcript({
       case 'remove_from_wishlist':
         return {
           bg: 'bg-[#FFDEE2]',
-          border: 'border-[#D946EF]',
           text: 'text-[#D946EF]',
           icon: 'text-[#D946EF]'
         };
       default:
         return {
           bg: 'bg-[#F2FCE2]',
-          border: 'border-[#8B5CF6]',
           text: 'text-[#8B5CF6]',
           icon: 'text-[#8B5CF6]'
         };
@@ -170,12 +166,12 @@ function Transcript({
           if (item.type === 'BREADCRUMB') {
             const functionName = getFunctionName(item.data);
             if (functionName) {
-              const { bg, border, text, icon } = getFunctionStyles(functionName);
+              const { bg, text, icon } = getFunctionStyles(functionName);
               const formattedName = functionName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
               
               return (
                 <div key={item.itemId} className="flex items-start mb-4 ml-14">
-                  <div className={`p-2 pr-6 rounded-full ${bg} ${border} border`}>
+                  <div className={`p-2 pr-6 rounded-full ${bg}`}>
                     <div className="flex items-center">
                       <div className={`${icon} rounded-full mr-2 flex-shrink-0`}>
                         {getFunctionIcon(functionName)}
@@ -220,7 +216,7 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white">
           <div className="flex items-center bg-gray-100 rounded-full py-2 px-4">
             <input 
               ref={inputRef}
