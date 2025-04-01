@@ -96,7 +96,7 @@ function Transcript({
               onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
               className="w-full bg-transparent px-4 py-3 focus:outline-none rounded-full"
-              disabled={!canSend}
+              // Allow typing even when not connected
             />
             {userText.trim() ? (
               <button
@@ -114,7 +114,6 @@ function Transcript({
               <button
                 onClick={onSwitchToVoiceMode}
                 className="bg-[#33C3F0] rounded-full p-3 mx-2 text-white hover:bg-[#30B4DD]"
-                disabled={!onSwitchToVoiceMode}
               >
                 <Mic className="w-5 h-5" />
               </button>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -147,7 +146,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const switchToVoiceMode = () => {
     onClose({ preventDefault: () => {} } as React.MouseEvent);
     setTimeout(() => {
-      const voiceButton = document.querySelector('.bg-[#33C3F0].rounded-full.p-3.mx-2');
+      const voiceButton = document.querySelector('.grid.grid-cols-2 .bg-\\[\\#8DD6F0\\]:first-child');
       if (voiceButton) {
         (voiceButton as HTMLElement).click();
       }
@@ -243,6 +242,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
             isAudioEnabled={false}
             instructions={instructions}
             tools={tools}
+            onSwitchToVoiceMode={switchToVoiceMode}
           />
         </EventProvider>
       </TranscriptProvider>

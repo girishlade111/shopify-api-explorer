@@ -28,6 +28,22 @@ const VoiceWidget = () => {
     setIsOpen(false);
   };
 
+  // Function to directly activate voice mode
+  const activateVoiceMode = () => {
+    setIsOpen(true);
+    setShowChatView(true);
+    setActiveChatType('ai');
+    setShowModeSelection(false);
+  };
+
+  // Function to directly activate text mode
+  const activateTextMode = () => {
+    setIsOpen(true);
+    setShowChatView(true);
+    setActiveChatType('atelier');
+    setShowModeSelection(false);
+  };
+
   const VoiceBar = () => (
     <button
       onClick={() => {
@@ -97,6 +113,7 @@ const VoiceWidget = () => {
                         setActiveChatType('ai');
                       }}
                       className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
+                      id="voice-mode-button" // Add ID for easier selection
                     >
                       <Mic size={24} className="text-white mb-1" />
                       <span className="text-white font-medium">Voice</span>
@@ -109,6 +126,7 @@ const VoiceWidget = () => {
                         setActiveChatType('atelier');
                       }}
                       className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
+                      id="text-mode-button" // Add ID for easier selection
                     >
                       <MessageSquare size={24} className="text-white mb-1" />
                       <span className="text-white font-medium">Text</span>
@@ -126,18 +144,19 @@ const VoiceWidget = () => {
                       <Menu className="w-6 h-6 text-gray-700" />
                     </button>
                     <h2 className="text-xl font-semibold">Enzo AI</h2>
-                    <button onClick={handleCloseWidget} className="p-2">
-                      <X className="w-6 h-6 text-gray-700" />
-                    </button>
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => setIsMinimized(true)}
+                        className="p-2 hover:bg-gray-100 rounded-full"
+                        aria-label="Minimize chat assistant"
+                      >
+                        <span className="w-5 h-1.5 bg-gray-500 rounded-full block"></span>
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="flex-1 overflow-y-auto p-4">
-                    <div className="flex items-start mb-4">
-                      <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
-                      <div className="bg-gray-100 rounded-lg p-4 max-w-[75%]">
-                        <p>Hello! I am Enzo, your AI Agent to help you shop.</p>
-                      </div>
-                    </div>
+                    {/* Auto-connecting, no initial message needed */}
                   </div>
                   
                   <div className="p-4">
@@ -148,16 +167,12 @@ const VoiceWidget = () => {
                         className="w-full bg-transparent px-4 py-3 focus:outline-none"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
-                            setShowChatView(true);
-                            setActiveChatType('atelier');
+                            activateTextMode();
                           }
                         }}
                       />
                       <button 
-                        onClick={() => {
-                          setShowChatView(true);
-                          setActiveChatType('ai');
-                        }}
+                        onClick={activateVoiceMode}
                         className="bg-[#33C3F0] rounded-full p-3 mx-2"
                       >
                         <Mic className="w-5 h-5 text-white" />
