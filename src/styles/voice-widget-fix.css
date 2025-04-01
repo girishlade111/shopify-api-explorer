@@ -102,6 +102,19 @@ body {
 }
 
 /* Ensure text starts closer to the left edge */
-input[placeholder="Type your message here..."] {
+input[placeholder="Type your message here..."],
+textarea[placeholder="Type your message here..."] {
   padding-left: 0.5rem !important;
+}
+
+/* Style the textarea to match the input field */
+.resize-none.min-h-\[40px\] {
+  line-height: 1.5 !important;
+}
+
+/* Remove default textarea styling */
+textarea {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
 }

@@ -1,7 +1,7 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
+import { Textarea } from '@/components/ui/textarea';
 
 interface TranscriptProps {
   userText: string;
@@ -27,6 +27,7 @@ function Transcript({
   } = useTranscript();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () =>  {
     messagesEndRef.current?.scrollIntoView({
@@ -39,7 +40,7 @@ function Transcript({
   }, [transcriptItems]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (canSend && userText.trim()) {
         onSendMessage();
@@ -218,13 +219,20 @@ function Transcript({
       {showTextInput && (
         <div className="absolute bottom-2 left-0 right-0 p-3 bg-white">
           <div className="relative bg-gray-100 rounded-full py-1 px-2 border border-gray-200">
-            <input 
-              ref={inputRef}
+            <Textarea 
+              ref={textareaRef}
               value={userText}
               onChange={e => setUserText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
-              className="w-full bg-transparent px-2 py-2 focus:outline-none pr-14 text-sm"
+              className="w-full bg-transparent px-2 py-2 focus:outline-none pr-14 text-sm resize-none min-h-[40px] max-h-[120px] overflow-y-auto"
+              rows={1}
+              style={{ 
+                border: 'none', 
+                borderRadius: '9999px',
+                boxShadow: 'none',
+                paddingLeft: '0.5rem'
+              }}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
               {userText.trim() ? (
