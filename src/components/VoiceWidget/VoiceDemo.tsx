@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Headphones, Menu, Mic, MicOff, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
+import { Headphones, Mic, MicOff, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
 import CopilotDemoApp from './CopilotDemoApp';
@@ -221,46 +221,8 @@ export default function VoiceDemo() {
         <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3"></div>
         <div className="flex-1">
           <p className="font-medium">Enzo AI</p>
-          <p className="text-sm text-gray-500">
-            {sessionStatus === 'CONNECTING' ? 'Connecting...' : 
-             sessionStatus === 'CONNECTED' ? 'Listening...' : 
-             'Disconnected'}
-          </p>
+          <p className="text-sm text-gray-500">Listening...</p>
         </div>
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <button className="p-2">
-              <Menu className="w-5 h-5 text-gray-700" />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] p-0">
-            <div className="flex flex-col py-4">
-              <button 
-                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
-                onClick={switchToTextMode}
-              >
-                <Mic className="w-6 h-6" />
-                <span className="text-lg">Switch to Text</span>
-              </button>
-              
-              <button 
-                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
-                onClick={speakToHuman}
-              >
-                <Headphones className="w-6 h-6" />
-                <span className="text-lg">Speak to Human</span>
-              </button>
-              
-              <button 
-                className="flex items-center gap-3 py-4 px-6 hover:bg-gray-100 w-full text-left"
-                onClick={resetChat}
-              >
-                <RefreshCw className="w-6 h-6" />
-                <span className="text-lg">Reset Chat</span>
-              </button>
-            </div>
-          </SheetContent>
-        </Sheet>
         <button 
           onClick={() => window.history.back()}
           className="p-2 ml-1"

@@ -41,7 +41,7 @@ function Transcript({
     }
   };
 
-  // For voice mode, return empty div without any padding or content
+  // For voice mode, return null to render nothing
   if (isVoiceMode) {
     return null;
   }
@@ -103,7 +103,7 @@ function Transcript({
                   : 'opacity-50 cursor-not-allowed'
               }`}
             >
-              {isVoiceMode ? <Mic className="w-5 h-5" /> : <Send className="w-5 h-5" />}
+              <Send className="w-5 h-5" />
             </button>
           </div>
         </div>
