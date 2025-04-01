@@ -45,7 +45,7 @@ body {
 
 /* Reduce padding in chat messages */
 .fixed.bottom-6.left-6.z-40 .p-4 {
-  padding: 0.75rem !important;
+  padding: 0.5rem !important;
 }
 
 /* Style the muted indicators */
@@ -58,5 +58,33 @@ body {
 
 /* Ensure proper button positioning in input field */
 .relative .absolute.right-2 {
-  right: 8px;
+  right: 5px;
+}
+
+/* Make the input field more compact */
+.relative.bg-gray-100.rounded-full {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+/* Reduce the height of the input field */
+.w-full.bg-transparent.px-3.py-2 {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* Make the send button more compact */
+.bg-\[\#33C3F0\].rounded-full.p-2 {
+  padding: 0.375rem !important;
+}
+
+/* Reduce bottom padding for the message container */
+.flex-1.overflow-y-auto.p-4.space-y-5.pb-20 {
+  padding-bottom: 3.5rem !important;
+}
+
+/* Reduce input area container padding */
+.absolute.bottom-0.left-0.right-0.p-3 {
+  padding: 0.5rem !important;
 }
