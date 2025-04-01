@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic } from 'lucide-react';
+import { Send } from 'lucide-react';
 import '../styles/chat-widget.css';
 
 interface Message {
@@ -110,7 +110,7 @@ const ChatWidget: React.FC = () => {
             onClick={handleSend}
             aria-label="Send message"
           >
-            <Mic size={20} />
+            <Send size={20} />
           </button>
         </div>
       </div>
