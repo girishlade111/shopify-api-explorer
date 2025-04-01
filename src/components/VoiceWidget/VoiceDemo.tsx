@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Headphones, Mic, MicOff, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -32,6 +33,8 @@ export default function VoiceDemo() {
   const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [isAiSpeaking, setIsAiSpeaking] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const storedSettings = localStorage.getItem('voiceWidgetSettings');
@@ -85,6 +88,35 @@ export default function VoiceDemo() {
       }
     }
   }, [isAudioEnabled]);
+
+  // Effect to handle AI speaking state for the video animation
+  useEffect(() => {
+    // This would be connected to actual AI speaking events
+    // For now it's just a simple demo
+    const toggleSpeakingInterval = setInterval(() => {
+      // For demo purposes only. In a real implementation,
+      // this should be connected to actual AI speaking events
+      if (sessionStatus === 'CONNECTED') {
+        setIsAiSpeaking(prev => !prev);
+      }
+    }, 5000);
+
+    return () => clearInterval(toggleSpeakingInterval);
+  }, [sessionStatus]);
+
+  // Effect to control the video playback based on AI speaking state
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isAiSpeaking) {
+        videoRef.current.play().catch(err => {
+          console.warn("Video play prevented:", err);
+        });
+      } else {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
+    }
+  }, [isAiSpeaking]);
 
   const cleanupResources = () => {
     cleanupConnection(pcRef.current);
@@ -218,10 +250,19 @@ export default function VoiceDemo() {
   return (
     <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full shadow-lg transition-all duration-300 overflow-hidden max-w-[300px]">
       <div className="flex items-center py-2 px-4">
-        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3"></div>
+        <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3 overflow-hidden">
+          <video 
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            src="https://static.videezy.com/system/resources/previews/000/052/425/original/4K-34.mp4"
+            type="video/mp4"
+            loop
+            muted
+            playsInline
+          />
+        </div>
         <div className="flex-1">
-          <p className="font-medium">Enzo AI</p>
-          <p className="text-sm text-gray-500">Listening...</p>
+          <p className="text-sm">Listening...</p>
         </div>
         <button 
           onClick={() => window.history.back()}
