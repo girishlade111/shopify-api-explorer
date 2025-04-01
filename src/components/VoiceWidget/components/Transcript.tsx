@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -217,7 +218,7 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-white">
+        <div className="absolute bottom-2 left-0 right-0 p-3 bg-white z-10">
           <div className="relative bg-gray-100 rounded-full py-1 px-2 border border-gray-200">
             <Textarea 
               ref={textareaRef}
