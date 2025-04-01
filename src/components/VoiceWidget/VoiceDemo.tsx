@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -126,7 +127,8 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
 
   const connectToService = async () => {
     if (connectionRetries >= MAX_CONNECTION_RETRIES) {
-      setError(`Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`);
+      // Don't set error message to display to the user
+      console.error(`Maximum connection attempts (${MAX_CONNECTION_RETRIES}) reached. Please try again later.`);
       setSessionStatus('DISCONNECTED');
       return;
     }
@@ -204,7 +206,8 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
       console.error('Error connecting:', error);
       cleanupResources();
       
-      setError(
+      // Log the error to console instead of showing it to the user
+      console.error(
         error instanceof Error
           ? error.message
           : 'Failed to connect. Please try again.'

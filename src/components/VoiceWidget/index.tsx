@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Menu, Mic, MessageSquare, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
 import AtelierChat from './AtelierChat';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
+import '../../styles/voice-widget-error.css';
 
 const VoiceWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -169,7 +169,7 @@ const VoiceWidget = () => {
                   </div>
                   
                   <div className="flex-1 overflow-y-auto p-4">
-                    {/* Removed "Connected" and "Chat session established successfully" messages */}
+                    {/* No error or status messages will be displayed here */}
                   </div>
                   
                   <div className="p-4 pb-6 mt-auto">
