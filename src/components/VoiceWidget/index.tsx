@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { MessageCircle, X, Mic, MessageSquare } from 'lucide-react';
+import { X, Mic, MessageSquare } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
 import AtelierChat from './AtelierChat';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -32,10 +32,19 @@ const VoiceWidget = () => {
             setActiveChatType(null);
           }
         }}
-        className="fixed bottom-6 left-6 z-50 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-200"
+        className={isOpen 
+          ? "fixed bottom-6 left-6 z-50 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-200"
+          : "fixed bottom-6 left-6 z-50 bg-white text-black px-6 py-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 min-w-[280px]"}
         aria-label="Toggle voice assistant"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <>
+            <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0"></div>
+            <span className="font-medium">Click here to chat with AI!</span>
+          </>
+        )}
       </button>
 
       {/* Voice Widget Container */}
