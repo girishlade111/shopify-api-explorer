@@ -30,12 +30,15 @@ header.fixed {
 
 /* Style for the sticky chat widget header */
 .fixed.bottom-6.left-6.z-40 .sticky.top-0 {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background-color: white;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  background-color: white !important;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  display: flex !important;
+  padding: 0.75rem !important;
+  border-bottom: 1px solid #f3f4f6 !important;
 }
 
 /* Remove any border or shadow from the input area */
@@ -174,4 +177,20 @@ textarea.pr-20,
 /* Ensure main content has proper padding to not get hidden under header */
 main.pt-20 {
   padding-top: 5rem !important; /* Increased padding to account for header height */
+}
+
+/* Force the chat widget header to be visible */
+.fixed.bottom-6.left-6.z-40 > div:first-child {
+  display: flex !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  background-color: white !important;
+}
+
+/* Ensure the chat container has proper spacing */
+.flex.flex-col.bg-white {
+  height: 440px !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
