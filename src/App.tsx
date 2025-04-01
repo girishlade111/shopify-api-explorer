@@ -2,7 +2,6 @@
 import React from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'sonner';
 
 import { Layout } from '@/components/Layout';
 import Header from '@/components/Header';
@@ -40,7 +39,6 @@ function App() {
             <FittingRoomProvider>
               <UserActivityProvider>
                 <ScrollToTop />
-                <Toaster position="top-right" richColors />
                 <Header />
                 <Routes>
                   <Route element={<Layout />}>
