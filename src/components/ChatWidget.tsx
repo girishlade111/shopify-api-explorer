@@ -13,17 +13,17 @@ const ChatWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Could you please clarify what you\'re looking for? I\'d be happy to assist you.',
+      text: 'Hello! How can I assist you today?',
       isUser: false
     },
     {
       id: '2',
-      text: 'dscakhd',
+      text: 'I\'m looking for a new jacket',
       isUser: true
     },
     {
       id: '3',
-      text: 'It seems like there might be a typo. How can I assist you today? Are you looking for something specific?',
+      text: 'Could you please let me know what you\'re looking for? Are you shopping for something specific or need help finding a particular item?',
       isUser: false
     }
   ]);
