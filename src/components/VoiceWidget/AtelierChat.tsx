@@ -233,7 +233,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   return (
     <div className="fixed bottom-6 left-6 z-40 w-[320px] h-[500px] bg-white rounded-[20px] shadow-none transition-all duration-300 overflow-hidden flex flex-col">
-      <div className="sticky top-0 flex items-center justify-between p-3 bg-white z-10 border-b border-gray-100">
+      <div className="sticky top-0 flex items-center justify-between p-3 bg-white z-30 border-b border-gray-100">
         <button 
           onClick={() => setMenuOpen(!menuOpen)} 
           className="p-2"
