@@ -27,6 +27,7 @@ export function cleanupConnection(pc: RTCPeerConnection | null): void {
       
       // Close the peer connection
       pc.close();
+      console.log("WebRTC connection closed successfully");
     } catch (err) {
       console.error("Error during connection cleanup:", err);
     }
@@ -44,6 +45,8 @@ export async function createRealtimeConnection(
     await checkMicrophoneSupport();
   }
   
+  console.log("Starting WebRTC connection setup");
+  
   // Log user profile at session start
   try {
     const userProfileStorage = localStorage.getItem("user-profile");
@@ -57,6 +60,15 @@ export async function createRealtimeConnection(
     console.error("Error loading user profile during WebRTC session start:", error);
   }
   
+  // Add more diagnostics about the ephemeral key (without showing the key)
+  console.log(`Ephemeral key provided: ${EPHEMERAL_KEY ? "Yes" : "No"}`);
+  if (EPHEMERAL_KEY) {
+    console.log(`Ephemeral key length: ${EPHEMERAL_KEY.length}`);
+  } else {
+    throw new Error("No ephemeral key provided for WebRTC connection");
+  }
+  
+  // Create RTCPeerConnection with more diagnostic events
   const pc = new RTCPeerConnection({
     iceServers: [
       {
@@ -74,6 +86,18 @@ export async function createRealtimeConnection(
   pc.oniceconnectionstatechange = () => {
     console.log(`ICE connection state: ${pc.iceConnectionState}`);
   };
+  
+  // Handle ICE gathering state changes
+  pc.onicegatheringstatechange = () => {
+    console.log(`ICE gathering state: ${pc.iceGatheringState}`);
+  };
+  
+  // Log when ICE candidates are created
+  pc.onicecandidate = (event) => {
+    if (event.candidate) {
+      console.log("New ICE candidate generated");
+    }
+  };
 
   // Handle ICE candidate errors
   pc.onicecandidateerror = (event) => {
@@ -82,6 +106,7 @@ export async function createRealtimeConnection(
 
   pc.ontrack = (e) => {
     if (audioElement.current) {
+      console.log("Track received from remote peer");
       audioElement.current.srcObject = e.streams[0];
       // Make sure audio is muted unless the user has explicitly enabled it
       audioElement.current.muted = !isAudioEnabled;
@@ -98,6 +123,7 @@ export async function createRealtimeConnection(
   try {
     // Always request microphone access, even for text-only mode
     // This is needed because OpenAI's realtime API requires an audio track
+    console.log("Requesting microphone access");
     stream = await navigator.mediaDevices.getUserMedia({ 
       audio: {
         echoCancellation: true,
@@ -109,6 +135,8 @@ export async function createRealtimeConnection(
       }
     });
 
+    console.log("Microphone access granted");
+    
     // Add all audio tracks from the stream
     stream.getAudioTracks().forEach(track => {
       // If skipAudioStream is true, mute the track but still add it
@@ -117,6 +145,9 @@ export async function createRealtimeConnection(
       }
       pc.addTrack(track, stream!);
     });
+    
+    console.log(`Added ${stream.getAudioTracks().length} audio tracks to the connection`);
+    
   } catch (err) {
     if (err instanceof Error) {
       if (err.name === "NotAllowedError") {
@@ -131,6 +162,7 @@ export async function createRealtimeConnection(
   }
 
   // Create data channel with more reliable options
+  console.log("Creating data channel");
   const dc = pc.createDataChannel("oai-events", {
     ordered: true
   });
@@ -141,10 +173,16 @@ export async function createRealtimeConnection(
   dc.onerror = (e) => console.error("Data channel error:", e);
 
   try {
+    console.log("Creating connection offer");
     const offer = await pc.createOffer();
+    console.log("Setting local description");
     await pc.setLocalDescription(offer);
+    
     const baseUrl = "https://api.openai.com/v1/realtime";
     const model = "gpt-4o-mini-realtime-preview-2024-12-17";
+    
+    console.log(`Connecting to OpenAI Realtime API with model: ${model}`);
+    console.log(`Target URL: ${baseUrl}?model=${model}`);
 
     const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
       method: "POST",
@@ -168,13 +206,16 @@ export async function createRealtimeConnection(
       throw new Error(`Failed to establish connection: ${sdpResponse.status} ${sdpResponse.statusText}`);
     }
 
+    console.log("Received SDP response from server");
     const answerSdp = await sdpResponse.text();
     const answer: RTCSessionDescriptionInit = {
       type: "answer",
       sdp: answerSdp,
     };
 
+    console.log("Setting remote description");
     await pc.setRemoteDescription(answer);
+    console.log("Remote description set successfully");
   } catch (err) {
     // Clean up resources on error
     if (stream) {

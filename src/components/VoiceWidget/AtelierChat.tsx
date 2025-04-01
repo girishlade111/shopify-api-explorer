@@ -8,14 +8,17 @@ import { SessionStatus } from './types';
 import { createRealtimeConnection, cleanupConnection } from './lib/realtimeConnection';
 import { useToast } from "@/hooks/use-toast";
 
+// Configuration constants with fallbacks
 const DEFAULT_NGROK_URL = "https://voice-conversation-engine.dev.appellatech.net";
 const DEFAULT_STORE_URL = "appella-test.myshopify.com";
 
 const NGROK_URL = import.meta.env.VITE_NGROK_URL || DEFAULT_NGROK_URL;
 const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 
+// Connection settings
 const MAX_CONNECTION_RETRIES = 3;
 const CONNECTION_TIMEOUT_MS = 15000;
+const RETRY_DELAY_MS = 2000;
 
 interface AtelierChatProps {
   onClose: (e: React.MouseEvent) => void;
@@ -37,6 +40,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const { toast } = useToast();
   const isMountedRef = useRef(true); // Track component mount state
   const connectionInProgressRef = useRef(false); // Prevent multiple connection attempts
+  const fallbackTokenRef = useRef<string | null>(null); // Store fallback token if needed
 
   useEffect(() => {
     const audioEl = new Audio();
@@ -79,6 +83,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setError(errorMsg);
       setSessionStatus('DISCONNECTED');
       console.error(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -110,9 +115,11 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         abortControllerRef.current.abort();
       }
       
-      setError('Connection timed out. Please try again.');
+      const timeoutError = 'Connection timed out. Please try again.';
+      setError(timeoutError);
       setSessionStatus('DISCONNECTED');
       connectionInProgressRef.current = false;
+      toast.error(timeoutError);
       
       setConnectionRetries(prev => prev + 1);
       
@@ -122,14 +129,24 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           if (isMountedRef.current) {
             connectToService();
           }
-        }, 2000);
+        }, RETRY_DELAY_MS);
       } else {
-        console.error(`Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`);
+        const finalError = `Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`;
+        console.error(finalError);
+        toast.error(finalError);
       }
     }, CONNECTION_TIMEOUT_MS);
 
     try {
       console.log("Attempting to fetch session data from:", `${NGROK_URL}/openai-realtime/session/${STORE_URL}`);
+      
+      // Add debugging information
+      console.log("Connection attempt details:", {
+        ngrokUrl: NGROK_URL,
+        storeUrl: STORE_URL,
+        attempt: connectionRetries + 1,
+        maxAttempts: MAX_CONNECTION_RETRIES
+      });
       
       const response = await fetch(`${NGROK_URL}/openai-realtime/session/${STORE_URL}`, {
         method: 'GET',
@@ -153,19 +170,24 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       }
 
       if (!response.ok) {
+        const responseText = await response.text();
+        console.error(`API error (${response.status}): ${responseText}`);
         throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
       console.log("Session data received:", data);
       
-      const clientSecret = data.result?.client_secret?.value;
+      const clientSecret = data.result?.client_secret?.value || fallbackTokenRef.current;
       const sessionInstructions = data.result?.instructions;
       const sessionTools = data.result?.tools || [];
 
       if (!clientSecret) {
         throw new Error('No client secret found in response');
       }
+
+      // Store client secret for potential reuse
+      fallbackTokenRef.current = clientSecret;
 
       cleanupResources();
 
@@ -195,7 +217,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           toast.error("Connection lost. Attempting to reconnect...");
           setTimeout(() => {
             if (isMountedRef.current) connectToService();
-          }, 2000);
+          }, RETRY_DELAY_MS);
         }
       };
       
@@ -207,7 +229,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
             toast.error("Connection lost. Attempting to reconnect...");
             setTimeout(() => {
               if (isMountedRef.current) connectToService();
-            }, 2000);
+            }, RETRY_DELAY_MS);
           }
         }
       };
@@ -247,6 +269,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setError(errorMessage);
       setSessionStatus('DISCONNECTED');
       connectionInProgressRef.current = false;
+      toast.error(errorMessage);
       
       setConnectionRetries(prev => prev + 1);
       
@@ -256,10 +279,11 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           if (isMountedRef.current) {
             connectToService();
           }
-        }, 2000);
+        }, RETRY_DELAY_MS);
       } else {
-        console.error(`Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`);
-        toast.error("Failed to connect after multiple attempts. Please try again later.");
+        const finalError = `Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`;
+        console.error(finalError);
+        toast.error(finalError);
       }
     }
   };
