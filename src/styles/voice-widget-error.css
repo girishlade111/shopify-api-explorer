@@ -5,7 +5,9 @@
 .fixed.bottom-6.left-6.z-40 .text-red-500,
 .fixed.bottom-6.left-6.z-40 .text-red-600,
 .fixed.bottom-6.left-6.z-40 .text-red-700,
-.fixed.bottom-6.left-6.z-40 .text-red-800 {
+.fixed.bottom-6.left-6.z-40 .text-red-800,
+.fixed.bottom-6.left-6.z-40 div[class*="bg-red-"],
+.fixed.bottom-6.left-6.z-40 div[class*="text-red-"] {
   display: none !important;
 }
 
@@ -13,4 +15,34 @@
 .fixed.bottom-6.left-6.z-40 *[data-error],
 .fixed.bottom-6.left-6.z-40 .error-message {
   display: none !important;
+}
+
+/* Hide specific alert bars with red backgrounds */
+.fixed.bottom-6.left-6.z-40 > div > div > div[style*="background"],
+.fixed.bottom-6.left-6.z-40 > div[class*="bg-pink-"],
+.fixed.bottom-6.left-6.z-40 > div > div > div[class*="bg-pink-"],
+.fixed.bottom-6.left-6.z-40 > div > div:first-child > div[class*="bg-"] {
+  display: none !important;
+}
+
+/* Hide all error-related elements */
+.fixed.bottom-6.left-6.z-40 div[class*="error"],
+.fixed.bottom-6.left-6.z-40 div[class*="Error"],
+.fixed.bottom-6.left-6.z-40 p[class*="error"],
+.fixed.bottom-6.left-6.z-40 span[class*="error"] {
+  display: none !important;
+}
+
+/* Hide all red color styled elements */
+.fixed.bottom-6.left-6.z-40 *[style*="color: red"],
+.fixed.bottom-6.left-6.z-40 *[style*="background-color: red"],
+.fixed.bottom-6.left-6.z-40 *[style*="background: red"],
+.fixed.bottom-6.left-6.z-40 *[style*="background:#f"],
+.fixed.bottom-6.left-6.z-40 *[style*="background: #f"] {
+  display: none !important;
+}
+
+/* Hide the specific red bar at the top */
+.fixed.bottom-6.left-6.z-40 > div > div:first-child {
+  background: transparent !important;
 }
