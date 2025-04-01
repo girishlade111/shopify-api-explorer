@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -162,7 +163,7 @@ function Transcript({
 
   return (
     <div className="flex flex-col w-full h-full relative">
-      <div className="flex-1 overflow-y-auto p-4 space-y-5 pb-16">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-14">
         {filteredItems.map(item => {
           if (item.type === 'BREADCRUMB') {
             const functionName = getFunctionName(item.data);
@@ -171,7 +172,7 @@ function Transcript({
               const formattedName = functionName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
               
               return (
-                <div key={item.itemId} className="flex items-start mb-4 ml-14">
+                <div key={item.itemId} className="flex items-start mb-3 ml-14">
                   <div className={`p-2 pr-6 rounded-full ${bg}`}>
                     <div className="flex items-center">
                       <div className={`${icon} rounded-full mr-2 flex-shrink-0`}>
@@ -187,14 +188,14 @@ function Transcript({
           
           if (item.type === 'MESSAGE') {
             return (
-              <div key={item.itemId} className={`flex ${item.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
+              <div key={item.itemId} className={`flex ${item.role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
                 {item.role !== 'user' && (
                   <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3 flex items-center justify-center">
                     {/* AI icon could go here */}
                   </div>
                 )}
                 <div 
-                  className={`p-4 rounded-lg ${
+                  className={`p-3 rounded-lg ${
                     item.role === 'user' 
                       ? 'bg-[#33C3F0] text-white max-w-[70%]' 
                       : 'bg-gray-100 text-gray-800 max-w-[70%] text-left'
@@ -217,7 +218,7 @@ function Transcript({
       </div>
 
       {showTextInput && (
-        <div className="absolute bottom-2 left-0 right-0 p-3 bg-white">
+        <div className="absolute bottom-0 left-0 right-0 p-3 bg-white">
           <div className="relative bg-gray-100 rounded-full py-1 px-2 border border-gray-200">
             <Textarea 
               ref={textareaRef}
