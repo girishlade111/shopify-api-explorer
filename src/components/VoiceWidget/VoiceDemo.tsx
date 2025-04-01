@@ -243,7 +243,8 @@ export default function VoiceDemo({ onClose }: VoiceDemoProps) {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full shadow-lg transition-all duration-300 overflow-hidden max-w-[360px]">
+    <div className="fixed bottom-6 left-6 z-40 bg-white rounded-full overflow-hidden max-w-[360px]">
+      {/* Removed shadow-lg from the main container */}
       <div className="flex items-center py-2 px-4">
         <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center mr-3 overflow-hidden">
           <video 

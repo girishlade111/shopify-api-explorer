@@ -234,7 +234,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     return (
       <div
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 cursor-pointer"
+        className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full hover:bg-gray-50 transition-all duration-200 flex items-center gap-3 cursor-pointer"
         aria-label="Expand chat widget"
       >
         <div className="w-12 h-12 rounded-full bg-[#33C3F0] flex items-center justify-center">
@@ -246,7 +246,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white overflow-hidden flex flex-col">
       <div className="flex items-center justify-between p-4 relative">
         <button 
           onClick={() => setMenuOpen(!menuOpen)} 
@@ -266,7 +266,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         </div>
         
         {menuOpen && (
-          <div className="absolute top-14 left-2 bg-white rounded-xl shadow-lg w-[250px] z-50">
+          <div className="absolute top-14 left-2 bg-white rounded-xl w-[250px] z-50">
             <div className="flex flex-col py-2">
               <button 
                 className="flex items-center gap-3 py-3 px-4 hover:bg-gray-100 w-full text-left"
