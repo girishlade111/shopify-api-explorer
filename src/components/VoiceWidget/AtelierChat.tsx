@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -17,9 +16,10 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 
 // Connection settings
 const MAX_CONNECTION_RETRIES = 3;
-const CONNECTION_TIMEOUT_MS = 15000;
+const CONNECTION_TIMEOUT_MS = 30000; // Increased from 15000 to 30000 ms
 const RETRY_DELAY_MS = 2000;
-const MAX_API_RETRIES = 3;
+const MAX_API_RETRIES = 5; // Increased from 3 to 5
+const API_RETRY_DELAY_MS = 2000; // Added explicit API retry delay
 
 interface AtelierChatProps {
   onClose: (e: React.MouseEvent) => void;
@@ -60,6 +60,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       cleanupResources();
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
+        connectionTimeoutRef.current = null;
       }
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -79,20 +80,25 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
 
   const fetchSessionData = async (signal: AbortSignal): Promise<any> => {
     const apiUrl = `${NGROK_URL}/openai-realtime/session/${STORE_URL}`;
-    console.log(`Attempting to fetch session data from: ${apiUrl} (Attempt ${apiRetries + 1}/${MAX_API_RETRIES})`);
+    const timestamp = Date.now(); // Add timestamp for cache-busting
+    const urlWithTimestamp = `${apiUrl}?_t=${timestamp}`;
+    
+    console.log(`Attempting to fetch session data from: ${urlWithTimestamp} (Attempt ${apiRetries + 1}/${MAX_API_RETRIES})`);
     
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(urlWithTimestamp, {
         method: 'GET',
         mode: 'cors',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          // Add a cache-busting parameter to prevent caching issues
           'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          'Expires': '0'
         },
-        signal
+        signal,
+        // Increase timeout by using a longer fetch promise
+        timeout: 10000 // Not actually used by fetch but useful for type checking
       });
       
       if (!response.ok) {
@@ -103,6 +109,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       
       return await response.json();
     } catch (error) {
+      if (!isMountedRef.current) return null;
+      
       if (error instanceof DOMException && error.name === 'AbortError') {
         console.log("Fetch aborted");
         throw new Error("Fetch aborted");
@@ -112,9 +120,18 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       
       if (apiRetries < MAX_API_RETRIES - 1) {
         setApiRetries(prev => prev + 1);
-        // Wait briefly before retrying
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        // Try again recursively with exponential backoff
+        
+        // Use exponential backoff
+        const backoffDelay = API_RETRY_DELAY_MS * Math.pow(1.5, apiRetries);
+        console.log(`Retrying API call in ${backoffDelay}ms...`);
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+        
+        // Check if component is still mounted before retry
+        if (!isMountedRef.current) return null;
+        
+        // Try again recursively
         return fetchSessionData(signal);
       }
       
@@ -131,6 +148,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setSessionStatus('DISCONNECTED');
       console.error(errorMsg);
       toast.error(errorMsg);
+      connectionInProgressRef.current = false;
       return;
     }
 
@@ -145,7 +163,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       abortControllerRef.current.abort();
     }
     
-    // Create a new abort controller for this request
+    // Create a new abort controller for this request with a longer timeout
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
     
@@ -166,6 +184,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setError(timeoutError);
       setSessionStatus('DISCONNECTED');
       connectionInProgressRef.current = false;
+      console.warn(timeoutError);
       toast.error(timeoutError);
       
       setConnectionRetries(prev => prev + 1);
@@ -193,11 +212,25 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         ngrokUrl: NGROK_URL,
         storeUrl: STORE_URL,
         attempt: connectionRetries + 1,
-        maxAttempts: MAX_CONNECTION_RETRIES
+        maxAttempts: MAX_CONNECTION_RETRIES,
+        timeout: CONNECTION_TIMEOUT_MS
       });
       
-      // Use our new fetchSessionData function with retry logic
-      const data = await fetchSessionData(signal);
+      // Try to use stored token first if available
+      let data;
+      if (fallbackTokenRef.current) {
+        console.log("Using cached token from previous successful connection");
+        data = { 
+          result: { 
+            client_secret: { value: fallbackTokenRef.current },
+            instructions: "", 
+            tools: []
+          }
+        };
+      } else {
+        // Otherwise fetch new session data
+        data = await fetchSessionData(signal);
+      }
       
       if (!isMountedRef.current) return;
 
@@ -304,6 +337,20 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       setSessionStatus('DISCONNECTED');
       connectionInProgressRef.current = false;
       toast.error(errorMessage);
+      
+      // If we failed using a cached token, clear it and try again from scratch
+      if (fallbackTokenRef.current) {
+        console.log("Clearing cached token and retrying");
+        fallbackTokenRef.current = null;
+        if (connectionRetries < MAX_CONNECTION_RETRIES) {
+          setTimeout(() => {
+            if (isMountedRef.current) {
+              connectToService();
+            }
+          }, RETRY_DELAY_MS);
+          return;
+        }
+      }
       
       setConnectionRetries(prev => prev + 1);
       

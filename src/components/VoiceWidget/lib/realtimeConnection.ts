@@ -72,7 +72,9 @@ export async function createRealtimeConnection(
   const iceServers = [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" }
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" }, // Added additional STUN server
+    { urls: "stun:stun4.l.google.com:19302" }  // Added additional STUN server
   ];
   
   console.log(`Configuring ICE servers: ${iceServers.length} servers`);
@@ -119,7 +121,7 @@ export async function createRealtimeConnection(
     console.warn("ICE candidate error:", {
       errorCode: event.errorCode,
       errorText: event.errorText,
-      // Remove hostCandidate property as it's not supported in the type
+      // Remove hostCandidate property as it doesn't exist in the type
       url: event.url
     });
   };

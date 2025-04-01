@@ -17,6 +17,7 @@ import UserProfilePage from '@/pages/UserProfilePage';
 import FittingRoomPage from '@/pages/FittingRoomPage';
 import NewArrivalsPage from '@/pages/NewArrivalsPage';
 import ServicesPage from '@/pages/ServicesPage';
+import ChatPage from '@/pages/ChatPage';
 
 import { UserActivityProvider } from '@/contexts/UserActivityContext';
 import { CartProvider } from '@/contexts/CartContext';
@@ -53,6 +54,7 @@ function App() {
                     <Route path="fitting-room" element={<FittingRoomPage />} />
                     <Route path="new-arrivals" element={<NewArrivalsPage />} />
                     <Route path="services" element={<ServicesPage />} />
+                    <Route path="chat" element={<ChatPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>
