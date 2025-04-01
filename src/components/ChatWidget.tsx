@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Send, X, MessageSquare } from 'lucide-react';
+import { Send, X, MessageSquare, Menu, ArrowUp, RefreshCw, Headphones, Mic } from 'lucide-react';
 import '../styles/chat-widget.css';
 
 interface Message {
@@ -29,6 +29,7 @@ const ChatWidget: React.FC = () => {
   ]);
   const [input, setInput] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +62,38 @@ const ChatWidget: React.FC = () => {
       
       setInput('');
     }
+  };
+
+  const handleResetChat = () => {
+    // Reset the chat with initial greeting
+    setMessages([{
+      id: Date.now().toString(),
+      text: 'Hello! How can I assist you today?',
+      isUser: false
+    }]);
+    setIsSidePanelOpen(false);
+  };
+
+  const handleSpeakToHuman = () => {
+    const newMessage = {
+      id: Date.now().toString(),
+      text: "I would like to speak with a human representative, please.",
+      isUser: true
+    };
+    
+    setMessages(prev => [...prev, newMessage]);
+    
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = {
+        id: (Date.now() + 1).toString(),
+        text: "I'll connect you with a human representative shortly. Please wait a moment.",
+        isUser: false
+      };
+      setMessages(prev => [...prev, botResponse]);
+    }, 1000);
+    
+    setIsSidePanelOpen(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -97,24 +130,76 @@ const ChatWidget: React.FC = () => {
     );
   }
 
+  if (isSidePanelOpen) {
+    return (
+      <div className="fixed bottom-6 left-6 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-50" 
+           style={{ height: '500px' }}>
+        <div className="w-full h-full flex flex-col">
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="flex justify-end mb-6">
+              <button 
+                onClick={() => setIsSidePanelOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className="space-y-4 mt-4">
+              <button 
+                onClick={() => setIsSidePanelOpen(false)}
+                className="flex items-center gap-3 w-full rounded-md py-3 px-4 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-700">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span>Switch to Voice</span>
+              </button>
+              
+              <button 
+                onClick={handleSpeakToHuman}
+                className="flex items-center gap-3 w-full rounded-md py-3 px-4 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+              >
+                <Headphones size={18} className="text-gray-700" />
+                <span>Speak to Human</span>
+              </button>
+              
+              <button 
+                onClick={handleResetChat}
+                className="flex items-center gap-3 w-full rounded-md py-3 px-4 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+              >
+                <RefreshCw size={18} className="text-gray-700" />
+                <span>Reset Chat</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed bottom-6 left-6 w-80 bg-white rounded-lg shadow-lg 
-                overflow-hidden flex flex-col animate-fade-in z-50" style={{ height: '500px' }}>
-      {/* Fixed header */}
-      <div className="flex justify-between items-center p-3 border-b">
-        <button className="p-2 rounded-full hover:bg-gray-100">
-          <MessageSquare className="w-5 h-5 text-gray-500" />
+                    overflow-hidden flex flex-col animate-fade-in z-50" style={{ height: '500px' }}>
+      <div className="flex justify-between items-center p-3">
+        <button 
+          onClick={() => setIsSidePanelOpen(true)}
+          className="p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
+        >
+          <Menu size={20} />
         </button>
-        <div className="font-semibold">Enzo AI</div>
+        <div>
+          <span className="text-lg font-bold text-black">Enzo AI</span>
+        </div>
         <button 
           onClick={() => setIsMinimized(true)}
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <X size={20} />
         </button>
       </div>
       
-      {/* Scrollable message container */}
       <div 
         ref={chatContainerRef}
         className="flex-1 p-4 overflow-y-auto flex flex-col chat-container bg-white w-full"
@@ -125,29 +210,48 @@ const ChatWidget: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
       
-      {/* Fixed footer with input */}
-      <div className="p-3 bg-white border-t">
+      <div className="p-3 bg-white">
         <form 
           onSubmit={(e) => {
             e.preventDefault();
             handleSend();
-          }}
-          className="flex items-center"
+          }} 
+          className="flex items-center gap-2 bg-gray-50 rounded-full p-2 pl-4 focus-within:ring-2 focus-within:ring-gray-200 transition-all"
         >
           <input
             type="text"
-            className="flex-1 border rounded-l-full px-4 py-2 focus:outline-none focus:ring-1 focus:ring-[#55c6ea]"
-            placeholder="Type your message here..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            placeholder="Type your message here..."
+            className="flex-1 bg-transparent border-none text-gray-700 focus:outline-none text-sm"
           />
-          <button 
-            type="submit"
-            className="bg-[#55c6ea] text-white rounded-r-full px-4 py-2 hover:bg-[#42b6da]"
-          >
-            <Send size={18} />
-          </button>
+          
+          {input.trim() ? (
+            <button 
+              type="submit" 
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-colors"
+              style={{
+                background: "linear-gradient(135deg, #70e7fd, #3ac7fb, #96edf5)",
+                backgroundSize: "200% 200%",
+                animation: "gradientShift 10s ease infinite"
+              }}
+            >
+              <ArrowUp size={16} />
+            </button>
+          ) : (
+            <button 
+              type="button"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-colors"
+              style={{
+                background: "linear-gradient(135deg, #70e7fd, #3ac7fb, #96edf5)",
+                backgroundSize: "200% 200%",
+                animation: "gradientShift 10s ease infinite"
+              }}
+            >
+              <Mic size={16} className="text-white" />
+            </button>
+          )}
         </form>
       </div>
     </div>
