@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Headphones, Mic, MicOff, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -89,13 +88,8 @@ export default function VoiceDemo() {
     }
   }, [isAudioEnabled]);
 
-  // Effect to handle AI speaking state for the video animation
   useEffect(() => {
-    // This would be connected to actual AI speaking events
-    // For now it's just a simple demo
     const toggleSpeakingInterval = setInterval(() => {
-      // For demo purposes only. In a real implementation,
-      // this should be connected to actual AI speaking events
       if (sessionStatus === 'CONNECTED') {
         setIsAiSpeaking(prev => !prev);
       }
@@ -104,7 +98,6 @@ export default function VoiceDemo() {
     return () => clearInterval(toggleSpeakingInterval);
   }, [sessionStatus]);
 
-  // Effect to control the video playback based on AI speaking state
   useEffect(() => {
     if (videoRef.current) {
       if (isAiSpeaking) {
@@ -255,7 +248,6 @@ export default function VoiceDemo() {
             ref={videoRef}
             className="w-full h-full object-cover"
             src="https://static.videezy.com/system/resources/previews/000/052/425/original/4K-34.mp4"
-            type="video/mp4"
             loop
             muted
             playsInline
