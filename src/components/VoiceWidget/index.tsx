@@ -5,8 +5,6 @@ import VoiceDemo from './VoiceDemo';
 import AtelierChat from './AtelierChat';
 import { TranscriptProvider } from './contexts/TranscriptContext';
 import { EventProvider } from './contexts/EventContext';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { Button } from '../ui/button';
 
 const VoiceWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,8 +12,6 @@ const VoiceWidget = () => {
   const [activeChatType, setActiveChatType] = useState<'ai' | 'atelier' | null>(null);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [showModeSelector, setShowModeSelector] = useState(false);
-  const [selectedMode, setSelectedMode] = useState<'voice' | 'text' | null>(null);
 
   // This effect is triggered when the widget is closed
   // to ensure proper cleanup
@@ -25,22 +21,8 @@ const VoiceWidget = () => {
       setShowChatView(false);
       setActiveChatType(null);
       setIsMinimized(false);
-      setShowModeSelector(false);
-      setSelectedMode(null);
     }
   }, [isOpen]);
-
-  const handleStartChat = () => {
-    if (selectedMode === 'voice') {
-      setShowModeSelector(false);
-      setShowChatView(true);
-      setActiveChatType('ai');
-    } else if (selectedMode === 'text') {
-      setShowModeSelector(false);
-      setShowChatView(true);
-      setActiveChatType('atelier');
-    }
-  };
 
   return (
     <>
@@ -49,7 +31,10 @@ const VoiceWidget = () => {
         <button
           onClick={() => {
             setIsOpen(!isOpen);
-            setShowModeSelector(true);
+            if (!isOpen) {
+              setShowChatView(false); // Reset to welcome view when opening
+              setActiveChatType(null);
+            }
           }}
           className="fixed bottom-6 left-6 z-50 bg-white text-black py-3 px-4 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"
           aria-label="Toggle voice assistant"
@@ -97,57 +82,6 @@ const VoiceWidget = () => {
           <EventProvider>
             {showChatView ? (
               activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
-            ) : showModeSelector ? (
-              <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[300px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b">
-                  <div className="w-6"></div> {/* Empty space for alignment */}
-                  <h2 className="text-xl font-semibold">Enzo AI</h2>
-                  <button onClick={() => setIsOpen(false)} className="p-2">
-                    <X className="w-6 h-6 text-gray-700" />
-                  </button>
-                </div>
-                
-                {/* Mode selection content */}
-                <div className="flex-1 flex flex-col items-center justify-center p-6">
-                  <h2 className="text-2xl font-medium text-gray-800 mb-8">How do you want to chat today?</h2>
-                  
-                  <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                    <button
-                      onClick={() => setSelectedMode('voice')}
-                      className={`flex flex-col items-center justify-center p-6 rounded-lg transition-all ${
-                        selectedMode === 'voice' 
-                          ? 'bg-[#33C3F0] text-white' 
-                          : 'bg-[#9FD5F0] text-white hover:bg-[#70c8f0]'
-                      }`}
-                    >
-                      <Mic className="w-10 h-10 mb-2" />
-                      <span className="text-lg font-medium">Voice</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => setSelectedMode('text')}
-                      className={`flex flex-col items-center justify-center p-6 rounded-lg transition-all ${
-                        selectedMode === 'text' 
-                          ? 'bg-[#33C3F0] text-white' 
-                          : 'bg-[#9FD5F0] text-white hover:bg-[#70c8f0]'
-                      }`}
-                    >
-                      <MessageSquare className="w-10 h-10 mb-2" />
-                      <span className="text-lg font-medium">Text</span>
-                    </button>
-                  </div>
-                  
-                  <Button
-                    onClick={handleStartChat}
-                    disabled={!selectedMode}
-                    className="mt-8 w-full max-w-xs"
-                    variant={selectedMode ? "default" : "outline"}
-                  >
-                    Continue
-                  </Button>
-                </div>
-              </div>
             ) : (
               <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
                 {/* Header */}
