@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Menu, Mic, MessageSquare, X } from 'lucide-react';
 import VoiceDemo from './VoiceDemo';
@@ -14,11 +13,8 @@ const VoiceWidget = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [showModeSelection, setShowModeSelection] = useState(false);
 
-  // This effect is triggered when the widget is closed
-  // to ensure proper cleanup
   useEffect(() => {
     if (!isOpen) {
-      // Reset chat state when closing the widget
       setShowChatView(false);
       setActiveChatType(null);
       setIsMinimized(false);
@@ -28,13 +24,12 @@ const VoiceWidget = () => {
 
   return (
     <>
-      {/* Chat Widget Toggle Button */}
       {!isOpen && !isMinimized && (
         <button
           onClick={() => {
             setIsOpen(!isOpen);
             if (!isOpen) {
-              setShowModeSelection(true); // Show mode selection when opening
+              setShowModeSelection(true);
               setShowChatView(false);
               setActiveChatType(null);
             }
@@ -63,7 +58,6 @@ const VoiceWidget = () => {
         </button>
       )}
 
-      {/* Minimized Chat Widget Button */}
       {!isOpen && isMinimized && (
         <button
           onClick={() => {
@@ -79,40 +73,36 @@ const VoiceWidget = () => {
         </button>
       )}
 
-      {/* Voice Widget Container */}
       {isOpen && (
         <TranscriptProvider>
           <EventProvider>
             {showModeSelection ? (
-              <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[320px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-                {/* Mode Selection Content - Simplified without header */}
-                <div className="flex-1 py-2 px-4 flex flex-col items-center justify-center">
-                  <h3 className="text-xl font-bold mb-3">Choose your mode</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-md">
-                    <button
-                      onClick={() => {
-                        setShowModeSelection(false);
-                        setShowChatView(true);
-                        setActiveChatType('atelier');
-                      }}
-                      className="flex flex-col items-center p-3 bg-white border-2 border-gray-200 rounded-xl hover:border-[#33C3F0] transition-all duration-200"
-                    >
-                      <MessageSquare size={32} className="text-[#33C3F0] mb-2" />
-                      <span className="text-base font-semibold">Text Chat</span>
-                      <p className="text-gray-500 text-center text-sm">Chat by typing messages</p>
-                    </button>
-                    
+              <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[180px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+                <div className="flex-1 py-4 px-4 flex flex-col items-center justify-center">
+                  <h3 className="text-lg font-medium mb-4">How do you want to chat today?</h3>
+                  <div className="grid grid-cols-2 gap-3 w-full max-w-md">
                     <button
                       onClick={() => {
                         setShowModeSelection(false);
                         setShowChatView(true);
                         setActiveChatType('ai');
                       }}
-                      className="flex flex-col items-center p-3 bg-white border-2 border-gray-200 rounded-xl hover:border-[#33C3F0] transition-all duration-200"
+                      className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
                     >
-                      <Mic size={32} className="text-[#33C3F0] mb-2" />
-                      <span className="text-base font-semibold">Voice Chat</span>
-                      <p className="text-gray-500 text-center text-sm">Chat by speaking out loud</p>
+                      <Mic size={24} className="text-white mb-1" />
+                      <span className="text-white font-medium">Voice</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        setShowModeSelection(false);
+                        setShowChatView(true);
+                        setActiveChatType('atelier');
+                      }}
+                      className="flex flex-col items-center justify-center p-4 bg-[#8DD6F0] rounded-lg hover:bg-[#6BC7E8] transition-all duration-200"
+                    >
+                      <MessageSquare size={24} className="text-white mb-1" />
+                      <span className="text-white font-medium">Text</span>
                     </button>
                   </div>
                 </div>
@@ -122,7 +112,6 @@ const VoiceWidget = () => {
                 activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
               ) : (
                 <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
-                  {/* Header */}
                   <div className="flex items-center justify-between p-4 border-b">
                     <button className="p-2">
                       <Menu className="w-6 h-6 text-gray-700" />
@@ -133,7 +122,6 @@ const VoiceWidget = () => {
                     </button>
                   </div>
                   
-                  {/* Chat content */}
                   <div className="flex-1 overflow-y-auto p-4">
                     <div className="flex items-start mb-4">
                       <div className="w-10 h-10 rounded-full bg-[#33C3F0] flex-shrink-0 mr-3"></div>
@@ -143,7 +131,6 @@ const VoiceWidget = () => {
                     </div>
                   </div>
                   
-                  {/* Input area */}
                   <div className="p-4 border-t">
                     <div className="flex items-center bg-gray-100 rounded-full">
                       <input
