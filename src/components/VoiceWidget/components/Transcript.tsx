@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Mic, Send, Cloud, DollarSign, Shirt, Navigation } from 'lucide-react';
 import { useTranscript } from '../contexts/TranscriptContext';
@@ -225,14 +226,14 @@ function Transcript({
               onChange={e => setUserText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
-              className="w-full bg-transparent px-2 py-2 focus:outline-none pr-20 text-sm resize-none min-h-[40px] max-h-[120px] overflow-y-auto"
+              className="w-full bg-transparent px-2 py-2 focus:outline-none text-sm resize-none min-h-[40px] max-h-[120px] overflow-y-auto"
               rows={1}
               style={{ 
                 border: 'none', 
                 borderRadius: '9999px',
                 boxShadow: 'none',
                 paddingLeft: '0.5rem',
-                paddingRight: '5rem'
+                paddingRight: '7rem'
               }}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2">

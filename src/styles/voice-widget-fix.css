@@ -71,7 +71,7 @@ body {
 .w-full.bg-transparent.px-3.py-2,
 .w-full.bg-transparent.px-2.py-2 {
   padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important;
+  padding-right: 7rem !important;
   padding-top: 0.5rem !important;
   padding-bottom: 0.5rem !important;
   font-size: 0.875rem !important;
@@ -101,11 +101,11 @@ body {
   padding-right: 0.5rem !important;
 }
 
-/* Ensure text starts closer to the left edge */
+/* Ensure text starts closer to the left edge but has plenty of space on the right */
 input[placeholder="Type your message here..."],
 textarea[placeholder="Type your message here..."] {
   padding-left: 0.5rem !important;
-  padding-right: 4.5rem !important; /* Increase padding on the right side more */
+  padding-right: 7rem !important; /* Significantly increase padding on the right side */
 }
 
 /* Style the textarea to match the input field */
@@ -118,20 +118,29 @@ textarea {
   border: none !important;
   outline: none !important;
   background: transparent !important;
+  padding-right: 7rem !important; /* Ensure all textareas have enough padding */
 }
 
-/* Ensure textarea text doesn't go behind the button */
-.pr-16 {
-  padding-right: 5rem !important;
+/* Force all textareas to have sufficient padding */
+textarea, 
+textarea.pr-16, 
+textarea.pr-20,
+.w-full.bg-transparent {
+  padding-right: 7rem !important;
 }
 
-/* Additional styles to prevent text overflow */
+/* Additional styling to prevent text overflow */
 .relative .textarea-container {
-  padding-right: 4.5rem !important;
+  padding-right: 7rem !important;
   width: 100%;
 }
 
-/* Ensure the textarea respects right padding */
-textarea.pr-16 {
-  padding-right: 5rem !important;
+/* Give the textarea proper spacing from the button */
+.w-full.bg-transparent {
+  margin-right: 3rem !important;
+}
+
+/* Ensure button doesn't overlap text */
+.absolute.right-2.top-1\/2.transform.-translate-y-1\/2 {
+  z-index: 10;
 }
