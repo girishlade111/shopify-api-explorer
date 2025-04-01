@@ -105,6 +105,7 @@ body {
 input[placeholder="Type your message here..."],
 textarea[placeholder="Type your message here..."] {
   padding-left: 0.5rem !important;
+  padding-right: 3.5rem !important; /* Increase padding on the right side */
 }
 
 /* Style the textarea to match the input field */
@@ -117,4 +118,9 @@ textarea {
   border: none !important;
   outline: none !important;
   background: transparent !important;
+}
+
+/* Ensure textarea text doesn't go behind the button */
+.pr-16 {
+  padding-right: 4rem !important;
 }
