@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Headphones, Mic, MicOff, RefreshCw, Volume2, VolumeX, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -18,7 +19,11 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 // Maximum number of connection retries
 const MAX_CONNECTION_RETRIES = 3;
 
-export default function VoiceDemo() {
+interface VoiceDemoProps {
+  onClose: (e: React.MouseEvent) => void;
+}
+
+export default function VoiceDemo({ onClose }: VoiceDemoProps) {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -219,13 +224,8 @@ export default function VoiceDemo() {
   };
 
   const switchToTextMode = () => {
-    window.history.back();
-    setTimeout(() => {
-      const textButton = document.querySelector('input[type="text"]');
-      if (textButton) {
-        (textButton as HTMLElement).focus();
-      }
-    }, 100);
+    // Instead of window.history.back()
+    onClose({ preventDefault: () => {} } as React.MouseEvent);
     setSheetOpen(false);
   };
 
@@ -257,7 +257,7 @@ export default function VoiceDemo() {
           <p className="text-sm">Listening...</p>
         </div>
         <button 
-          onClick={() => window.history.back()}
+          onClick={onClose}
           className="p-2 ml-1"
           aria-label="Close voice assistant"
         >

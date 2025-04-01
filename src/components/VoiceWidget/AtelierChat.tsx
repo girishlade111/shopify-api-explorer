@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Headphones, Menu, Mic, RefreshCw, X } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -18,7 +19,11 @@ const STORE_URL = import.meta.env.VITE_STORE_URL || DEFAULT_STORE_URL;
 // Maximum number of connection retries
 const MAX_CONNECTION_RETRIES = 3;
 
-export default function AtelierChat() {
+interface AtelierChatProps {
+  onClose: (e: React.MouseEvent) => void;
+}
+
+export default function AtelierChat({ onClose }: AtelierChatProps) {
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('DISCONNECTED');
   const [error, setError] = useState<string | null>(null);
   const [instructions, setInstructions] = useState<string>("");
@@ -157,7 +162,8 @@ export default function AtelierChat() {
   };
 
   const switchToVoiceMode = () => {
-    window.history.back();
+    // Instead of window.history.back()
+    onClose({ preventDefault: () => {} } as React.MouseEvent);
     setTimeout(() => {
       const voiceButton = document.querySelector('.bg-[#33C3F0].rounded-full.p-3.mx-2');
       if (voiceButton) {
@@ -179,7 +185,7 @@ export default function AtelierChat() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 z-40 w-full md:w-[400px] h-[600px] bg-white rounded-t-xl md:rounded-xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -218,7 +224,7 @@ export default function AtelierChat() {
         </Sheet>
         <h2 className="text-xl font-semibold">Enzo AI</h2>
         <button 
-          onClick={() => window.history.back()}
+          onClick={onClose}
           className="p-2"
           aria-label="Close chat assistant"
         >

@@ -23,6 +23,11 @@ const VoiceWidget = () => {
     }
   }, [isOpen]);
 
+  const handleCloseWidget = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsOpen(false);
+  };
+
   return (
     <>
       {!isOpen && !isMinimized && (
@@ -110,7 +115,7 @@ const VoiceWidget = () => {
               </div>
             ) : (
               showChatView ? (
-                activeChatType === 'ai' ? <VoiceDemo /> : <AtelierChat />
+                activeChatType === 'ai' ? <VoiceDemo onClose={handleCloseWidget} /> : <AtelierChat onClose={handleCloseWidget} />
               ) : (
                 <div className="fixed bottom-6 left-6 z-40 w-[400px] h-[600px] bg-white rounded-[24px] shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
                   <div className="flex items-center justify-between p-4 border-b">
@@ -118,7 +123,7 @@ const VoiceWidget = () => {
                       <Menu className="w-6 h-6 text-gray-700" />
                     </button>
                     <h2 className="text-xl font-semibold">Enzo AI</h2>
-                    <button onClick={() => setIsOpen(false)} className="p-2">
+                    <button onClick={handleCloseWidget} className="p-2">
                       <X className="w-6 h-6 text-gray-700" />
                     </button>
                   </div>
