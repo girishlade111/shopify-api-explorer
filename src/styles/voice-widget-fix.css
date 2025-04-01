@@ -83,12 +83,66 @@ body {
   padding: 0.625rem !important;
 }
 
-/* Properly size and position the main chat area */
+/* Reduce bottom padding for the message container */
 .flex-1.overflow-y-auto.p-4.space-y-5.pb-16 {
-  padding-bottom: 60px !important;
-  height: auto !important;
-  flex: 1 !important;
-  overflow-y: auto !important;
+  padding-bottom: 2.5rem !important;
+}
+
+/* Lift the input area from the bottom */
+.absolute.bottom-2.left-0.right-0.p-3 {
+  padding: 0.5rem !important;
+  bottom: 10px !important;
+}
+
+/* Reduce input field horizontal padding */
+.relative.bg-gray-100.rounded-full.py-1.px-4,
+.relative.bg-gray-100.rounded-full.py-1.px-2 {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+/* Ensure text starts closer to the left edge but has adequate space on the right */
+input[placeholder="Type your message here..."],
+textarea[placeholder="Type your message here..."] {
+  padding-left: 0.5rem !important;
+  padding-right: 2rem !important;
+}
+
+/* Style the textarea to match the input field */
+.resize-none.min-h-\[40px\] {
+  line-height: 1.5 !important;
+}
+
+/* Remove default textarea styling */
+textarea {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding-right: 2rem !important;
+}
+
+/* Force all textareas to have sufficient padding */
+textarea, 
+textarea.pr-16, 
+textarea.pr-20,
+.w-full.bg-transparent {
+  padding-right: 2rem !important;
+}
+
+/* Additional styling to prevent text overflow */
+.relative .textarea-container {
+  padding-right: 2rem !important;
+  width: 100%;
+}
+
+/* Give the textarea proper spacing from the button */
+.w-full.bg-transparent {
+  margin-right: 1.5rem !important;
+}
+
+/* Ensure button doesn't overlap text */
+.absolute.right-2.top-1\/2.transform.-translate-y-1\/2 {
+  z-index: 10;
 }
 
 /* Fix for the chat widget container to ensure proper layout */
@@ -118,100 +172,21 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Fix the parent container of the chat content */
+/* Ensure proper spacing between header and content */
 .fixed.bottom-6.left-6.z-40 > div > .flex-1.overflow-hidden {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 400px !important;
+  padding-top: 0 !important;
+  height: calc(100% - 50px) !important;
   overflow: hidden !important;
+}
+
+/* Ensure transcript content area doesn't overflow */
+.flex-1.overflow-y-auto.p-4.space-y-5.pb-16 {
+  height: calc(100% - 60px) !important;
+  overflow-y: auto !important;
 }
 
 /* Ensure proper menu positioning */
 .fixed.bottom-6.left-6.z-40 .absolute.top-12 {
   top: 45px !important;
   z-index: 60 !important;
-}
-
-/* Fix the input box positioning - CRITICAL CHANGE */
-.absolute.bottom-0.left-0.right-0.p-3,
-.absolute.bottom-2.left-0.right-0.p-3 {
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  padding: 8px !important;
-  background-color: white !important;
-  z-index: 40 !important;
-  border-top: 1px solid #f0f0f0 !important;
-  display: block !important; /* Ensure it's visible */
-}
-
-/* Make sure the text input is visible */
-.relative.bg-gray-100.rounded-full.py-1.px-4,
-.relative.bg-gray-100.rounded-full.py-1.px-2 {
-  display: flex !important;
-  padding: 6px 12px !important;
-  border-radius: 9999px !important;
-}
-
-/* Ensure text area is properly styled */
-.resize-none.min-h-\[40px\] {
-  min-height: 40px !important;
-  max-height: 100px !important;
-}
-
-/* Remove default textarea styling */
-textarea {
-  border: none !important;
-  outline: none !important;
-  background: transparent !important;
-  padding-right: 2rem !important;
-}
-
-/* Force all textareas to have sufficient padding */
-textarea, 
-textarea.pr-16, 
-textarea.pr-20,
-.w-full.bg-transparent {
-  padding-right: 2rem !important;
-}
-
-/* Give the textarea proper spacing from the button */
-.w-full.bg-transparent {
-  margin-right: 1.5rem !important;
-}
-
-/* Ensure button doesn't overlap text */
-.absolute.right-2.top-1\/2.transform.-translate-y-1\/2 {
-  z-index: 10;
-}
-
-/* Fix chat container layout - CRITICAL FIX */
-.fixed.bottom-6.left-6.z-40 .bg-white.rounded-\[24px\] {
-  height: 500px !important;
-  max-height: 80vh !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important; /* Ensure content doesn't overflow */
-}
-
-/* New! Ensure the main transcript container has proper layout */
-.flex.flex-col.w-full.h-full.relative {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100% !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-/* New! Make chat input always visible */
-.absolute.bottom-0.left-0.right-0.p-3 {
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-}
-
-/* Make sure AtelierChat box displays properly */
-.fixed.bottom-6.left-6.z-40 .bg-white.rounded-\[24px\] {
-  height: 500px !important;
 }
