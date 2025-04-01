@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -86,28 +87,31 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     console.log(`Attempting to fetch session data from: ${urlWithTimestamp} (Attempt ${apiRetries + 1}/${MAX_API_RETRIES})`);
     
     try {
-      const response = await fetch(urlWithTimestamp, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        },
-        signal,
-        // Increase timeout by using a longer fetch promise
-        timeout: 10000 // Not actually used by fetch but useful for type checking
-      });
+      // Create a promise that rejects after a timeout
+      const fetchWithTimeout = async () => {
+        const response = await fetch(urlWithTimestamp, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          },
+          signal,
+        });
+        
+        if (!response.ok) {
+          const responseText = await response.text();
+          console.error(`API error (${response.status}): ${responseText}`);
+          throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
+        }
+        
+        return await response.json();
+      };
       
-      if (!response.ok) {
-        const responseText = await response.text();
-        console.error(`API error (${response.status}): ${responseText}`);
-        throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
-      }
-      
-      return await response.json();
+      return await fetchWithTimeout();
     } catch (error) {
       if (!isMountedRef.current) return null;
       
