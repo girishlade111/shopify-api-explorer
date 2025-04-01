@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Mic, Headphones, RefreshCw } from 'lucide-react';
 import { TranscriptProvider } from './contexts/TranscriptContext';
@@ -34,6 +35,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
+  const isMountedRef = useRef(true); // Add a ref to track component mount state
 
   useEffect(() => {
     const audioEl = new Audio();
@@ -44,12 +46,14 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     connectToService();
     
     return () => {
+      isMountedRef.current = false; // Set to false on unmount
       cleanupResources();
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
       }
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
     };
   }, []);
@@ -75,11 +79,14 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     setSessionStatus('CONNECTING');
     setError(null);
     
+    // Cancel any existing abort controller
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     
+    // Create a new abort controller for this request
     abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
     
     if (connectionTimeoutRef.current) {
       clearTimeout(connectionTimeoutRef.current);
@@ -88,9 +95,12 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
     let timeoutTriggered = false;
     connectionTimeoutRef.current = setTimeout(() => {
       timeoutTriggered = true;
-      if (abortControllerRef.current) {
+      if (isMountedRef.current && abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      
+      if (!isMountedRef.current) return;
+      
       setError('Connection timed out. Please try again.');
       setSessionStatus('DISCONNECTED');
       
@@ -99,7 +109,9 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
         console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
         setTimeout(() => {
-          connectToService();
+          if (isMountedRef.current) {
+            connectToService();
+          }
         }, 2000);
       } else {
         console.error(`Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`);
@@ -114,8 +126,10 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        signal: abortControllerRef.current.signal
+        signal
       });
+
+      if (!isMountedRef.current) return; // Check if component is still mounted
 
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
@@ -148,6 +162,12 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         false
       );
 
+      if (!isMountedRef.current) {
+        // Clean up if component unmounted during connection
+        cleanupConnection(pc);
+        return;
+      }
+
       pcRef.current = pc;
       dcRef.current = dc;
       setInstructions(sessionInstructions || "");
@@ -158,6 +178,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       console.log("Chat session established successfully.");
       
     } catch (error) {
+      if (!isMountedRef.current) return; // Check if component is still mounted
+      
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
         connectionTimeoutRef.current = null;
@@ -167,7 +189,13 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         return;
       }
     
-      console.error('Error connecting:', error);
+      // Only log this if it's not an AbortError or if it is but the component is still mounted
+      if (!(error instanceof DOMException && error.name === 'AbortError') || isMountedRef.current) {
+        console.error('Error connecting:', error);
+      }
+      
+      if (!isMountedRef.current) return;
+      
       cleanupResources();
       
       const errorMessage = error instanceof Error
@@ -182,7 +210,9 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
         console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
         setTimeout(() => {
-          connectToService();
+          if (isMountedRef.current) {
+            connectToService();
+          }
         }, 2000);
       } else {
         console.error(`Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`);
@@ -231,7 +261,7 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 w-[320px] h-[500px] bg-white rounded-[20px] shadow-none transition-all duration-300 overflow-hidden flex flex-col">
+    <div className="fixed bottom-6 left-6 z-40 w-[320px] h-[440px] bg-white rounded-[20px] shadow-none transition-all duration-300 overflow-hidden flex flex-col">
       <div className="flex items-center justify-between p-3 relative">
         <button 
           onClick={() => setMenuOpen(!menuOpen)} 
