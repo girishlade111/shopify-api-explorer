@@ -96,39 +96,38 @@ export async function createRealtimeConnection(
 
   let stream: MediaStream | null = null;
   try {
-    // Only request microphone access if not skipping audio stream
-    if (!skipAudioStream) {
-      // Request microphone access with specific constraints for better quality
-      stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          channelCount: 1,
-          sampleRate: 48000,
-          sampleSize: 16
-        }
-      });
-
-      // Add all audio tracks from the stream
-      stream.getAudioTracks().forEach(track => {
-        pc.addTrack(track, stream!);
-      });
-    }
-  } catch (err) {
-    // Only throw errors related to microphone if we're not skipping audio stream
-    if (!skipAudioStream) {
-      if (err instanceof Error) {
-        if (err.name === "NotAllowedError") {
-          throw new Error("Microphone access was denied. Please allow microphone access in your browser settings and try again.");
-        } else if (err.name === "NotFoundError") {
-          throw new Error("No microphone found. Please connect a microphone and try again.");
-        } else if (err.name === "NotReadableError") {
-          throw new Error("Your microphone is busy or not responding. Please check your microphone connection and try again.");
-        }
+    // Always request microphone access, even for text-only mode
+    // This is needed because OpenAI's realtime API requires an audio track
+    stream = await navigator.mediaDevices.getUserMedia({ 
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1,
+        sampleRate: 48000,
+        sampleSize: 16
       }
-      throw new Error("Failed to access microphone. Please check your microphone settings and try again.");
+    });
+
+    // Add all audio tracks from the stream
+    stream.getAudioTracks().forEach(track => {
+      // If skipAudioStream is true, mute the track but still add it
+      if (skipAudioStream) {
+        track.enabled = false;
+      }
+      pc.addTrack(track, stream!);
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      if (err.name === "NotAllowedError") {
+        throw new Error("Microphone access was denied. Please allow microphone access in your browser settings and try again.");
+      } else if (err.name === "NotFoundError") {
+        throw new Error("No microphone found. Please connect a microphone and try again.");
+      } else if (err.name === "NotReadableError") {
+        throw new Error("Your microphone is busy or not responding. Please check your microphone connection and try again.");
+      }
     }
+    throw new Error("Failed to access microphone. Please check your microphone settings and try again.");
   }
 
   // Create data channel with more reliable options
@@ -161,6 +160,11 @@ export async function createRealtimeConnection(
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
+      
+      // Log the error details for debugging
+      const errorText = await sdpResponse.text();
+      console.error("SDP Response Error:", sdpResponse.status, errorText);
+      
       throw new Error(`Failed to establish connection: ${sdpResponse.status} ${sdpResponse.statusText}`);
     }
 
@@ -177,6 +181,7 @@ export async function createRealtimeConnection(
       stream.getTracks().forEach(track => track.stop());
     }
     cleanupConnection(pc);
+    console.error("WebRTC connection error:", err);
     throw new Error("Failed to establish connection. Please check your internet connection and try again.");
   }
 

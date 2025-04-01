@@ -34,7 +34,6 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
-  const isInitialConnectionRef = useRef<boolean>(true);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -42,6 +41,12 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Create audio element for handling audio output
+    const audioEl = new Audio();
+    audioEl.autoplay = true;
+    audioEl.muted = true; // Start muted for text chat
+    audioElementRef.current = audioEl;
+    
     connectToService();
     
     return () => {
@@ -93,11 +98,30 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       clearTimeout(connectionTimeoutRef.current);
     }
     
+    let timeoutTriggered = false;
     connectionTimeoutRef.current = setTimeout(() => {
+      timeoutTriggered = true;
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      throw new Error('Connection timed out. Please try again.');
+      setError('Connection timed out. Please try again.');
+      setSessionStatus('DISCONNECTED');
+      
+      // Increment retry counter
+      setConnectionRetries(prev => prev + 1);
+      
+      if (connectionRetries < MAX_CONNECTION_RETRIES - 1) {
+        console.log(`Retrying connection (attempt ${connectionRetries + 1}/${MAX_CONNECTION_RETRIES})...`);
+        setTimeout(() => {
+          connectToService();
+        }, 2000);
+      } else {
+        toast({
+          title: "Connection Failed",
+          description: `Failed to connect after ${MAX_CONNECTION_RETRIES} attempts. Please try again later.`,
+          variant: "destructive"
+        });
+      }
     }, CONNECTION_TIMEOUT_MS);
 
     try {
@@ -118,6 +142,10 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
         connectionTimeoutRef.current = null;
       }
 
+      if (timeoutTriggered) {
+        return; // Timeout already triggered, abort further processing
+      }
+
       if (!response.ok) {
         throw new Error(`Failed to get session data: ${response.status} ${response.statusText}`);
       }
@@ -136,8 +164,8 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       const { pc, dc } = await createRealtimeConnection(
         clientSecret,
         audioElementRef,
-        false,
-        true // Skip audio stream since this is text chat
+        false, // Audio not enabled
+        false  // Don't skip audio stream - we need it for the API
       );
 
       pcRef.current = pc;
@@ -157,6 +185,10 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current);
         connectionTimeoutRef.current = null;
+      }
+    
+      if (timeoutTriggered) {
+        return; // Timeout already triggered, abort further processing
       }
     
       console.error('Error connecting:', error);
