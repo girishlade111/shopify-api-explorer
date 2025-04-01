@@ -309,31 +309,4 @@ export default function AtelierChat({ onClose }: AtelierChatProps) {
       </TranscriptProvider>
     </div>
   );
-
-  function switchToVoiceMode() {
-    onClose({ preventDefault: () => {} } as React.MouseEvent);
-    // Directly activate the voice mode without going through the selection screen
-    setTimeout(() => {
-      const voiceModeButton = document.getElementById('voice-mode-button');
-      if (voiceModeButton) {
-        voiceModeButton.click();
-      } else {
-        // If button can't be found, try an alternative approach
-        const event = new CustomEvent('activateVoiceMode');
-        document.dispatchEvent(event);
-      }
-    }, 100);
-    setMenuOpen(false);
-  }
-
-  function speakToHuman() {
-    console.log("Speak to human functionality would be implemented here");
-    setMenuOpen(false);
-  }
-
-  function resetChat() {
-    cleanupResources();
-    connectToService();
-    setMenuOpen(false);
-  }
 }
