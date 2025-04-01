@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import * as TextChatConnection from './TextChatConnection';
 import { Button } from '../ui/button';
@@ -199,8 +200,8 @@ export const TextChatComponent: React.FC = () => {
           </div>
         </div>
       ) : (
-        <ScrollArea className="flex-1 p-4 pb-24">
-          <div className="space-y-4">
+        <ScrollArea className="flex-1 py-2">
+          <div className="space-y-4 px-4">
             {messages.map((message) => (
               <div 
                 key={message.id}
@@ -228,7 +229,7 @@ export const TextChatComponent: React.FC = () => {
       )}
       
       {isConnected && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 pb-6">
+        <div className="px-4 py-4 pb-6 mt-auto">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
