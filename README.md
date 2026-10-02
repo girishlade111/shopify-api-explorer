@@ -1,69 +1,72 @@
-# Welcome to your Lovable project
+# Shopify API Explorer
 
-## Project info
+A client-side web app for exploring and interacting with the Shopify Storefront / Admin APIs. Browse endpoints, build and run requests against a store, inspect responses, and experiment with voice-driven interaction via the built-in voice widget.
 
-**URL**: https://lovable.dev/projects/75cd61a4-79b2-4f84-974a-1627695f466a
+## Features
 
-## How can I edit this code?
+- **API explorer UI** — browse Shopify API resources and compose requests with an interactive form-driven interface
+- **Live request/response view** — send requests to a configured store URL and inspect formatted JSON responses
+- **Voice widget** — talk to the demo assistant (Atelier chat / voice demo) powered by a configurable backend URL
+- **Charts & data views** — visualize API results with charts (recharts)
+- **Modern UI** — Radix UI primitives, shadcn-style components, Tailwind CSS, dark/light theming
+- **100% client-side** — no backend required; API base URLs are configured via environment variables with sensible defaults
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- React 18 + TypeScript + Vite 5
+- Tailwind CSS + Radix UI + shadcn/ui components
+- React Router, React Query, React Hook Form, Zod
+- Recharts for visualizations
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/75cd61a4-79b2-4f84-974a-1627695f466a) and start prompting.
+## Quick Start
 
-Changes made via Lovable will be committed automatically to this repo.
+```bash
+# install dependencies
+npm install
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# start the dev server
 npm run dev
+
+# production build
+npm run build   # outputs to dist/
 ```
 
-**Edit a file directly in GitHub**
+## Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Optional environment variables (all have defaults, so the app runs without them):
 
-**Use GitHub Codespaces**
+| Variable | Description |
+| --- | --- |
+| `VITE_NGROK_URL` | Backend URL used by the voice widget |
+| `VITE_STORE_URL` | Default Shopify store URL |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Create a `.env` file in the project root, e.g.:
 
-## What technologies are used for this project?
+```env
+VITE_STORE_URL=https://your-store.myshopify.com
+VITE_NGROK_URL=https://your-backend.example.com
+```
 
-This project is built with .
+## Project Structure
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+├── index.html            # entry HTML
+├── src/
+│   ├── main.tsx          # app entry
+│   ├── App.tsx           # routes + providers
+│   ├── pages/            # page components
+│   ├── components/       # UI components incl. VoiceWidget/
+│   ├── hooks/            # shared React hooks
+│   ├── lib/              # utilities
+│   └── styles/           # global styles
+├── public/               # static assets
+└── vite.config.ts        # Vite config
+```
 
-## How can I deploy this project?
+## Deploy Notes
 
-Simply open [Lovable](https://lovable.dev/projects/75cd61a4-79b2-4f84-974a-1627695f466a) and click on Share -> Publish.
+Static build — the production `dist/` output can be hosted on any static host (Cloudflare Pages, Netlify, GitHub Pages).
 
-## I want to use a custom domain - is that possible?
+## Credit
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+Built by Girish Lade — https://ladestack.in
